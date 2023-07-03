@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit'
-import dark_mode from './features/counterSlice'
+import hooks from './features/counterSlice'
 export const store = configureStore({
   reducer: {
-    dark_mode
+    hooks
   },
 })
 

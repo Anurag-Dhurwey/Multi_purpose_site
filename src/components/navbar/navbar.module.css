@@ -1,45 +1,74 @@
-.nav{
-
-    background: rgba(0, 255, 255, 0.507);
-    padding: 6px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.nav {
+  background: rgba(0, 255, 255, 0.507);
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.nav ul{
-   
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        column-gap: 20px;
-        font-weight: bold;
-    
+.nav ul {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 20px;
+  font-weight: bold;
 }
 
-.nav ul li{
-    text-transform: uppercase;
+.nav ul li {
+  text-transform: uppercase;
 }
 
-
-.right{
-    padding: 6px 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    column-gap: 20px;
+.right {
+  padding: 6px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 20px;
 }
 
-.right ul{
-   
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    column-gap: 20px;
-    font-weight: bold;
-
+.right ul {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  column-gap: 20px;
+  font-weight: bold;
 }
 
-.right ul li{
-text-transform: uppercase;
+.right ul li {
+  text-transform: uppercase;
+}
+/* h-8 w-8 rounded-full bg-blue-700 */
+.profile_icon {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 100%;
+  background-color: rgba(24, 24, 202, 0.692);
+  position: relative;
+  display: inline-block;
+}
+.dropdown_content {
+  padding: 0.5rem;
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: fit-content;
+  overflow: auto;
+  border-radius: 10%;
+  background: rgb(0, 255, 255);
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+}
+.dropdown_content button {
+  padding: 0.2rem 0.3rem;
+  border-radius: 10%;
+}
+.profile_icon:hover .dropdown_content {
+  display: block;
+}
+
+.dropdown_content button:hover {
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  background-color: aliceblue;
+  color: aqua;
+  font-weight: bold;
 }

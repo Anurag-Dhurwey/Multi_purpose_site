@@ -3,11 +3,12 @@ import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
 
 export interface CounterState {
-    value: boolean
+    darkmode: boolean,
+    media_Items:Array<T>
   }
-  
   const initialState: CounterState = {
-    value: false,
+    darkmode: false,
+    media_Items:[]
   }
 
 
@@ -15,11 +16,12 @@ export interface CounterState {
     name: 'counter',
     initialState,
     reducers: {
-      dark_mode:(state)=>{state.value=!state.value}
+      toggle_dark_mode:(state)=>{state.darkmode=!state.darkmode},
+      set_media_items:(state,action)=>{state.media_Items=[...action.payload]}
     },
   })
   
   // Action creators are generated for each case reducer function
-  export const { dark_mode } = counterSlice.actions
+  export const { toggle_dark_mode,set_media_items } = counterSlice.actions
   
   export default counterSlice.reducer

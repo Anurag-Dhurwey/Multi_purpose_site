@@ -3,11 +3,11 @@ import React from "react";
 import { signIn, signOut } from "next-auth/react";
 import style from "./navbar.module.css";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 const Navbar = () => {
   const nav = ["home", "discover", "about", "post", "search"];
   const { data: session } = useSession();
 
-  console.log(session)
 
   return (
     <div className={style.nav}>
@@ -18,13 +18,31 @@ const Navbar = () => {
         })}
       </ul>
       <div className={style.right}>
-        <ul>
-          <li onClick={()=>signIn()}>Login</li>
-        </ul>
-        <ul>
-          <li onClick={()=>signOut()}>Logout</li>
-        </ul>
-        <div className="h-8 w-8 rounded-full bg-blue-700"></div>
+        {!session && (
+          <ul>
+            <li onClick={() => signIn()}>
+              {" "}
+              <button>Login</button>{" "}
+            </li>
+          </ul>
+        )}
+        <button onClick={() => {}} className={style.profile_icon}>
+          <div className={style.dropdown_content}>
+            {session && (
+              <>
+                <button>
+                  <Link href={"/profile"}>Profile</Link>
+                </button>
+                <button onClick={() => signOut()}>Logout</button>
+              </>
+            )}
+            {!session && (
+              <>
+                <button onClick={() => signIn()}>Login</button>
+              </>
+            )}
+          </div>
+        </button>
       </div>
     </div>
   );
