@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect } from "react";
-import { buildFileUrl } from "@sanity/asset-utils";
 import { getFileAsset } from "@sanity/asset-utils";
 import { useAppDispatch, useAppSelector } from "../../redux_toolkit/hooks";
 import { RootState } from "@/redux_toolkit/store";
@@ -10,7 +9,6 @@ import {
   set_media_items,
 } from "../../redux_toolkit/features/counterSlice";
 import Image from "next/image";
-
 const Home = () => {
   const scrrenMode = useAppSelector((state: RootState) => state.hooks.darkmode);
   const all_Media_content = useAppSelector(
@@ -24,7 +22,6 @@ const Home = () => {
     dispatch(set_media_items(media));
     return media;
   };
-  console.log(all_Media_content);
 
   useEffect(() => {
     usersList();
@@ -36,12 +33,21 @@ const Home = () => {
       <div className="w-[60%] h-screen bg-green-600">
         {all_Media_content.map((item, i) => {
           const { caption, desc, meadiaFile, postedBy } = item;
-          // console.log(buildFileUrl(meadiaFile))
-          console.log(getFileAsset(meadiaFile.asset,{projectId: '8u4ze61m', dataset:'production'}))
-
+          const url = getFileAsset(meadiaFile.asset, { projectId: "8u4ze61m", dataset: "production",}).url;
+          const meadiaType=`${url.substring(url.lastIndexOf(".") + 1)}`
           return (
             <div key={i}>
-              <video controls src={getFileAsset(meadiaFile.asset,{projectId: '8u4ze61m', dataset:'production'}).url}/>
+              {
+                ['webm','mp4','avi','ogg'].includes(meadiaType) && (
+                  <video controls src={url}/>
+                )
+              }
+
+              {
+                ['jpeg' , 'jpg','png'].includes(meadiaType) && (
+                  <Image src={url} alt="post" width={1000} height={1000} />
+                )
+              }
             </div>
           );
         })}
