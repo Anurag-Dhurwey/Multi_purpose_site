@@ -26,7 +26,7 @@ const Navbar = () => {
             </li>
           </ul>
         )}
-        <button onClick={() => {}} className={style.profile_icon}>
+        <div onClick={() => {}} className={style.profile_icon}>
           <div className={style.dropdown_content}>
             {session && (
               <>
@@ -42,7 +42,9 @@ const Navbar = () => {
               </>
             )}
           </div>
-        </button>
+
+
+        </div>
       </div>
     </div>
   );
