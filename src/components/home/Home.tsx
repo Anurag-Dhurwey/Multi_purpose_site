@@ -10,16 +10,18 @@ import {
 } from "../../redux_toolkit/features/counterSlice";
 import Image from "next/image";
 import Comment from "../comment/Comment";
+import { useSession } from "next-auth/react";
 const Home = () => {
   const scrrenMode = useAppSelector((state: RootState) => state.hooks.darkmode);
+  const { data: session } = useSession();
   const all_Media_content = useAppSelector(
     (state: RootState) => state.hooks.media_Items
   );
   const dispatch = useAppDispatch();
 
-  const usersList = async () => {
+  const postedMeadia = async () => {
     const media = await client.fetch(
-      `*[_type == "post"]{_id,caption,desc,meadiaFile,postedBy->,tag,comments[]{comment,postedBy->}}`
+      `*[_type == "post" && postedBy->email=="anuragdhurwey9211@gmail.com"]{_id,caption,desc,meadiaFile,postedBy->,tag,comments[]{comment,postedBy->}}`
     );
     // console.log(media)
     dispatch(set_media_items(media));
@@ -28,19 +30,19 @@ const Home = () => {
 
   useEffect(() => {
     if (!all_Media_content?.length) {
-      usersList();
+      postedMeadia();
     }
   }, []);
 
   return (
     <div className="w-full flex justify-center items-center">
-      <div className="w-[15%] h-screen bg-slate-600"></div>
+      {/* <div className="w-[15%] h-screen bg-slate-600"></div> */}
       <div className="w-[80%] h-screen ">
         {all_Media_content.map((item, i) => {
           const { caption, desc, meadiaFile, postedBy, comments } = item;
-          const { userName } = postedBy;
+          const { name:user } = postedBy;
           const url = getFileAsset(meadiaFile.asset, {
-            projectId: "8u4ze61m",
+            projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
             dataset: "production",
           }).url;
           const meadiaType = `${url.substring(url.lastIndexOf(".") + 1)}`;
@@ -72,7 +74,7 @@ const Home = () => {
                 comments={comments}
                 caption={caption}
                 desc={desc}
-                userName={userName}
+                user={user}
               />
             </div>
           );
