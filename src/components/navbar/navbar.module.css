@@ -44,7 +44,10 @@
   border-radius: 100%;
   background-color: rgba(24, 24, 202, 0.692);
   position: relative;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* overflow: hidden; */
 }
 .dropdown_content {
   padding: 0.5rem;

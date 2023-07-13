@@ -8,25 +8,25 @@ const Navbar = () => {
   const nav = ["home", "discover", "about", "post", "search"];
   const { data: session } = useSession();
 
-
   return (
     <div className={style.nav}>
-      <h2>LOGO</h2>
+      <Link href={'/'}>
+      <button>LOGO</button>
+      </Link>
       <ul>
         {nav.map((nav, i) => {
           return <li key={i}>{nav}</li>;
         })}
       </ul>
       <div className={style.right}>
-        {!session && (
-          <ul>
-            <li onClick={() => signIn()}>
-              {" "}
-              <button>Login</button>{" "}
-            </li>
-          </ul>
+        {!session && <button onClick={() => signIn()}>Login</button>}
+        {session && (
+          <Link href={'/upload'}>
+            <button>Upload</button>
+          </Link>
         )}
         <div onClick={() => {}} className={style.profile_icon}>
+            <span className=" font-extrabold text-2xl text-yellow-700">{session?.user?.name?.slice(0,1)}</span>
           <div className={style.dropdown_content}>
             {session && (
               <>
@@ -42,8 +42,6 @@ const Navbar = () => {
               </>
             )}
           </div>
-
-
         </div>
       </div>
     </div>

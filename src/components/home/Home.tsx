@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import Comment from "../comment/Comment";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 const Home = () => {
   const scrrenMode = useAppSelector((state: RootState) => state.hooks.darkmode);
   const { data: session } = useSession();
@@ -21,10 +22,10 @@ const Home = () => {
 
   const postedMeadia = async () => {
     const media = await client.fetch(
-      `*[_type == "post" && postedBy->email=="anuragdhurwey9211@gmail.com"]{_id,caption,desc,meadiaFile,postedBy->,tag,comments[]{comment,postedBy->}}`
+      `*[_type == "post"]{_id,caption,desc,meadiaFile,postedBy->,tag,comments[]{comment,postedBy->}}`
     );
-    // console.log(media)
     dispatch(set_media_items(media));
+    console.log(media)
     return media;
   };
 
@@ -50,11 +51,12 @@ const Home = () => {
           return (
             <div
               key={i}
-              className="w-full py-2 flex justify-evenly items-start bg-green-600"
+              className="w-full py-2 flex justify-evenly items-start bg-green-600 rounded-xl"
             >
-              <div className="w-[65%] h-[395px] overflow-hidden flex justify-center items-center">
+              <div className="w-[65%] h-[395px] overflow-hidden flex justify-start items-center">
+                <Link href={''} className=" self-start">
                 {["webm", "mp4", "avi", "ogg"].includes(meadiaType) && (
-                  <video controls src={url} className=" max-h-[395px]" />
+                  <video controls src={url} className=" max-h-[395px] rounded-md" />
                 )}
 
                 {["jpeg", "jpg", "png"].includes(meadiaType) && (
@@ -63,9 +65,10 @@ const Home = () => {
                     alt="post"
                     width={1000}
                     height={1000}
-                    className="max-h-[395px]"
+                    className="max-h-[395px] rounded-md"
                   />
                 )}
+                </Link>
               </div>
 
               {/* in this Comment component all the information of media file is available */}

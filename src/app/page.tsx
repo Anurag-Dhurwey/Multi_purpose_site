@@ -1,9 +1,8 @@
-import { Home, Navbar } from "@/components";
+import { Home } from "@/components";
 
 export default function Assemble() {
   return (
     <>
-    <Navbar/>
     <Home/>
     </>
   )
