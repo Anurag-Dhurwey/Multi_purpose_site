@@ -2,13 +2,14 @@
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { client } from "@/lib/sanityClient";
-import { setUser } from "@/redux_toolkit/features/counterSlice";
+import { setUser, set_my_uploads } from "@/redux_toolkit/features/counterSlice";
 import { useDispatch } from "react-redux";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import Image from "next/image";
 const page = () => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
+
   const getUserInfo = async () => {
     const userData = await client.fetch(
       `*[_type=="user" && email=="${session?.user?.email}"]`
@@ -18,13 +19,20 @@ const page = () => {
 
   const user = useAppSelector((state) => state.hooks.user);
   const { name, email, image, _id } = user;
+  const all_Media_content = useAppSelector((state) => state.hooks.media_Items);
+  const my_uploads = useAppSelector((state) => state.hooks.my_uploads);
+
   useEffect(() => {
-    if (!user.email || !user.name || !user.image) {
-      if (session) {
+    if (session) {
+      if (!user.email || !user.name || !user.image) {
         getUserInfo();
-      } else {
-        alert("session not found login again");
       }
+
+      if (!my_uploads.length) {
+        dispatch(set_my_uploads({all_posts:all_Media_content,email}));
+      }
+    } else {
+      alert("session not found login again");
     }
   }, [session]);
 
@@ -37,6 +45,7 @@ const page = () => {
       </>
     );
   }
+  console.log(my_uploads)
 
   return (
     <div className="w-full flex justify-center items-start">
