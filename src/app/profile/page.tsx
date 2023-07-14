@@ -19,7 +19,7 @@ const page = () => {
   const user = useAppSelector((state) => state.hooks.user);
   const { name, email, image, _id } = user;
   useEffect(() => {
-    if (!user) {
+    if (!user.email || !user.name || !user.image) {
       if (session) {
         getUserInfo();
       } else {
@@ -27,6 +27,7 @@ const page = () => {
       }
     }
   }, [session]);
+
   if (!session) {
     return (
       <>
@@ -36,16 +37,19 @@ const page = () => {
       </>
     );
   }
+
   return (
     <div className="w-full flex justify-center items-start">
       <div className="flex justify-between items-center">
-        <Image
-          src={image}
-          width={1000}
-          height={1000}
-          alt="profile"
-          className="w-[150px] h-[150px] rounded-full overflow-hidden"
-        />
+        {user.image && (
+          <Image
+            src={image}
+            width={1000}
+            height={1000}
+            alt="profile"
+            className="w-[150px] h-[150px] rounded-full overflow-hidden"
+          />
+        )}
         <div className="flex-1">
           <h4>
             Name : <span>{name}</span>

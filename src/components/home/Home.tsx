@@ -53,7 +53,7 @@ const Home = () => {
               key={i}
               className="w-full py-2 flex justify-evenly items-start bg-green-600 rounded-xl"
             >
-              <div className="w-[65%] h-[395px] overflow-hidden flex justify-start items-center">
+              <div className="w-[65%] h-[395px] overflow-hidden flex justify-center items-center">
                 <Link href={''} className=" self-start">
                 {["webm", "mp4", "avi", "ogg"].includes(meadiaType) && (
                   <video controls src={url} className=" max-h-[395px] rounded-md" />
@@ -65,7 +65,7 @@ const Home = () => {
                     alt="post"
                     width={1000}
                     height={1000}
-                    className="max-h-[395px] rounded-md"
+                    className="max-h-[395px] w-auto rounded-md"
                   />
                 )}
                 </Link>
@@ -77,7 +77,7 @@ const Home = () => {
                 comments={comments}
                 caption={caption}
                 desc={desc}
-                user={user}
+                user={user?user:'Unknown'}
               />
             </div>
           );

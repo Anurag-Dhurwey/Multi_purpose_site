@@ -1,24 +1,37 @@
 import { client } from "@/lib/sanityClient";
 import { NextResponse } from "next/server";
-import { uploadForm } from "@/typeScript/basics";
-import { basename } from "path";
-import { createReadStream } from "fs";
+import { uploadForm, user } from "@/typeScript/basics";
 
-interface reqBody extends uploadForm {
-  _id:string
+interface Body {
+  jsonRes: object;
+  user: user;
+  form: uploadForm;
 }
 
 export async function POST(req: Request) {
   try {
-    const body:reqBody = await req.json();
-   const { caption, desc, file,fileList, _id ,fileData}=body
-    // const meadiaAsset = await client.assets.upload("image", meadia_file, {
-    //   contentType: meadia_file.type,
-    //   filename: meadia_file.name,
-    // });
-    console.log(fileData)
+    const body = await req.json();
+    const { jsonRes, user, form }: Body = body;
+    const doc = {
+      _type: "post",
+      meadiaFile: {
+        _type: "file",
+        asset: {
+          _type: "reference",
+          _ref: jsonRes._id,
+        },
+      },
+      postedBy: {
+        _type: "reference",
+        _ref: user._id,
+      },
+      caption: form.caption,
+      desc: form.desc,
+      tag: "",
+    };
+    const res = await client.create(doc);
 
-    return NextResponse.json(fileData);
+    return NextResponse.json(res);
   } catch (error) {
     console.error(error);
     // return NextResponse.json(error);

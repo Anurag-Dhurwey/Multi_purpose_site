@@ -7,7 +7,6 @@ import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { setUser } from "@/redux_toolkit/features/counterSlice";
 import { client } from "@/lib/sanityClient";
 import { useSession } from "next-auth/react";
-
 const page = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.hooks.user);
@@ -31,9 +30,13 @@ const page = () => {
           `*[_type=="user" && email=="${session?.user?.email}"]{_id}`
         );
         dispatch(setUser({ ...user, _id: id[0]._id }));
+        return { ...user, _id: id[0]._id };
       } catch (error) {
         console.error(error);
+        alert(`Unable to find Profile ID => ${error.message} `)
       }
+    } else {
+      return user;
     }
   };
 
@@ -48,12 +51,12 @@ const page = () => {
     }
   };
 
-  const onSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isFileValid.length) {
       setModal(true);
-      getUserId();
-      uploadingData(file, form, user, setIsPosting);
+      const user_with_id = await getUserId();
+      uploadingData(file, form, user_with_id, setIsPosting);
     } else if (isFileValid.length) {
       alert(isFileValid[0].message);
     }
@@ -132,7 +135,7 @@ const page = () => {
 export default page;
 
 function checkFileSize(file: File, setIsFileValid: Function) {
-  const size: boolean = file.size <= 1000 * 1024*10;
+  const size: boolean = file.size <= 1000 * 1024 * 10;
   if (size) {
     setIsFileValid([]);
   } else if (!size) {
@@ -155,15 +158,27 @@ async function uploadingData(
       contentType: file.type,
       filename: file.name,
     });
-
+    console.log(jsonRes);
+    console.log(user);
     if (jsonRes) {
-      setIsPosting(false);
-      console.log(file);
-      console.log(form);
-      console.log(jsonRes);
+      try {
+        const postedData = await fetch("/api/upload", {
+          method: "POST",
+          body: JSON.stringify({ jsonRes, user, form }),
+        });
+        if (postedData) {
+          setIsPosting(false);
+          console.log(postedData);
+        }
+      } catch (error) {
+        setIsPosting(false);
+        console.error(error);
+        alert(`Unable to post => ${error.message} `)
+      }
     }
   } catch (error) {
     setIsPosting(false);
     console.error(error);
+    alert(`Unable to Upload => ${error.message} `)
   }
 }
