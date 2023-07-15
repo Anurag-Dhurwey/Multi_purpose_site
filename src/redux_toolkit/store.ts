@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import hooks from './features/counterSlice'
+import hooks from './features/indexSlice'
 export const store = configureStore({
   reducer: {
     hooks

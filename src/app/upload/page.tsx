@@ -4,7 +4,7 @@ import { user, uploadForm } from "@/typeScript/basics";
 import style from "./upload.module.css";
 import { Upload } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import { setUser } from "@/redux_toolkit/features/counterSlice";
+import { setUser } from "@/redux_toolkit/features/indexSlice";
 import { client } from "@/lib/sanityClient";
 import { useSession } from "next-auth/react";
 const page = () => {
