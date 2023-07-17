@@ -6,12 +6,9 @@ import React, { useState } from "react";
 import { IoMdSend } from "react-icons/io";
 import { client } from "@/lib/sanityClient";
 const CommentForm = ({ meadia_item }) => {
-
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.hooks.user);
-  const media_Items = useAppSelector(
-    (state) => state.hooks.media_Items
-  );
+  const media_Items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
   const [form, setForm] = useState<String>("");
   // the below get user function is repetitive it is also called in comment component and other all the function which need user with _id
@@ -42,11 +39,17 @@ const CommentForm = ({ meadia_item }) => {
       });
       const jsonRes = await res.json();
       if (jsonRes) {
-        const previousFilteredData=media_Items.filter((item)=>{
-          return item._id !== jsonRes._id
-        })
-        dispatch(set_media_items([...previousFilteredData,{...jsonRes}]));
-        console.log(jsonRes)
+        const updatedMeadia_Items = media_Items.map((item) => {
+          if (item._id == jsonRes._id) {
+            return { ...item,comments:[...jsonRes.comments] };
+          } else {
+            return item;
+          }
+        });
+
+        dispatch(set_media_items([...updatedMeadia_Items]));
+        setForm('')
+        console.log(jsonRes);
       }
     } catch (error) {
       console.error(error);
@@ -65,6 +68,8 @@ const CommentForm = ({ meadia_item }) => {
         className="mb-1 gap-x-1 w-full flex justify-center items-center"
       >
         <input
+          required
+          minLength={3}
           type="text"
           name="comment"
           id="comment"

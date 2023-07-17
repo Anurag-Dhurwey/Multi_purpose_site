@@ -2,10 +2,13 @@
 import React, { useState } from "react";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import CommentForm from "./miniComps/CommentForm";
-const Comment = ({ meadia_item,user }) => {
-  const { caption, desc, comments,_id } = meadia_item
+import { useSession } from "next-auth/react";
+const MetaData_with_Comment = ({ meadia_item, user }) => {
+  const { caption, desc, comments, _id } = meadia_item;
   const [cmtView, setCmtView] = useState(false);
   const [descView, setDescView] = useState(false);
+
+  const { data: session } = useSession();
 
   return (
     <div className={`w-[30%] h-[395px] overflow-hidden`}>
@@ -51,7 +54,7 @@ const Comment = ({ meadia_item,user }) => {
           <div className={`w-full px-3 py-0  `}>
             {comments?.map((cmnt, i) => {
               const { comment, postedBy: commentBy } = cmnt;
-              const { name: user } = commentBy;
+              // const { name: user } = commentBy;
               return (
                 <div
                   key={comment + i}
@@ -61,20 +64,27 @@ const Comment = ({ meadia_item,user }) => {
                 >
                   <span className="flex justify-center items-center">
                     <button className="w-4 h-4 bg-blue-600 rounded-full"></button>
-                    <p>{user}</p>
+                    <p>
+                      {commentBy.name ? commentBy.name : session?.user?.name}
+                    </p>
                   </span>
                   <p>{cmtView ? comment : comment.slice(0, 50) + "....."}</p>
                 </div>
               );
             })}
+            {!comments && (<p className="w-full text-center font-medium">No comments yet!</p>)}
           </div>
-         
-          <span className={`w-full ${cmtView?'pt-[80%]':''} flex flex-col items-center justify-center sticky bottom-0`}>
-          {cmtView && (
-            <div className="w-full ">
-              <CommentForm meadia_item={meadia_item}/>
-            </div>
-          )}
+
+          <span
+            className={`w-full ${
+              cmtView ? "pt-[80%]" : ""
+            } flex flex-col items-center justify-center sticky bottom-0`}
+          >
+            {cmtView && (
+              <div className="w-full ">
+                <CommentForm meadia_item={meadia_item} />
+              </div>
+            )}
             <button
               className="text-2xl font-semibold text-white"
               onClick={() => {
@@ -96,4 +106,4 @@ const Comment = ({ meadia_item,user }) => {
   );
 };
 
-export default Comment;
+export default MetaData_with_Comment;

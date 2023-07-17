@@ -7,7 +7,7 @@ import {
   toggle_dark_mode,
   set_media_items,
 } from "../../redux_toolkit/features/indexSlice";
-import Comment from "../comment/Comment";
+import Metadata_with_Comment from "../metadataOfMedia/MetaData";
 import { useSession } from "next-auth/react";
 import Media from "../media/Media";
 const Home = () => {
@@ -32,15 +32,14 @@ const Home = () => {
       getPostedMeadia();
     }
   }, []);
-
+  console.log(media_Items);
   return (
     <div className="w-full flex justify-center items-center">
       {/* <div className="w-[15%] h-screen bg-slate-600"></div> */}
       <div className="w-[80%] h-screen ">
         {media_Items.map((item, i) => {
-          const {  meadiaFile, postedBy } = item;
-          const { name: user } = postedBy;
-
+          const { meadiaFile, postedBy } = item;
+          // const { name: user } = postedBy;
           return (
             <div
               key={i}
@@ -54,9 +53,9 @@ const Home = () => {
 
               {/* in this Comment component all the information of media file is available */}
               {/* we will fix that later */}
-              <Comment
+              <Metadata_with_Comment
                 meadia_item={item}
-                user={user ? user : "Unknown"}
+                user={postedBy.name ? postedBy.name : "Unknown"}
               />
             </div>
           );
