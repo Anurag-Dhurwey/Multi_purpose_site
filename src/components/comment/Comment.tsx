@@ -7,9 +7,9 @@ const Comment = ({ comments, user, caption, desc }) => {
   const [descView, setDescView] = useState(false);
 
   return (
-    <div className={`w-[30%] h-[395px] relative  overflow-auto `}>
-      <div
-        className={`p-3 mb-1 bg-yellow-700 rounded-md `}
+    <div className={`w-[30%] h-[395px] overflow-hidden`}>
+     {!cmtView && ( <div
+        className={`p-3 mb-1 ${descView?'h-full':''} bg-yellow-700 rounded-md overflow-auto`}
         onClick={() => {
           setDescView(!descView);
           setCmtView(false);
@@ -29,13 +29,11 @@ const Comment = ({ comments, user, caption, desc }) => {
             {descView ? <MdExpandLess /> : <MdExpandMore />}
           </button>
         )}
-      </div>
+      </div>)}
 
-      <div className="w-full flex flex-col justify-center">
+     {!descView && ( <div className={`w-full ${cmtView?'h-full':''} rounded-md bg-yellow-700 flex flex-col justify-start overflow-auto`}>
         <div
-          className={`w-full ${
-            cmtView ? "h-full" : ""
-          } p-3 pt-0 bg-yellow-700 rounded-md `}
+          className={`w-full p-3 pt-0  `}
           onClick={() => {
             setCmtView(!cmtView);
             setDescView(false);
@@ -67,7 +65,7 @@ const Comment = ({ comments, user, caption, desc }) => {
                 )}
         </div>
         
-      </div>
+      </div>)}
       <div></div>
     </div>
   );
