@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import CommentForm from "./miniComps/CommentForm";
-const Comment = ({ comments, user, caption, desc }) => {
+const Comment = ({ meadia_item,user }) => {
+  const { caption, desc, comments,_id } = meadia_item
   const [cmtView, setCmtView] = useState(false);
   const [descView, setDescView] = useState(false);
 
@@ -23,7 +24,6 @@ const Comment = ({ comments, user, caption, desc }) => {
           </span>
           <h3>{descView ? caption : caption.slice(0, 30) + "....."}</h3>
           <p className={`text-sm ${descView ? "" : "hidden"}`}>{desc}</p>
-          {/* {descView && ( */}
           <span className="w-full flex justify-center sticky bottom-0">
             <button
               className="text-2xl font-semibold text-white"
@@ -39,7 +39,6 @@ const Comment = ({ comments, user, caption, desc }) => {
               )}
             </button>
           </span>
-          {/* )} */}
         </div>
       )}
 
@@ -73,7 +72,7 @@ const Comment = ({ comments, user, caption, desc }) => {
           <span className={`w-full ${cmtView?'pt-[80%]':''} flex flex-col items-center justify-center sticky bottom-0`}>
           {cmtView && (
             <div className="w-full ">
-              <CommentForm />
+              <CommentForm meadia_item={meadia_item}/>
             </div>
           )}
             <button

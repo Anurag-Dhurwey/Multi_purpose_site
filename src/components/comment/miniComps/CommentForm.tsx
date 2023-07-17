@@ -1,12 +1,57 @@
 "use client";
+import { useAppSelector, useAppDispatch } from "@/redux_toolkit/hooks";
+import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
+import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { IoMdSend } from "react-icons/io";
-const CommentForm = () => {
-  const [form, setForm] = useState<String>("");
+import { client } from "@/lib/sanityClient";
+const CommentForm = ({ meadia_item }) => {
 
-  const onHnandleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.hooks.user);
+  const media_Items = useAppSelector(
+    (state) => state.hooks.media_Items
+  );
+  const { data: session } = useSession();
+  const [form, setForm] = useState<String>("");
+  // the below get user function is repetitive it is also called in comment component and other all the function which need user with _id
+  const getUserId = async () => {
+    if (!user._id) {
+      try {
+        const id = await client.fetch(
+          `*[_type=="user" && email=="${session?.user?.email}"]{_id}`
+        );
+        dispatch(setUser({ ...user, _id: id[0]._id }));
+        return { ...user, _id: id[0]._id };
+      } catch (error) {
+        console.error(error);
+        alert(`Unable to find Profile ID => ${error.message} `);
+      }
+    } else {
+      return user;
+    }
+  };
+
+  const onHnandleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(e.target);
+    const user_with_id = await getUserId();
+    try {
+      const res = await fetch("/api/comment", {
+        method: "POST",
+        body: JSON.stringify({ form, meadia_item, user: user_with_id }),
+      });
+      const jsonRes = await res.json();
+      if (jsonRes) {
+        const previousFilteredData=media_Items.filter((item)=>{
+          return item._id !== jsonRes._id
+        })
+        dispatch(set_media_items([...previousFilteredData,{...jsonRes}]));
+        console.log(jsonRes)
+      }
+    } catch (error) {
+      console.error(error);
+      alert("comment not posted");
+    }
   };
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {

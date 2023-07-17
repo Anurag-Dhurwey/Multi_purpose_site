@@ -23,6 +23,7 @@ const page = () => {
     filePath: "",
   });
   const [file, setFile] = useState<File>();
+  // the below get user function is repetitive it is also called in comment component and other all the function which need user with _id 
   const getUserId = async () => {
     if (!user._id) {
       try {

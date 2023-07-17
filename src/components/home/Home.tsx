@@ -18,7 +18,7 @@ const Home = () => {
   );
   const dispatch = useAppDispatch();
 
-  const postedMeadia = async () => {
+  const getPostedMeadia = async () => {
     const media = await client.fetch(
       `*[_type == "post"]{_id,caption,desc,meadiaFile,postedBy->,tag,comments[]{comment,postedBy->}}`
     );
@@ -29,7 +29,7 @@ const Home = () => {
 
   useEffect(() => {
     if (!media_Items?.length) {
-      postedMeadia();
+      getPostedMeadia();
     }
   }, []);
 
@@ -38,7 +38,7 @@ const Home = () => {
       {/* <div className="w-[15%] h-screen bg-slate-600"></div> */}
       <div className="w-[80%] h-screen ">
         {media_Items.map((item, i) => {
-          const { caption, desc, meadiaFile, postedBy, comments } = item;
+          const {  meadiaFile, postedBy } = item;
           const { name: user } = postedBy;
 
           return (
@@ -55,9 +55,7 @@ const Home = () => {
               {/* in this Comment component all the information of media file is available */}
               {/* we will fix that later */}
               <Comment
-                comments={comments}
-                caption={caption}
-                desc={desc}
+                meadia_item={item}
                 user={user ? user : "Unknown"}
               />
             </div>
