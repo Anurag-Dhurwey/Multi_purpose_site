@@ -41,14 +41,14 @@ const CommentForm = ({ meadia_item }) => {
       if (jsonRes) {
         const updatedMeadia_Items = media_Items.map((item) => {
           if (item._id == jsonRes._id) {
-            return { ...item,comments:[...jsonRes.comments] };
+            return { ...item, comments: [...jsonRes.comments] };
           } else {
             return item;
           }
         });
 
         dispatch(set_media_items([...updatedMeadia_Items]));
-        setForm('')
+        setForm("");
         console.log(jsonRes);
       }
     } catch (error) {

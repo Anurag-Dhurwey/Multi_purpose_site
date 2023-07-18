@@ -72,7 +72,9 @@ const MetaData_with_Comment = ({ meadia_item, user }) => {
                 </div>
               );
             })}
-            {!comments && (<p className="w-full text-center font-medium">No comments yet!</p>)}
+            {!comments && (
+              <p className="w-full text-center font-medium">No comments yet!</p>
+            )}
           </div>
 
           <span
