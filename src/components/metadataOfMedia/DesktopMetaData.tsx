@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import style from "./metaData.module.css";
+import style from "./desktopMetaData.module.css";
 import TitleDesc from "./miniComps/TitleDesc";
 import CommentBox from "./miniComps/CommentBox";
-const MetaData_with_Comment = ({ meadia_item, user }) => {
+const DesktopMetaData = ({ meadia_item, user }) => {
   const { caption, desc, comments, _id } = meadia_item;
   const [cmtView, setCmtView] = useState(false);
   const [descView, setDescView] = useState(false);
@@ -25,4 +25,4 @@ const MetaData_with_Comment = ({ meadia_item, user }) => {
   );
 };
 
-export default MetaData_with_Comment;
+export default DesktopMetaData;

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import style from './home.module.css'
+import style from "./home.module.css";
 import { useAppDispatch, useAppSelector } from "../../redux_toolkit/hooks";
 import { RootState } from "@/redux_toolkit/store";
 import { client, urlFor } from "../../lib/sanityClient";
@@ -9,10 +9,12 @@ import {
   set_media_items,
   setUser,
 } from "../../redux_toolkit/features/indexSlice";
-import Metadata_with_Comment from "../metadataOfMedia/MetaData";
+import DesktopMetaData from "../metadataOfMedia/DesktopMetaData";
 import { useSession } from "next-auth/react";
 import Media from "../media/Media";
 import LikesButton from "../metadataOfMedia/miniComps/LikesButton";
+import TitleDesc from "../metadataOfMedia/miniComps/TitleDesc";
+import MobileViewMetaData from "../metadataOfMedia/MobileViewMetaData";
 const Home = () => {
   const scrrenMode = useAppSelector((state: RootState) => state.hooks.darkmode);
   const { data: session } = useSession();
@@ -54,23 +56,20 @@ const Home = () => {
           const { meadiaFile, postedBy } = item;
           // const { name: user } = postedBy;
           return (
-            <div
-              key={i}
-              className={style.itemsOuterDiv}
-            >
-              <div
-                className={style.itemsInnerDiv}
-              >
-                <Media meadiaFile={meadiaFile} profileView={false} />
+            <div key={i} className={style.itemsOuterDiv}>
+              <div className={style.itemsInnerDiv}>
+                <Media meadiaFile={meadiaFile}  />
                 <span className=" absolute top-1 right-1 px-1 flex flex-col items-center bg-[#ffffff63] rounded-xl">
                   <LikesButton meadia_item={item} />
-                  <p>{item.likes?item.likes.length:0}</p>
+                  <p>{item.likes ? item.likes.length : 0}</p>
                 </span>
               </div>
 
-              {/* in this Comment component all the information of media file is available */}
-              {/* we will fix that later */}
-              <Metadata_with_Comment
+              <MobileViewMetaData
+                meadia_item={item}
+                user={postedBy.name ? postedBy.name : "Unknown"}
+              />
+              <DesktopMetaData
                 meadia_item={item}
                 user={postedBy.name ? postedBy.name : "Unknown"}
               />
