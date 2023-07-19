@@ -6,12 +6,6 @@
   align-items: center;
 }
 
-@media (max-width:720px) {
-  .nav{
-    display: none;
-  }
-}
-
 .nav ul {
   display: flex;
   justify-content: center;
@@ -20,8 +14,23 @@
   font-weight: bold;
 }
 
+@media (max-width: 720px) {
+  .nav ul {
+    display: none;
+  }
+  .nav {
+    padding: 3px 5px;
+  }
+}
+
 .nav ul li {
   text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .LOGO {
+    padding-left: 20px;
+  }
 }
 
 .right {
@@ -30,6 +39,12 @@
   justify-content: space-between;
   align-items: center;
   column-gap: 20px;
+}
+@media (max-width: 720px) {
+  .right {
+    padding: 6px 0px;
+    column-gap: 10px;
+  }
 }
 
 .right ul {
@@ -54,6 +69,13 @@
   justify-content: center;
   align-items: center;
   /* overflow: hidden; */
+}
+
+@media (max-width: 720px) {
+  .profile_icon {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
 }
 .dropdown_content {
   padding: 0.5rem;
