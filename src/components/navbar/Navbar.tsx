@@ -12,31 +12,43 @@ const Navbar = () => {
   const { data: session } = useSession();
   const [sideNavbar, setSideNavbar] = useState<boolean>(false);
   return (
-    <div>
-      <div className={`${style.nav}`}>
-        <span style={{zIndex:'10'}}>
-          <button onClick={() => setSideNavbar(true)}>
-            <FaBars style={{fontSize:'large',fontWeight:'600', color:'black'}} />
-          </button>
-          {sideNavbar && <SideNavbar setSideNavbar={setSideNavbar} />}
+    <div style={{width:'100vw'}}>
+      <div className={`${style.nav}`} >
+        <span className={style.sideBarForMobile} style={{ zIndex: "10" }}>
+          {!sideNavbar && (
+            <button onClick={() => setSideNavbar(true)}>
+              <FaBars
+                style={{ fontSize: "large", fontWeight: "600", color: "black" }}
+              />
+            </button>
+          )}
+          {sideNavbar && <SideNavbar setSideNavbar={setSideNavbar} navRoutes={nav}/>}
         </span>
 
         <Link href={"/"} className={style.LOGO}>
           <button>LOGO</button>
         </Link>
 
+        <div className={style.navRoutes}>
         <ul>
           {nav.map((nav, i) => {
             return <li key={i}>{nav}</li>;
           })}
         </ul>
+        </div>
 
         <div className={style.right}>
           {!session && <button onClick={() => signIn()}>Login</button>}
           {session && (
             <Link href={"/upload"} className="text-xs">
               <button>
-                <BiUpload style={{fontSize:'large',fontWeight:'600', color:'black'}} />
+                <BiUpload
+                  style={{
+                    fontSize: "large",
+                    fontWeight: "600",
+                    color: "black",
+                  }}
+                />
               </button>
             </Link>
           )}
