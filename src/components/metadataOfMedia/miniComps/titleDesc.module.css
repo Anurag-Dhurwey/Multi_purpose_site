@@ -1,0 +1,30 @@
+
+.titleDesc{
+    padding: 8px;
+    padding-bottom: 0px;
+    margin-bottom: 4px;
+    background-color: rgba(43, 195, 201, 0.76);
+    border-radius: 6px;
+    overflow: auto;
+}
+
+.titleDescSpan{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 6px;
+}
+
+.titleDescSpan2{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    bottom: 0%;
+}
+
+.titleDescSpan2Button{
+    font-size: xx-large;
+    font-weight:500;
+    color: white;
+}

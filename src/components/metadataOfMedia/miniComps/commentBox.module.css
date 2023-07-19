@@ -1,0 +1,51 @@
+
+.commentBox{
+    width: 100%;
+    border-radius: 6px;
+    background-color:  rgba(43, 195, 201, 0.76);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: auto;
+}
+
+.commentBoxInnerDiv{
+    width: 100%;
+    padding:0px 6px;
+}
+
+.comment{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+}
+.comment span{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.comment span button {
+    width: 16px;
+    height: 16px;
+    background-color: rgba(10, 10, 240, 0.705);
+    border-radius: 100%;
+}
+
+.commentBoxSpan{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    bottom: 0%;
+}
+
+.commentBoxSpan button{
+    font-size: xx-large;
+    font-weight:500;
+    color: white;
+}

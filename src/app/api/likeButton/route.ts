@@ -37,13 +37,13 @@ export async function POST(req: Request) {
           autoGenerateArrayKeys: true,
         });
       // to add on user's liked posts array
-      const userArray = await client
-        .patch(user._id)
-        .setIfMissing({ likedPosts: [] })
-        .insert("after", "likedPosts[-1]", [
-          { post: { _type: "reference", _ref: meadia_item._id } },
-        ])
-        .commit({ autoGenerateArrayKeys: true });
+      // const userArray = await client
+      //   .patch(user._id)
+      //   .setIfMissing({ likedPosts: [] })
+      //   .insert("after", "likedPosts[-1]", [
+      //     { post: { _type: "reference", _ref: meadia_item._id } },
+      //   ])
+      //   .commit({ autoGenerateArrayKeys: true });
       return NextResponse.json({ ...res });
     }
   } catch (error) {

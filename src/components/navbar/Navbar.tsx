@@ -9,7 +9,8 @@ const Navbar = () => {
   const { data: session } = useSession();
 
   return (
-    <div className={style.nav}>
+<div>
+<div className={`${style.nav}`}>
       <Link href={'/'}>
       <button>LOGO</button>
       </Link>
@@ -45,6 +46,7 @@ const Navbar = () => {
         </div>
       </div>
     </div>
+</div>
   );
 };
 

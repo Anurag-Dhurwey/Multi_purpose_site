@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-
+import style from './home.module.css'
 import { useAppDispatch, useAppSelector } from "../../redux_toolkit/hooks";
 import { RootState } from "@/redux_toolkit/store";
 import { client, urlFor } from "../../lib/sanityClient";
@@ -47,19 +47,19 @@ const Home = () => {
   }, [session]);
   console.log(user);
   return (
-    <div className="w-full flex justify-center items-center">
+    <div className={style.main}>
       {/* <div className="w-[15%] h-screen bg-slate-600"></div> */}
-      <div className="w-[80%] h-screen ">
+      <div className={style.secondDiv}>
         {media_Items.map((item, i) => {
           const { meadiaFile, postedBy } = item;
           // const { name: user } = postedBy;
           return (
             <div
               key={i}
-              className="w-full py-2 flex justify-evenly items-start bg-green-600 rounded-xl"
+              className={style.itemsOuterDiv}
             >
               <div
-                className={`h-[395px] w-[65%] overflow-hidden relative flex justify-center items-center bg-slate-500 rounded-xl`}
+                className={style.itemsInnerDiv}
               >
                 <Media meadiaFile={meadiaFile} profileView={false} />
                 <span className=" absolute top-1 right-1 px-1 flex flex-col items-center bg-[#ffffff63] rounded-xl">
