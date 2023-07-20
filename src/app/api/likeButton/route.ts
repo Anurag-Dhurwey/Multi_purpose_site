@@ -1,15 +1,22 @@
 import { client } from "@/lib/sanityClient";
 import { NextResponse } from "next/server";
 
+interface item {
+  postedBy: {
+    email: string;
+  };
+  _key: string;
+}
+
 export async function POST(req: Request) {
   const { meadia_item, user, isLiked } = await req.json();
   try {
     if (isLiked) {
-        console.log(user)
-      const _key = meadia_item.likes?.map((item) => {
+      console.log(user);
+      const _key = meadia_item.likes?.map((item: item) => {
         if (item.postedBy.email == user.email) {
           console.log(item._key + " _key");
-          console.log(item)
+          console.log(item);
           return item._key;
         }
       });

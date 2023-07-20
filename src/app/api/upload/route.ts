@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 import { uploadForm, user } from "@/typeScript/basics";
 
 interface Body {
-  uploadedFileRes: object;
+  uploadedFileRes: {
+    _id:string
+  };
   user: user;
   form: uploadForm;
 }
