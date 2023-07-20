@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { client } from "@/lib/sanityClient";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
+import { getUserId } from "@/lib/functions/getUserId";
 const LikesButton = ({ meadia_item }) => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
@@ -13,27 +14,10 @@ const LikesButton = ({ meadia_item }) => {
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [api, setApi] = useState<boolean>(false);
 
-  // the below get user function is repetitive it is also called in comment component and other all the function which need user with _id
-  const getUserId = async () => {
-    if (!user._id) {
-      try {
-        const id = await client.fetch(
-          `*[_type=="user" && email=="${session?.user?.email}"]{_id}`
-        );
-        dispatch(setUser({ ...user, _id: id[0]._id }));
-        return { ...user, _id: id[0]._id };
-      } catch (error) {
-        console.error(error);
-        alert(`Unable to find Profile ID => ${error.message} `);
-      }
-    } else {
-      return user;
-    }
-  };
 
   const handleLikeButton = async () => {
     setApi(true);
-    const user_with_id = await getUserId();
+    const user_with_id = await getUserId({dispatch,setUser,user,session});
     try {
       setIsLiked((val) => !val);
       const res = await fetch("/api/likeButton", {
@@ -41,7 +25,7 @@ const LikesButton = ({ meadia_item }) => {
         body: JSON.stringify({ meadia_item, user: user_with_id, isLiked }),
       });
       const jsonRes = await res.json();
-      setIsLiked(true);
+      // setIsLiked(true);
       if (jsonRes) {
         const updatedMeadia_Items = media_Items.map((item) => {
           if (item._id == jsonRes._id) {
@@ -54,8 +38,8 @@ const LikesButton = ({ meadia_item }) => {
             } else {
               const _key = jsonRes?.likes.map((item) => {
                 console.log(item.postedBy._ref == user._id);
-                console.log(item.postedBy._ref + " " + user._id);
                 if (item.postedBy._ref == user._id) {
+                  console.log(item._key);
                   return item._key;
                 }
               });

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { uploadForm, user } from "@/typeScript/basics";
 
 interface Body {
-  jsonRes: object;
+  uploadedFileRes: object;
   user: user;
   form: uploadForm;
 }
@@ -11,14 +11,14 @@ interface Body {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { jsonRes, user, form }: Body = body;
+    const { uploadedFileRes, user, form }: Body = body;
     const doc = {
       _type: "post",
       meadiaFile: {
         _type: "file",
         asset: {
           _type: "reference",
-          _ref: jsonRes._id,
+          _ref: uploadedFileRes._id,
         },
       },
       postedBy: {
@@ -30,8 +30,26 @@ export async function POST(req: Request) {
       tag: "",
     };
     const res = await client.create(doc);
-
-    return NextResponse.json(res);
+    const createdPost = {
+      caption: form.caption,
+      desc: form.desc,
+      tag: "",
+      meadiaFile: {
+        _type: "file",
+        asset: {
+          _type: "reference",
+          _ref: uploadedFileRes._id,
+        },
+      },
+      postedBy: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      comments: [],
+      likes: [],
+    };
+    return NextResponse.json({res,createdPost});
   } catch (error) {
     console.error(error);
     // return NextResponse.json(error);

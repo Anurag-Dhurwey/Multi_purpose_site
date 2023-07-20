@@ -5,7 +5,11 @@ border-radius: 10px;
 outline: none;
 padding: 2px 5px;
 }
-
+@media (max-width:430px) {
+  .form input{
+    width: 90vw;
+  }
+}
 .form div{
   padding: 10px 0;
   display: flex;

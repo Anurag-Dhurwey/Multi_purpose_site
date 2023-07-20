@@ -12,8 +12,8 @@ const Navbar = () => {
   const { data: session } = useSession();
   const [sideNavbar, setSideNavbar] = useState<boolean>(false);
   return (
-    <div style={{width:'100vw'}}>
-      <div className={`${style.nav}`} >
+    <div className="max-[430px]:h-[42px] h-[56px]" >
+      <div className={`${style.nav}`} style={{width:'100vw',position:'fixed',top:'0',zIndex:'9'}}>
         <span className={style.sideBarForMobile} style={{ zIndex: "10" }}>
           {!sideNavbar && (
             <button onClick={() => setSideNavbar(true)}>

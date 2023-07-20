@@ -1,17 +1,21 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { user, uploadForm } from "@/typeScript/basics";
 import style from "./upload.module.css";
 import { Upload } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import { setUser } from "@/redux_toolkit/features/indexSlice";
+import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { client } from "@/lib/sanityClient";
 import { useSession } from "next-auth/react";
+import { getUserId } from "@/lib/functions/getUserId";
+import { getMediaItems } from "@/lib/functions/getMediaItems";
 const page = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.hooks.user);
+  const meadia_items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
 
+  const [onSuccess,setOnSuccess]=useState<boolean|null>(null)
   const [modal, setModal] = useState<Boolean>(false);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [isFileValid, setIsFileValid] = useState<
@@ -23,23 +27,7 @@ const page = () => {
     filePath: "",
   });
   const [file, setFile] = useState<File>();
-  // the below get user function is repetitive it is also called in comment component and other all the function which need user with _id 
-  const getUserId = async () => {
-    if (!user._id) {
-      try {
-        const id = await client.fetch(
-          `*[_type=="user" && email=="${session?.user?.email}"]{_id}`
-        );
-        dispatch(setUser({ ...user, _id: id[0]._id }));
-        return { ...user, _id: id[0]._id };
-      } catch (error) {
-        console.error(error);
-        alert(`Unable to find Profile ID => ${error.message} `)
-      }
-    } else {
-      return user;
-    }
-  };
+
 
   const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -56,21 +44,40 @@ const page = () => {
     e.preventDefault();
     if (!isFileValid.length) {
       setModal(true);
-      const user_with_id = await getUserId();
-      uploadingData(file, form, user_with_id, setIsPosting);
+      const user_with_id = await getUserId({
+        dispatch,
+        setUser,
+        user,
+        session,
+      });
+      uploadingData(
+        file,
+        form,
+        user_with_id,
+        { set_media_items, setIsPosting, dispatch,setOnSuccess },
+        meadia_items
+      );
     } else if (isFileValid.length) {
       alert(isFileValid[0].message);
     }
   };
 
+  useEffect(() => {
+    if (session) {
+      if (!meadia_items.length) {
+        getMediaItems({ dispatch, set_media_items });
+      }
+    }
+  }, [session]);
   return (
-    <div className="flex justify-center items-start w-full min-h-screen bg-slate-200">
+    <div className="flex justify-center items-start w-screen min-h-screen bg-slate-200">
       <Upload
         visibility={modal}
         setVisibility={setModal}
         isPosting={isPosting}
+        onSuccess={onSuccess}
       />
-      <div className="py-6 max-w-[800px] w-full h-full rounded-xl bg-red-200 flex justify-evenly items-center">
+      <div className="py-6 max-w-[800px] min-w-[325px] w-full h-full rounded-xl bg-red-200 flex justify-evenly items-center">
         <form
           onSubmit={(e) => onSubmitHandler(e)}
           className={`${style.form} flex flex-col justify-evenly items-center`}
@@ -146,40 +153,52 @@ function checkFileSize(file: File, setIsFileValid: Function) {
   }
 }
 
+interface useStates {
+  setIsPosting: Function;
+  dispatch: Function;
+  set_media_items: Function;
+  setOnSuccess:Function
+}
+
 async function uploadingData(
   file: File,
   form: uploadForm,
   user: user,
-  setIsPosting: Function
+  States: useStates,
+  meadia_items: Array<T>
 ) {
+  const { dispatch, setIsPosting, set_media_items,setOnSuccess } = States;
   try {
     setIsPosting(true);
 
-    const jsonRes = await client.assets.upload("file", file, {
+    const uploadedFileRes = await client.assets.upload("file", file, {
       contentType: file.type,
       filename: file.name,
     });
-    console.log(jsonRes);
-    console.log(user);
-    if (jsonRes) {
+    if (uploadedFileRes) {
       try {
         const postedData = await fetch("/api/upload", {
           method: "POST",
-          body: JSON.stringify({ jsonRes, user, form }),
+          body: JSON.stringify({ uploadedFileRes, user, form }),
         });
-        if (postedData) {
+        const jsonData = await postedData.json();
+        if (jsonData) {
+          const { res, createdPost } = jsonData;
+          dispatch(set_media_items([ { ...createdPost },...meadia_items]));
+          setOnSuccess(true)
           setIsPosting(false);
-          console.log(postedData);
         }
       } catch (error) {
         setIsPosting(false);
+        setOnSuccess(false)
         console.error(error);
-        alert(`Unable to post => ${error.message} `)
+        alert(`Unable to post => ${error.message} `);
       }
     }
   } catch (error) {
+    setOnSuccess(false)
     setIsPosting(false);
     console.error(error);
-    alert(`Unable to Upload => ${error.message} `)
+    alert(`Unable to Upload => ${error.message} `);
   }
 }

@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import style from "./home.module.css";
 import { useAppDispatch, useAppSelector } from "../../redux_toolkit/hooks";
 import { RootState } from "@/redux_toolkit/store";
-import { client, urlFor } from "../../lib/sanityClient";
 import {
   toggle_dark_mode,
   set_media_items,
@@ -13,8 +12,8 @@ import DesktopMetaData from "../metadataOfMedia/DesktopMetaData";
 import { useSession } from "next-auth/react";
 import Media from "../media/Media";
 import LikesButton from "../metadataOfMedia/miniComps/LikesButton";
-import TitleDesc from "../metadataOfMedia/miniComps/TitleDesc";
 import MobileViewMetaData from "../metadataOfMedia/MobileViewMetaData";
+import { getMediaItems } from "@/lib/functions/getMediaItems";
 const Home = () => {
   const scrrenMode = useAppSelector((state: RootState) => state.hooks.darkmode);
   const { data: session } = useSession();
@@ -24,18 +23,10 @@ const Home = () => {
   );
   const dispatch = useAppDispatch();
 
-  const getPostedMeadia = async () => {
-    const media = await client.fetch(
-      `*[_type == "post"]{_id,caption,desc,meadiaFile,postedBy->,tag,comments[]{comment,postedBy->},likes[]{_key,postedBy->}}`
-    );
-    dispatch(set_media_items(media));
-    console.log(media);
-    return media;
-  };
 
   useEffect(() => {
     if (!media_Items?.length) {
-      getPostedMeadia();
+      getMediaItems({dispatch,set_media_items});
     }
     if (!user.email) {
       dispatch(
@@ -47,20 +38,20 @@ const Home = () => {
       );
     }
   }, [session]);
-  console.log(user);
+  console.log(media_Items);
+  
   return (
     <div className={style.main}>
       {/* <div className="w-[15%] h-screen bg-slate-600"></div> */}
       <div className={style.secondDiv}>
         {media_Items.map((item, i) => {
           const { meadiaFile, postedBy } = item;
-          // const { name: user } = postedBy;
           return (
             <div key={i} className={style.itemsOuterDiv}>
               <div className={style.itemsInnerDiv}>
                 <Media meadiaFile={meadiaFile} />
                 <span className=" absolute top-0 right-0 flex justify-center items-start gap-x-4 rounded-xl">
-                  <span className="flex items-center pt-1">
+                  <span className="flex items-center pt-1 gap-x-[2px] min-[430px]:pr-1">
                     <LikesButton meadia_item={item} />
                     <p style={{fontSize:'small'}}>{item.likes ? item.likes.length : 0}</p>
                   </span>
