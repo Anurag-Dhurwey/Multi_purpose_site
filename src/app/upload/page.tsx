@@ -9,7 +9,7 @@ import { client } from "@/lib/sanityClient";
 import { useSession } from "next-auth/react";
 import { getUserId } from "@/lib/functions/getUserId";
 import { getMediaItems } from "@/lib/functions/getMediaItems";
-const page = () => {
+const Page = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.hooks.user);
   const meadia_items = useAppSelector((state) => state.hooks.media_Items);
@@ -140,7 +140,7 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
 
 function checkFileSize(file: File, setIsFileValid: Function) {
   const size: boolean = file.size <= 1000 * 1024 * 10;

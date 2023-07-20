@@ -10,7 +10,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import Image from "next/image";
 import { Media } from "@/components";
-const page = () => {
+const Page = () => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
 
@@ -95,4 +95,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
