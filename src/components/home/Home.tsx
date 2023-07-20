@@ -58,17 +58,19 @@ const Home = () => {
           return (
             <div key={i} className={style.itemsOuterDiv}>
               <div className={style.itemsInnerDiv}>
-                <Media meadiaFile={meadiaFile}  />
-                <span className=" absolute top-1 right-1 px-1 flex flex-col items-center bg-[#ffffff63] rounded-xl">
-                  <LikesButton meadia_item={item} />
-                  <p>{item.likes ? item.likes.length : 0}</p>
+                <Media meadiaFile={meadiaFile} />
+                <span className=" absolute top-0 right-0 flex justify-center items-start gap-x-4 rounded-xl">
+                  <span className="flex items-center pt-1">
+                    <LikesButton meadia_item={item} />
+                    <p style={{fontSize:'small'}}>{item.likes ? item.likes.length : 0}</p>
+                  </span>
+                  <MobileViewMetaData
+                    meadia_item={item}
+                    user={postedBy.name ? postedBy.name : "Unknown"}
+                  />
                 </span>
               </div>
 
-              <MobileViewMetaData
-                meadia_item={item}
-                user={postedBy.name ? postedBy.name : "Unknown"}
-              />
               <DesktopMetaData
                 meadia_item={item}
                 user={postedBy.name ? postedBy.name : "Unknown"}

@@ -11,8 +11,8 @@ const MobileViewMetaData = ({ meadia_item, user }) => {
 
 
   return (
-    <div className="w-[10%] h-[395px] relative min-[430px]:hidden">
-      <span className="py-2 flex flex-col gap-y-4 justify-start items-center h-[30%]">
+    <div className=" relative min-[430px]:hidden">
+      <span className="flex gap-x-4 justify-center items-center pt-1 pr-1">
         <button
           onClick={() => {
             setDescView(true);
@@ -22,7 +22,7 @@ const MobileViewMetaData = ({ meadia_item, user }) => {
             style={{
               fontSize: "large",
               fontWeight: "600",
-              color: "black",
+              color: "white",
             }}
           />
         </button>
@@ -33,15 +33,15 @@ const MobileViewMetaData = ({ meadia_item, user }) => {
         >
           <BiSolidCommentDetail
             style={{
-              fontSize: "large",
+              fontSize: "x-large",
               fontWeight: "600",
-              color: "black",
+              color: "white",
             }}
           />
         </button>
       </span>
       {cmtView || descView ? (
-        <div className="w-[80vw] h-full overflow-hidden absolute top-0 right-0">
+        <div className="w-[80vw] h-[395px] overflow-hidden absolute top-0 right-0">
           <span className=" absolute top-0 right-0 p-1">
             <button
               onClick={() => {

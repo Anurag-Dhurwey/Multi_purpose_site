@@ -1,19 +1,18 @@
-.main{
-    width: 30%;
-    height: 395px;
-    overflow: hidden;
+.main {
+  width: 30%;
+  height: 395px;
+  overflow: hidden;
 }
 
-@media (max-width:825px){
-    .main{
-        /* height: 330px; */
-
-    }
+@media (max-width: 825px) {
+  .main {
+    /* height: 330px; */
+    width: 38%;
+  }
 }
 
-@media (max-width:430px) {
-    .main{
-        display: none;
-    }
+@media (max-width: 430px) {
+  .main {
+    display: none;
+  }
 }
-

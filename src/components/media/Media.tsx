@@ -24,7 +24,7 @@ const [imgCover,setImgCover]=useState<boolean>(false)
               alt="post"
               width={1000}
               height={1000}
-              className={`max-h-[395px]  ${!imgCover?'h-full w-full':''} rounded-md object-cover`}
+              className={`max-h-[395px] ${!imgCover?' object-cover':'h-auto w-auto'} rounded-md `}
             />
           )}
         </span>
