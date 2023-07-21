@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { user } from "@/typeScript/basics";
+import { media_Item, user } from "@/typeScript/basics";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 export interface CounterState {
   darkmode: boolean;
   user: user;
-  media_Items: Array<T>;
-  my_uploads: Array<T>;
+  media_Items: Array<media_Item>;
+  my_uploads: Array<media_Item>;
 }
 const initialState: CounterState = {
   darkmode: false,

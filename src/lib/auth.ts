@@ -65,11 +65,11 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    async session({ session, token, user }) {
-      // Send properties to the client, like an access_token from a provider.
-      session.accessToken = token.accessToken
-      return session
-    },
+    // async session({ session, token, user }) {
+    //   // Send properties to the client, like an access_token from a provider.
+    //   session.accessToken = token.accessToken
+    //   return session
+    // },
     async signIn({ user, account, profile, email, credentials }) {
       const isAllowedToSignIn = true
       if (isAllowedToSignIn) {

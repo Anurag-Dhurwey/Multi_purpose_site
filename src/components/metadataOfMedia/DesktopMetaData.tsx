@@ -3,7 +3,11 @@ import React, { useState } from "react";
 import style from "./desktopMetaData.module.css";
 import TitleDesc from "./miniComps/TitleDesc";
 import CommentBox from "./miniComps/CommentBox";
-const DesktopMetaData = ({ meadia_item, user }) => {
+import { media_Item } from "@/typeScript/basics";
+interface Iprops{
+  meadia_item:media_Item,user:string
+}
+const DesktopMetaData = ({ meadia_item, user }:Iprops) => {
   const { caption, desc, comments, _id } = meadia_item;
   const [cmtView, setCmtView] = useState(false);
   const [descView, setDescView] = useState(false);

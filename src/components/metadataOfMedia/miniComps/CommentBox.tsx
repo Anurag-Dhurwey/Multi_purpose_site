@@ -3,6 +3,7 @@ import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import style from "./commentBox.module.css";
 import { useSession } from "next-auth/react";
 import CommentForm from "./CommentForm";
+import { media_Item } from "@/typeScript/basics";
 interface Iprops {
   useStates: {
     cmtView: boolean;
@@ -10,7 +11,7 @@ interface Iprops {
     setCmtView: Function;
     setDescView: Function;
   };
-  meadia_item: Object;
+  meadia_item: media_Item;
 }
 const CommentBox = ({ useStates, meadia_item }: Iprops) => {
   const { cmtView, descView, setCmtView, setDescView } = useStates;
@@ -23,7 +24,6 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
           <div className={`${style.commentBoxInnerDiv}  `}>
             {comments?.map((cmnt, i) => {
               const { comment, postedBy: commentBy } = cmnt;
-              // const { name: user } = commentBy;
               return (
                 <div
                   key={comment + i}

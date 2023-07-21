@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { user, uploadForm } from "@/typeScript/basics";
+import { user, uploadForm, media_Item } from "@/typeScript/basics";
 import style from "./upload.module.css";
 import { Upload } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
@@ -15,7 +15,7 @@ const Page = () => {
   const meadia_items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
 
-  const [onSuccess,setOnSuccess]=useState<boolean|null>(null)
+  const [onSuccess, setOnSuccess] = useState<boolean | null>(null);
   const [modal, setModal] = useState<Boolean>(false);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [isFileValid, setIsFileValid] = useState<
@@ -27,7 +27,6 @@ const Page = () => {
     filePath: "",
   });
   const [file, setFile] = useState<File>();
-
 
   const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -42,23 +41,27 @@ const Page = () => {
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isFileValid.length) {
-      setModal(true);
-      const user_with_id = await getUserId({
-        dispatch,
-        setUser,
-        user,
-        session,
-      });
-      uploadingData(
-        file,
-        form,
-        user_with_id,
-        { set_media_items, setIsPosting, dispatch,setOnSuccess },
-        meadia_items
-      );
-    } else if (isFileValid.length) {
-      alert(isFileValid[0].message);
+    if (session && file) {
+      if (!isFileValid.length) {
+        setModal(true);
+        const user_with_id = await getUserId({
+          dispatch,
+          setUser,
+          user,
+          session,
+        });
+        uploadingData(
+          file,
+          form,
+          user_with_id,
+          { set_media_items, setIsPosting, dispatch, setOnSuccess },
+          meadia_items
+        );
+      } else if (isFileValid.length) {
+        alert(isFileValid[0].message);
+      }
+    } else {
+      console.log("session not found");
     }
   };
 
@@ -157,17 +160,17 @@ interface useStates {
   setIsPosting: Function;
   dispatch: Function;
   set_media_items: Function;
-  setOnSuccess:Function
+  setOnSuccess: Function;
 }
 
 async function uploadingData(
   file: File,
   form: uploadForm,
-  user: user,
+  user: user_with_id,
   States: useStates,
-  meadia_items: Array<T>
+  meadia_items: Array<media_Item>
 ) {
-  const { dispatch, setIsPosting, set_media_items,setOnSuccess } = States;
+  const { dispatch, setIsPosting, set_media_items, setOnSuccess } = States;
   try {
     setIsPosting(true);
 
@@ -184,21 +187,32 @@ async function uploadingData(
         const jsonData = await postedData.json();
         if (jsonData) {
           const { res, createdPost } = jsonData;
-          dispatch(set_media_items([ { ...createdPost },...meadia_items]));
-          setOnSuccess(true)
+          dispatch(set_media_items([{ ...createdPost }, ...meadia_items]));
+          setOnSuccess(true);
           setIsPosting(false);
         }
       } catch (error) {
         setIsPosting(false);
-        setOnSuccess(false)
+        setOnSuccess(false);
         console.error(error);
-        alert(`Unable to post => ${error.message} `);
       }
     }
   } catch (error) {
-    setOnSuccess(false)
+    setOnSuccess(false);
     setIsPosting(false);
     console.error(error);
-    alert(`Unable to Upload => ${error.message} `);
   }
 }
+
+// below type is for resolving type script error
+type user_with_id =
+  | user
+  | {
+      _id: any;
+      name: string | null | undefined;
+      email: string | null | undefined;
+      image?: string | undefined;
+      desc?: string | undefined;
+      link?: string | undefined;
+    }
+  | undefined;

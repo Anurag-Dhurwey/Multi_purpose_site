@@ -4,35 +4,19 @@ import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { IoMdSend } from "react-icons/io";
-import { client } from "@/lib/sanityClient";
 import { getUserId } from "@/lib/functions/getUserId";
-const CommentForm = ({ meadia_item }) => {
+import { media_Item } from "@/typeScript/basics";
+const CommentForm = ({ meadia_item }:{meadia_item:media_Item}) => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.hooks.user);
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
-  const [form, setForm] = useState<String>("");
-  // the below get user function is repetitive it is also called in comment component and other all the function which need user with _id
-  // const getUserId = async () => {
-  //   if (!user._id) {
-  //     try {
-  //       const id = await client.fetch(
-  //         `*[_type=="user" && email=="${session?.user?.email}"]{_id}`
-  //       );
-  //       dispatch(setUser({ ...user, _id: id[0]._id }));
-  //       return { ...user, _id: id[0]._id };
-  //     } catch (error) {
-  //       console.error(error);
-  //       alert(`Unable to find Profile ID => ${error.message} `);
-  //     }
-  //   } else {
-  //     return user;
-  //   }
-  // };
+  const [form, setForm] = useState("");
 
   const onHnandleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const user_with_id = await getUserId({dispatch,setUser,user,session});
+    if(session){
+      const user_with_id = await getUserId({dispatch,setUser,user,session});
     try {
       const res = await fetch("/api/comment", {
         method: "POST",
@@ -55,6 +39,9 @@ const CommentForm = ({ meadia_item }) => {
     } catch (error) {
       console.error(error);
       alert("comment not posted");
+    }
+    }else{
+      console.log('session not found')
     }
   };
 

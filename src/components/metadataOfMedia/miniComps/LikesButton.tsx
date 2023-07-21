@@ -6,7 +6,8 @@ import { client } from "@/lib/sanityClient";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { getUserId } from "@/lib/functions/getUserId";
-const LikesButton = ({ meadia_item }) => {
+import { media_Item, postedBy } from "@/typeScript/basics";
+const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
   const user = useAppSelector((state) => state.hooks.user);
@@ -16,8 +17,9 @@ const LikesButton = ({ meadia_item }) => {
 
 
   const handleLikeButton = async () => {
-    setApi(true);
-    const user_with_id = await getUserId({dispatch,setUser,user,session});
+    if(session){
+      setApi(true);
+    const user_with_id = await getUserId({ dispatch, setUser, user, session });
     try {
       setIsLiked((val) => !val);
       const res = await fetch("/api/likeButton", {
@@ -36,7 +38,7 @@ const LikesButton = ({ meadia_item }) => {
               setIsLiked(false);
               return { ...item, likes: [...newLikesList] };
             } else {
-              const _key = jsonRes?.likes.map((item) => {
+              const _key = jsonRes?.likes.map((item: like) => {
                 console.log(item.postedBy._ref == user._id);
                 if (item.postedBy._ref == user._id) {
                   console.log(item._key);
@@ -80,6 +82,9 @@ const LikesButton = ({ meadia_item }) => {
     } finally {
       setApi(false);
     }
+    }else{
+      console.log('session not found')
+    }
   };
 
   useEffect(() => {
@@ -92,7 +97,7 @@ const LikesButton = ({ meadia_item }) => {
       console.log(mapLikes);
       setIsLiked(true);
     }
-  }, [api, media_Items,session]);
+  }, [api, media_Items, session]);
 
   return (
     <button
@@ -106,3 +111,8 @@ const LikesButton = ({ meadia_item }) => {
 };
 
 export default LikesButton;
+
+interface like {
+  _key: string;
+  postedBy: { _type: string; _ref: string };
+}

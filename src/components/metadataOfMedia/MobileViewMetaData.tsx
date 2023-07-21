@@ -4,11 +4,15 @@ import { BsInfoSquareFill } from "react-icons/bs";
 import { MdOutlineClose } from "react-icons/md";
 import TitleDesc from "./miniComps/TitleDesc";
 import CommentBox from "./miniComps/CommentBox";
-const MobileViewMetaData = ({ meadia_item, user }) => {
+import { media_Item } from "@/typeScript/basics";
+interface Iprops {
+  meadia_item: media_Item;
+  user: string;
+}
+const MobileViewMetaData = ({ meadia_item, user }: Iprops) => {
   const { caption, desc, comments, _id } = meadia_item;
   const [cmtView, setCmtView] = useState(false);
   const [descView, setDescView] = useState(false);
-
 
   return (
     <div className=" relative min-[430px]:hidden">

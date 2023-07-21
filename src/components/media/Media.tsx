@@ -3,8 +3,9 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getFileAsset } from "@sanity/asset-utils";
+import { meadiaFile } from "@/typeScript/basics";
 
-const Media = ({ meadiaFile, profileView }:{meadiaFile:Array<T>, profileView?:boolean}) => {
+const Media = ({ meadiaFile, profileView }:{meadiaFile:meadiaFile, profileView?:boolean}) => {
   const url = getFileAsset(meadiaFile.asset, {
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     dataset: "production",

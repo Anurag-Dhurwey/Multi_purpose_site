@@ -1,15 +1,17 @@
+import { userAgent } from "next/server";
 import { client } from "../sanityClient";
+import { session, sessionUser, user } from "@/typeScript/basics";
 interface states {
   dispatch: Function;
   setUser: Function;
   user:user,
-  session:Object
+  session:session
+  // if session is null below function will throw error 
+  // so question is why i gave type null  
+  // because while calling below function there is typescript error 
 }
-interface user {
-  _id: string;
-  name: string;
-  email: string;
-}
+
+
 export const getUserId = async (
   { dispatch, setUser,user,session, }: states
 ) => {
@@ -34,9 +36,10 @@ export const getUserId = async (
       };
     } catch (error) {
       console.error(error);
-      alert(`Unable to find Profile ID => ${error.message} `);
+      alert(`Unable to find Profile ID => ${error} `);
     }
   } else {
     return user;
   }
 };
+

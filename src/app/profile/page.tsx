@@ -63,9 +63,9 @@ const Page = () => {
   return (
     <div className="w-full flex flex-col justify-center items-start">
       <div className="flex justify-between items-center gap-x-5">
-        {user.image && (
+        {user.image && session.user?.image &&(
           <Image
-            src={image}
+            src={session.user?.image}
             width={1000}
             height={1000}
             alt="profile"
