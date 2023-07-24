@@ -25,9 +25,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    column-gap: 10px;
 }
 
-.comment span button {
+.comment .Img {
     width: 16px;
     height: 16px;
     background-color: rgba(10, 10, 240, 0.705);
