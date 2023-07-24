@@ -1,22 +1,15 @@
 import { client } from "@/lib/sanityClient";
+import { like } from "@/typeScript/basics";
 import { NextResponse } from "next/server";
 
-interface item {
-  postedBy: {
-    email: string;
-  };
-  _key: string;
-}
+
 
 export async function POST(req: Request) {
   const { meadia_item, user, isLiked } = await req.json();
   try {
     if (isLiked) {
-      console.log(user);
-      const _key = meadia_item.likes?.map((item: item) => {
-        if (item.postedBy.email == user.email) {
-          console.log(item._key + " _key");
-          console.log(item);
+      const _key = meadia_item.likes?.map((item: like) => {
+        if (item.email == user.email) {
           return item._key;
         }
       });
@@ -38,7 +31,7 @@ export async function POST(req: Request) {
         .patch(meadia_item._id)
         .setIfMissing({ likes: [] })
         .insert("after", "likes[-1]", [
-          { postedBy: { _type: "reference", _ref: user._id } },
+          { userId: user._id, name: user.name, email: user.email },
         ])
         .commit({
           autoGenerateArrayKeys: true,

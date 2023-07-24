@@ -31,13 +31,12 @@ export interface media_Item {
   caption: string;
   desc: string;
   tag: string;
-  likes: Array<{
-    _key: string;
-    postedBy: postedBy;
-  }>;
+  likes: Array<like>;
   comments: Array<{
     comment: string;
-    postedBy: postedBy;
+    name:string;
+    email:string;
+    userId:string
   }>;
   _updatedAt?: string;
   _createdAt?: string;
@@ -60,4 +59,12 @@ export interface postedBy {
   _rev: string;
   _type: string;
   name: string;
+}
+
+
+export interface like{
+  _key: string;
+  name:string,
+  email:string,
+  userId:string
 }

@@ -23,7 +23,7 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
         <div className={`${style.commentBox} ${cmtView ? "h-full" : ""} `}>
           <div className={`${style.commentBoxInnerDiv}  `}>
             {comments?.map((cmnt, i) => {
-              const { comment, postedBy: commentBy } = cmnt;
+              const { comment, name } = cmnt;
               return (
                 <div
                   key={comment + i}
@@ -33,7 +33,7 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
                   <span className="">
                     <button className=""></button>
                     <p>
-                      {commentBy.name ? commentBy.name : session?.user?.name}
+                      {name ? name : 'unknown'}
                     </p>
                   </span>
                   <p>{cmtView ? comment : comment.slice(0, 50) + "....."}</p>
@@ -50,7 +50,7 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
           <span
             className={`${style.commentBoxSpan} ${cmtView ? "pt-[80%]" : ""} `}
           >
-            {cmtView && (
+            {cmtView && session && (
               <div className="w-full ">
                 <CommentForm meadia_item={meadia_item} />
               </div>

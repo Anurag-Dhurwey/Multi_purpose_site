@@ -6,96 +6,106 @@ import { client } from "@/lib/sanityClient";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { getUserId } from "@/lib/functions/getUserId";
-import { media_Item, postedBy } from "@/typeScript/basics";
+import { like, media_Item, postedBy } from "@/typeScript/basics";
 const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
   const user = useAppSelector((state) => state.hooks.user);
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
+  const [btnColor, setBtnColor] = useState<boolean>(false);
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [api, setApi] = useState<boolean>(false);
 
-
   const handleLikeButton = async () => {
-    if(session){
+    if (session) {
       setApi(true);
-    const user_with_id = await getUserId({ dispatch, setUser, user, session });
-    try {
-      setIsLiked((val) => !val);
-      const res = await fetch("/api/likeButton", {
-        method: "POST",
-        body: JSON.stringify({ meadia_item, user: user_with_id, isLiked }),
+      const user_with_id = await getUserId({
+        dispatch,
+        setUser,
+        user,
+        session,
       });
-      const jsonRes = await res.json();
-      // setIsLiked(true);
-      if (jsonRes) {
-        const updatedMeadia_Items = media_Items.map((item) => {
-          if (item._id == jsonRes._id) {
-            if (isLiked) {
-              const newLikesList = item.likes?.filter((like) => {
-                return like.postedBy.email !== session?.user?.email;
-              });
-              setIsLiked(false);
-              return { ...item, likes: [...newLikesList] };
-            } else {
-              const _key = jsonRes?.likes.map((item: like) => {
-                console.log(item.postedBy._ref == user._id);
-                if (item.postedBy._ref == user._id) {
-                  console.log(item._key);
-                  return item._key;
-                }
-              });
-              if (item.likes) {
-                return {
-                  ...item,
-                  likes: [
-                    ...item.likes,
-                    {
-                      _key: _key[0],
-                      postedBy: { email: session?.user?.email },
-                    },
-                  ],
-                };
-              } else {
-                return {
-                  ...item,
-                  likes: [
-                    {
-                      _key: _key[0],
-                      postedBy: { email: session?.user?.email },
-                    },
-                  ],
-                };
-              }
-            }
-          } else {
-            return item;
-          }
+      try {
+        setBtnColor((val) => !val);
+        const res = await fetch("/api/likeButton", {
+          method: "POST",
+          body: JSON.stringify({ meadia_item, user: user_with_id, isLiked }),
         });
-        dispatch(set_media_items([...updatedMeadia_Items]));
-        console.log(jsonRes);
+        const jsonRes = await res.json();
+        // setBtnColor(true);
+        if (jsonRes) {
+          const updatedMeadia_Items = media_Items.map((item) => {
+            if (item._id == jsonRes._id) {
+              if (isLiked) {
+                const newLikesList = item.likes?.filter((like) => {
+                  return like.email !== session?.user?.email;
+                });
+                setIsLiked(false);
+                return { ...item, likes: [...newLikesList] };
+              } else {
+                const _key = jsonRes?.likes.map((item: like) => {
+                  console.log(item.userId);
+                  if (item.userId == user._id) {
+                    console.log(item._key);
+                    return item._key;
+                  }
+                });
+                setIsLiked(true);
+                if (item.likes) {
+                  return {
+                    ...item,
+                    likes: [
+                      ...item.likes,
+                      {
+                        _key: _key[0],
+                        userId: user._id,
+                        email: user.email,
+                        name: user.name,
+                      },
+                    ],
+                  };
+                } else {
+                  return {
+                    ...item,
+                    likes: [
+                      {
+                        _key: _key[0],
+                        userId: user._id,
+                        email: user.email,
+                        name: user.name,
+                      },
+                    ],
+                  };
+                }
+              }
+            } else {
+              return item;
+            }
+          });
+          dispatch(set_media_items([...updatedMeadia_Items]));
+          console.log(jsonRes);
+        }
+      } catch (error) {
+        setBtnColor((val) => !val);
+        console.error(error);
+        console.log("unable to like =>> Internal server error");
+      } finally {
+        setApi(false);
       }
-    } catch (error) {
-      setIsLiked((val) => !val);
-      console.error(error);
-      console.log("unable to like =>> Internal server error");
-    } finally {
-      setApi(false);
-    }
-    }else{
-      console.log('session not found')
+    } else {
+      console.log("session not found");
     }
   };
 
   useEffect(() => {
     const mapLikes = meadia_item.likes?.filter((item) => {
       if (item._key) {
-        return item.postedBy.email == session?.user?.email;
+        return item.email == session?.user?.email;
       }
     });
     if (mapLikes?.length) {
-      console.log(mapLikes);
       setIsLiked(true);
+      setBtnColor(true);
     }
   }, [api, media_Items, session]);
 
@@ -105,14 +115,9 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
       onClick={() => handleLikeButton()}
       className="text-2xl"
     >
-      <AiFillLike style={{ color: isLiked ? "blue" : "white" }} />
+      <AiFillLike style={{ color: btnColor ? "blue" : "white" }} />
     </button>
   );
 };
 
 export default LikesButton;
-
-interface like {
-  _key: string;
-  postedBy: { _type: string; _ref: string };
-}
