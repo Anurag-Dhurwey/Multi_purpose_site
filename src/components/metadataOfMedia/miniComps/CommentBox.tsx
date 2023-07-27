@@ -8,6 +8,8 @@ import { media_Item } from "@/typeScript/basics";
 import { client } from "@/lib/sanityClient";
 import { set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
+import { message } from "antd";
+
 interface Iprops {
   useStates: {
     cmtView: boolean;
@@ -23,6 +25,7 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
+  const [messageApi, contextHolder] = message.useMessage();
   const OnDeleteHandle = async (_key: string) => {
     try {
       const res = await client
@@ -43,12 +46,14 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
         dispatch(set_media_items([...updatedItems]));
       }
     } catch (error) {
-      console.log("unable to delete");
+      messageApi.error("internal server error");
+      console.error("unable to delete");
     }
   };
 
   return (
     <>
+      {contextHolder}
       {!descView && (
         <div className={`${style.commentBox} ${cmtView ? "h-full" : ""} `}>
           <div className={`${style.commentBoxInnerDiv}  `}>

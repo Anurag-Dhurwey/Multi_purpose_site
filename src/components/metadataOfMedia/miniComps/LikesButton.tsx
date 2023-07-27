@@ -7,8 +7,11 @@ import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { getUserId } from "@/lib/functions/getUserId";
 import { like, media_Item, postedBy } from "@/typeScript/basics";
+import { message } from "antd";
+
 const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
   const dispatch = useAppDispatch();
+  const [messageApi, contextHolder]=message.useMessage()
   const { data: session } = useSession();
   const user = useAppSelector((state) => state.hooks.user);
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
@@ -24,6 +27,7 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
         setUser,
         user,
         session,
+        messageApi
       });
       try {
         setBtnColor((val) => !val);
@@ -88,12 +92,13 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
       } catch (error) {
         setBtnColor((val) => !val);
         console.error(error);
-        console.log("unable to like =>> Internal server error");
+        messageApi.error("unable to like =>> Internal server error");
       } finally {
         setApi(false);
       }
     } else {
       console.log("session not found");
+      messageApi.error("login to contineu");
     }
   };
 
@@ -110,6 +115,8 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
   }, [api, media_Items, session]);
 
   return (
+   <>
+   {contextHolder}
     <button
       disabled={api}
       onClick={() => handleLikeButton()}
@@ -117,6 +124,7 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
     >
       <AiFillLike style={{ color: btnColor ? "blue" : "white" }} />
     </button>
+   </>
   );
 };
 

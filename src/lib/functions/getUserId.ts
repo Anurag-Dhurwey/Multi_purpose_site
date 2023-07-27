@@ -1,19 +1,18 @@
 import { userAgent } from "next/server";
 import { client } from "../sanityClient";
+import { MessageInstance } from "antd/es/message/interface";
 import { session, sessionUser, user } from "@/typeScript/basics";
 interface states {
   dispatch: Function;
   setUser: Function;
   user:user,
-  session:session
-  // if session is null below function will throw error 
-  // so question is why i gave type null  
-  // because while calling below function there is typescript error 
+  session:session;
+  messageApi:MessageInstance;
 }
 
 
 export const getUserId = async (
-  { dispatch, setUser,user,session, }: states
+  { dispatch, setUser,user,session, messageApi}: states
 ) => {
   if (!user._id) {
     try {
@@ -36,7 +35,7 @@ export const getUserId = async (
       };
     } catch (error) {
       console.error(error);
-      alert(`Unable to find Profile ID => ${error} `);
+      messageApi.error(`internal server error `);
     }
   } else {
     return user;

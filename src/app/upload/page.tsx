@@ -9,8 +9,11 @@ import { client } from "@/lib/sanityClient";
 import { useSession } from "next-auth/react";
 import { getUserId } from "@/lib/functions/getUserId";
 import { getMediaItems } from "@/lib/functions/getMediaItems";
+import { message } from "antd";
+
 const Page = () => {
   const dispatch = useAppDispatch();
+  const [messageApi, contextHolder]=message.useMessage()
   const user = useAppSelector((state) => state.hooks.user);
   const meadia_items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
@@ -49,6 +52,7 @@ const Page = () => {
           setUser,
           user,
           session,
+          messageApi
         });
         uploadingData(
           file,
@@ -68,12 +72,13 @@ const Page = () => {
   useEffect(() => {
     if (session) {
       if (!meadia_items.length) {
-        getMediaItems({ dispatch, set_media_items });
+        getMediaItems({ dispatch, set_media_items ,messageApi});
       }
     }
   }, [session]);
   return (
     <div className="flex justify-center items-start w-screen min-h-screen bg-slate-200">
+      {contextHolder}
       <Upload
         visibility={modal}
         setVisibility={setModal}

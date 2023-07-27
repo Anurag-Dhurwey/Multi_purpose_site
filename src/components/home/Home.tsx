@@ -14,6 +14,8 @@ import Media from "../media/Media";
 import LikesButton from "../metadataOfMedia/miniComps/LikesButton";
 import MobileViewMetaData from "../metadataOfMedia/MobileViewMetaData";
 import { getMediaItems } from "@/lib/functions/getMediaItems";
+import { message } from "antd";
+
 const Home = () => {
   const scrrenMode = useAppSelector((state: RootState) => state.hooks.darkmode);
   const { data: session } = useSession();
@@ -22,11 +24,11 @@ const Home = () => {
     (state: RootState) => state.hooks.media_Items
   );
   const dispatch = useAppDispatch();
-
+  const [messageApi, contextHolder]=message.useMessage()
 
   useEffect(() => {
     if (!media_Items?.length) {
-      getMediaItems({dispatch,set_media_items});
+      getMediaItems({dispatch,set_media_items,messageApi});
     }
     if (!user.email) {
       dispatch(
@@ -37,11 +39,13 @@ const Home = () => {
         })
       );
     }
+
   }, [session]);
   console.log(media_Items);
   
   return (
     <div className={style.main}>
+      {contextHolder}
       {/* <div className="w-[15%] h-screen bg-slate-600"></div> */}
       <div className={style.secondDiv}>
         {media_Items.map((item, i) => {
@@ -61,7 +65,6 @@ const Home = () => {
                   />
                 </span>
               </div>
-
               <DesktopMetaData
                 meadia_item={item}
                 user={postedBy.name ? postedBy.name : "Unknown"}

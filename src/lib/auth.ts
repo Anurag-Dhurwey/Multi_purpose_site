@@ -44,10 +44,10 @@ export const authOptions: NextAuthOptions = {
       clientId: `${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}`,
       clientSecret: `${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET}`
     }),
-    FacebookProvider({
-      clientId: `${process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID}`,
-      clientSecret: `${process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_SECRET}`
-    }),
+    // FacebookProvider({
+    //   clientId: `${process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID}`,
+    //   clientSecret: `${process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_SECRET}`
+    // }),
   ],
   adapter: SanityAdapter(client,{
     schemas: {

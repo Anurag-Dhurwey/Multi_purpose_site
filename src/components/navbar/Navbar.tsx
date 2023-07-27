@@ -7,10 +7,13 @@ import { BiUpload } from "react-icons/bi";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import SideNavbar from "./miniComps/SideNavbar";
+
+
 const Navbar = () => {
   const nav = ["home", "discover", "about", "post", "search"];
   const { data: session } = useSession();
   const [sideNavbar, setSideNavbar] = useState<boolean>(false);
+
   return (
     <div className="max-[430px]:h-[42px] h-[56px]" >
       <div className={`${style.nav}`} style={{width:'100vw',position:'fixed',top:'0',zIndex:'9'}}>

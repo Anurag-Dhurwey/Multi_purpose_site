@@ -6,8 +6,11 @@ import React, { useState } from "react";
 import { IoMdSend } from "react-icons/io";
 import { getUserId } from "@/lib/functions/getUserId";
 import { media_Item } from "@/typeScript/basics";
+import { message } from "antd";
+
 const CommentForm = ({ meadia_item }:{meadia_item:media_Item}) => {
   const dispatch = useAppDispatch();
+  const [messageApi, contextHolder] = message.useMessage();
   const user = useAppSelector((state) => state.hooks.user);
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
@@ -16,7 +19,7 @@ const CommentForm = ({ meadia_item }:{meadia_item:media_Item}) => {
   const onHnandleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if(session){
-      const user_with_id = await getUserId({dispatch,setUser,user,session});
+      const user_with_id = await getUserId({dispatch,setUser,user,session,messageApi});
     try {
       const res = await fetch("/api/comment", {
         method: "POST",
@@ -38,10 +41,11 @@ const CommentForm = ({ meadia_item }:{meadia_item:media_Item}) => {
       }
     } catch (error) {
       console.error(error);
-      alert("comment not posted");
+      messageApi.error("comment not posted");
     }
     }else{
       console.log('session not found')
+      messageApi.error('login to contineu')
     }
   };
 
@@ -51,6 +55,7 @@ const CommentForm = ({ meadia_item }:{meadia_item:media_Item}) => {
 
   return (
     <>
+    {contextHolder}
       <form
         onSubmit={(e) => onHnandleSubmit(e)}
         className="mb-1 gap-x-1 w-full flex justify-center items-center"
