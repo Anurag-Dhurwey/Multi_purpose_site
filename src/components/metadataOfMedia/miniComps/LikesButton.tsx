@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { AiFillLike } from "react-icons/ai";
 import { useSession } from "next-auth/react";
-import { client } from "@/lib/sanityClient";
+import { client } from "@/utilities/sanityClient";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
-import { getUserId } from "@/lib/functions/getUserId";
+import { getUserId } from "@/utilities/functions/getUserId";
 import { like, media_Item, postedBy } from "@/typeScript/basics";
 import { message } from "antd";
 

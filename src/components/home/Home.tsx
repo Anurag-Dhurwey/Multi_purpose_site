@@ -13,7 +13,7 @@ import { useSession } from "next-auth/react";
 import Media from "../media/Media";
 import LikesButton from "../metadataOfMedia/miniComps/LikesButton";
 import MobileViewMetaData from "../metadataOfMedia/MobileViewMetaData";
-import { getMediaItems } from "@/lib/functions/getMediaItems";
+import { getMediaItems } from "@/utilities/functions/getMediaItems";
 import { message } from "antd";
 
 const Home = () => {

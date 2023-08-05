@@ -8,15 +8,17 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import SideNavbar from "./miniComps/SideNavbar";
 
-
 const Navbar = () => {
-  const nav = ["home", "discover", "about", "post", "search"];
+  const nav = ["home", "chats", "suggetions", "search"];
   const { data: session } = useSession();
   const [sideNavbar, setSideNavbar] = useState<boolean>(false);
 
   return (
-    <div className="max-[430px]:h-[42px] h-[56px]" >
-      <div className={`${style.nav}`} style={{width:'100vw',position:'fixed',top:'0',zIndex:'9'}}>
+    <div className="max-[430px]:h-[42px] h-[56px]">
+      <div
+        className={`${style.nav}`}
+        style={{ width: "100vw", position: "fixed", top: "0", zIndex: "9" }}
+      >
         <span className={style.sideBarForMobile} style={{ zIndex: "10" }}>
           {!sideNavbar && (
             <button onClick={() => setSideNavbar(true)}>
@@ -25,7 +27,9 @@ const Navbar = () => {
               />
             </button>
           )}
-          {sideNavbar && <SideNavbar setSideNavbar={setSideNavbar} navRoutes={nav}/>}
+          {sideNavbar && (
+            <SideNavbar setSideNavbar={setSideNavbar} navRoutes={nav} />
+          )}
         </span>
 
         <Link href={"/"} className={style.LOGO}>
@@ -33,11 +37,15 @@ const Navbar = () => {
         </Link>
 
         <div className={style.navRoutes}>
-        <ul>
-          {nav.map((nav, i) => {
-            return <li key={i}>{nav}</li>;
-          })}
-        </ul>
+          <ul>
+            {nav.map((nav, i) => {
+              return (
+                <li key={i}>
+                  <Link href={`/${nav}`}>{nav}</Link>
+                </li>
+              );
+            })}
+          </ul>
         </div>
 
         <div className={style.right}>

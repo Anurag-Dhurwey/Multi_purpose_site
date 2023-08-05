@@ -1,4 +1,4 @@
-import { client } from "@/lib/sanityClient";
+import { client } from "@/utilities/sanityClient";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {

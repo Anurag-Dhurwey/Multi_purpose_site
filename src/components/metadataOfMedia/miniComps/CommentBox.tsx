@@ -5,7 +5,7 @@ import style from "./commentBox.module.css";
 import { useSession } from "next-auth/react";
 import CommentForm from "./CommentForm";
 import { media_Item } from "@/typeScript/basics";
-import { client } from "@/lib/sanityClient";
+import { client } from "@/utilities/sanityClient";
 import { set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { message } from "antd";

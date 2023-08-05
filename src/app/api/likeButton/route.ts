@@ -1,4 +1,4 @@
-import { client } from "@/lib/sanityClient";
+import { client } from "@/utilities/sanityClient";
 import { like } from "@/typeScript/basics";
 import { NextResponse } from "next/server";
 

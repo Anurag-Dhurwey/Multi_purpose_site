@@ -69,3 +69,12 @@ export interface like{
   email:string,
   userId:string
 }
+
+
+export interface socketIoConnectionType {
+  session: session;
+  dispatch: Function;
+  user: user;
+  setUser: Function;
+  set_onLineUsers: Function;
+}

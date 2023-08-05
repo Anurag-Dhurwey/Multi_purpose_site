@@ -4,7 +4,7 @@ import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { IoMdSend } from "react-icons/io";
-import { getUserId } from "@/lib/functions/getUserId";
+import { getUserId } from "@/utilities/functions/getUserId";
 import { media_Item } from "@/typeScript/basics";
 import { message } from "antd";
 

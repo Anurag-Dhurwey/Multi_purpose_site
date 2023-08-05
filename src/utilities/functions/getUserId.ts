@@ -7,7 +7,7 @@ interface states {
   setUser: Function;
   user:user,
   session:session;
-  messageApi:MessageInstance;
+  messageApi?:MessageInstance;
 }
 
 
@@ -35,7 +35,7 @@ export const getUserId = async (
       };
     } catch (error) {
       console.error(error);
-      messageApi.error(`internal server error `);
+      messageApi?.error(`internal server error `);
     }
   } else {
     return user;

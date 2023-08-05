@@ -4,16 +4,22 @@ import { user, uploadForm, media_Item } from "@/typeScript/basics";
 import style from "./upload.module.css";
 import { Upload } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import { setUser, set_media_items } from "@/redux_toolkit/features/indexSlice";
-import { client } from "@/lib/sanityClient";
+
+import {
+  setUser,
+  set_media_items,
+  set_onLineUsers,
+} from "@/redux_toolkit/features/indexSlice";
 import { useSession } from "next-auth/react";
-import { getUserId } from "@/lib/functions/getUserId";
-import { getMediaItems } from "@/lib/functions/getMediaItems";
+import { client } from "@/utilities/sanityClient";
+import { getMediaItems } from "@/utilities/functions/getMediaItems";
+import { getUserId } from "@/utilities/functions/getUserId";
+import { socketIoConnection } from "@/utilities/socketIo";
 import { message } from "antd";
 
 const Page = () => {
   const dispatch = useAppDispatch();
-  const [messageApi, contextHolder]=message.useMessage()
+  const [messageApi, contextHolder] = message.useMessage();
   const user = useAppSelector((state) => state.hooks.user);
   const meadia_items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
@@ -52,7 +58,7 @@ const Page = () => {
           setUser,
           user,
           session,
-          messageApi
+          messageApi,
         });
         uploadingData(
           file,
@@ -72,10 +78,17 @@ const Page = () => {
   useEffect(() => {
     if (session) {
       if (!meadia_items.length) {
-        getMediaItems({ dispatch, set_media_items ,messageApi});
+        getMediaItems({ dispatch, set_media_items, messageApi });
       }
     }
   }, [session]);
+
+  useEffect(() => {
+    if (session) {
+      socketIoConnection({ session, set_onLineUsers, setUser, dispatch, user });
+    }
+  }, [session]);
+
   return (
     <div className="flex justify-center items-start w-screen min-h-screen bg-slate-200">
       {contextHolder}
