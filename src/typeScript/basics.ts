@@ -9,13 +9,40 @@ export interface sessionUser {
   name?: string | null;
   email?: string | null;
 }
+export interface userTosendReq {
+  _id: string;
+  name: string;
+  email: string;
+  image: string;
+  bio:string;
+  desc: string;
+  link: string;
+}
+
 export interface user {
   _id?: string;
   name?: string;
   email?: string;
   image?: string;
+  bio?:string;
   desc?: string;
   link?: string;
+  connections?: connections;
+}
+
+export interface connections {
+  connectedUsr: Array<{
+    userId: string;
+    name: string;
+    mail: string;
+    img: string;
+  }>;
+  requests: Array<{
+    userId: string;
+    name: string;
+    mail: string;
+    img: string;
+  }>;
 }
 
 export interface uploadForm {
@@ -33,11 +60,11 @@ export interface media_Item {
   tag: string;
   likes: Array<like>;
   comments: Array<{
-    _key:string;
+    _key: string;
     comment: string;
-    name:string;
-    email:string;
-    userId:string
+    name: string;
+    email: string;
+    userId: string;
   }>;
   _updatedAt?: string;
   _createdAt?: string;
@@ -62,14 +89,12 @@ export interface postedBy {
   name: string;
 }
 
-
-export interface like{
+export interface like {
   _key: string;
-  name:string,
-  email:string,
-  userId:string
+  name: string;
+  email: string;
+  userId: string;
 }
-
 
 export interface socketIoConnectionType {
   session: session;
@@ -77,4 +102,8 @@ export interface socketIoConnectionType {
   user: user;
   setUser: Function;
   set_onLineUsers: Function;
+}
+
+export interface suggestedData {
+  users: Array<userTosendReq>;
 }

@@ -1,10 +1,10 @@
 import { userAgent } from "next/server";
 import { client } from "../sanityClient";
 import { MessageInstance } from "antd/es/message/interface";
-import { session, sessionUser, user } from "@/typeScript/basics";
+import { connections, session, sessionUser, user } from "@/typeScript/basics";
 interface states {
   dispatch: Function;
-  setUser: Function;
+  setUser: (action:user)=>void;
   user:user,
   session:session;
   messageApi?:MessageInstance;
@@ -14,24 +14,29 @@ interface states {
 export const getUserId = async (
   { dispatch, setUser,user,session, messageApi}: states
 ) => {
-  if (!user._id) {
+  if (!user._id && session.user?.name && session.user?.email && session.user?.image) {
     try {
-      const id = await client.fetch(
-        `*[_type=="user" && email=="${session?.user?.email}"]{_id}`
+      const res :Array<{_id:string,connections:connections}>= await client.fetch(
+        `*[_type=="user" && email=="${session?.user?.email}"]{_id,connections}`
       );
       dispatch(
         setUser({
           ...user,
-          _id: id[0]._id,
+          _id: res[0]._id,
           name: session?.user?.name,
           email: session?.user?.email,
+          connections:res[0].connections,
+          image:session?.user?.image
+          
         })
       );
       return {
         ...user,
-        _id: id[0]._id,
+        _id: res[0]._id,
         name: session?.user?.name,
         email: session?.user?.email,
+        connections:res[0].connections,
+        image:session?.user?.image
       };
     } catch (error) {
       console.error(error);
@@ -41,4 +46,3 @@ export const getUserId = async (
     return user;
   }
 };
-
