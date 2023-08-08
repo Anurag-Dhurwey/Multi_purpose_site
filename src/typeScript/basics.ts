@@ -1,3 +1,5 @@
+import { onlineUsers } from "@/redux_toolkit/features/indexSlice";
+
 export interface session {
   user?: sessionUser;
 }
@@ -9,41 +11,47 @@ export interface sessionUser {
   name?: string | null;
   email?: string | null;
 }
-export interface userTosendReq {
+
+export interface users {
   _id: string;
   name: string;
   email: string;
   image: string;
-  bio:string;
+  bio: string;
   desc: string;
   link: string;
+  connections?: { connectedUsr: connectedUsr };
 }
 
-export interface user {
+export interface admin {
   _id?: string;
   name?: string;
   email?: string;
   image?: string;
-  bio?:string;
+  bio?: string;
   desc?: string;
   link?: string;
   connections?: connections;
 }
 
+export type me = admin;
+
 export interface connections {
-  connectedUsr: Array<{
-    userId: string;
-    name: string;
-    mail: string;
-    img: string;
-  }>;
-  requests: Array<{
-    userId: string;
-    name: string;
-    mail: string;
-    img: string;
-  }>;
+  connectedUsr: connectedUsr;
+  requests: requests;
 }
+type connectedUsr = Array<{
+  userId: string;
+  name: string;
+  mail: string;
+  img: string;
+}>;
+type requests = Array<{
+  userId: string;
+  name: string;
+  mail: string;
+  img: string;
+}>;
 
 export interface uploadForm {
   caption: string;
@@ -59,16 +67,18 @@ export interface media_Item {
   desc: string;
   tag: string;
   likes: Array<like>;
-  comments: Array<{
-    _key: string;
-    comment: string;
-    name: string;
-    email: string;
-    userId: string;
-  }>;
+  comments: comments;
   _updatedAt?: string;
   _createdAt?: string;
 }
+
+type comments = Array<{
+  _key: string;
+  comment: string;
+  name: string;
+  email: string;
+  userId: string;
+}>;
 
 export interface meadiaFile {
   _type: string;
@@ -99,11 +109,11 @@ export interface like {
 export interface socketIoConnectionType {
   session: session;
   dispatch: Function;
-  user: user;
-  setUser: Function;
-  set_onLineUsers: Function;
+  admin: admin;
+  set_Admin: (action: admin) => void;
+  set_onLineUsers: (action: Array<onlineUsers>) => void;
 }
 
 export interface suggestedData {
-  users: Array<userTosendReq>;
+  users: Array<users>;
 }

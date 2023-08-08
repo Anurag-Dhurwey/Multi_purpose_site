@@ -1,12 +1,12 @@
 import { client } from "@/utilities/sanityClient";
 import { NextResponse } from "next/server";
-import { uploadForm, user } from "@/typeScript/basics";
+import { uploadForm, admin } from "@/typeScript/basics";
 
 interface Body {
   uploadedFileRes: {
     _id:string
   };
-  user: user;
+  user: admin;
   form: uploadForm;
 }
 

@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import {
-  setUser,
+  set_Admin,
   set_my_uploads,
   set_media_items,
   set_onLineUsers,
@@ -16,11 +16,11 @@ const Page = () => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
 
-  const getUserInfo = async () => {
+  const getAdminData = async () => {
     const userData = await client.fetch(
       `*[_type=="user" && email=="${session?.user?.email}"]`
     );
-    dispatch(setUser({ ...userData[0] }));
+    dispatch(set_Admin({ ...userData[0] }));
   };
 
   const getMyUploads = async () => {
@@ -32,15 +32,15 @@ const Page = () => {
     return media;
   };
 
-  const user = useAppSelector((state) => state.hooks.user);
-  const { name, email, image, _id } = user;
+  const admin = useAppSelector((state) => state.hooks.admin);
+  const { name, email, image, _id } = admin;
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
   const my_uploads = useAppSelector((state) => state.hooks.my_uploads);
 
   useEffect(() => {
     if (session) {
-      if (!user.email || !user.name || !user.image) {
-        getUserInfo();
+      if (!admin.email || !admin.name || !admin.image) {
+        getAdminData();
       }
 
       if (!my_uploads.length) {
@@ -53,7 +53,7 @@ const Page = () => {
 
   useEffect(() => {
     if (session) {
-      socketIoConnection({ session, set_onLineUsers, setUser, dispatch, user });
+      socketIoConnection({ session, set_onLineUsers, set_Admin, dispatch, admin });
     }
   }, [session]);
 
@@ -71,7 +71,7 @@ const Page = () => {
   return (
     <div className="w-full flex flex-col justify-center items-start">
       <div className="flex justify-between items-center gap-x-5">
-        {user.image && session.user?.image && (
+        {admin.image && session.user?.image && (
           <Image
             src={session.user?.image}
             width={1000}

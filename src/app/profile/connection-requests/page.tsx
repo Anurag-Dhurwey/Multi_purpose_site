@@ -2,24 +2,24 @@
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { getUserId } from "@/utilities/functions/getUserId";
-import { setUser } from "@/redux_toolkit/features/indexSlice";
+import { getAdminData } from "@/utilities/functions/getAdminData";
+import { set_Admin } from "@/redux_toolkit/features/indexSlice";
 import Image from "next/image";
 const Page = () => {
   const dispatch=useAppDispatch()
   const { data: session } = useSession();
   const connectionRequests = useAppSelector(
-    (state) => state.hooks.user.connections?.requests
+    (state) => state.hooks.admin.connections?.requests
   );
-  const user=useAppSelector(state=>state.hooks.user)
+  const admin=useAppSelector(state=>state.hooks.admin)
   console.log(connectionRequests);
   if (!session) {
     return null;
   }
 
   useEffect(() => {
-    if (session) {
-      getUserId({dispatch,user,session,setUser})
+    if (session && !admin._id) {
+      getAdminData({dispatch,admin,session,set_Admin})
     }
     console.log('hello')
   }, [session]);

@@ -1,14 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { media_Item, suggestedData, user, userTosendReq } from "@/typeScript/basics";
+import { media_Item, suggestedData, admin, users } from "@/typeScript/basics";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export interface onlineUsers extends user {
-  socketId: String;
-}
+
 
 export interface CounterState {
   darkmode: boolean;
-  user: user;
+  admin: admin;
   media_Items: Array<media_Item>;
   my_uploads: Array<media_Item>;
   onLineUsers: Array<onlineUsers>;
@@ -16,7 +14,7 @@ export interface CounterState {
 }
 const initialState: CounterState = {
   darkmode: false,
-  user: {},
+  admin: {},
   media_Items: [],
   my_uploads: [],
   onLineUsers: [],
@@ -30,22 +28,22 @@ export const counterSlice = createSlice({
     toggle_dark_mode: (state) => {
       state.darkmode = !state.darkmode;
     },
-    setUser: (state, action:PayloadAction<user>) => {
-      state.user = action.payload;
+    set_Admin: (state, action:PayloadAction<admin>) => {
+      state.admin = action.payload;
     },
-    set_media_items: (state, action) => {
+    set_media_items: (state, action:PayloadAction<Array<media_Item>>) => {
       state.media_Items = [...action.payload];
     },
-    set_my_uploads: (state, action) => {
+    set_my_uploads: (state,  action:PayloadAction<Array<media_Item>>) => {
       state.my_uploads = [...action.payload];
     },
-    set_onLineUsers: (state, action) => {
+    set_onLineUsers: (state,  action:PayloadAction<Array<onlineUsers>>) => {
       state.onLineUsers = [...action.payload];
     },
     set_suggestedData: (state, action:PayloadAction<suggestedDataPayloadType>) => {
       const { _type }: { _type: String } = action.payload;
       if (_type == "users") {
-        const { data }: { data: Array<userTosendReq> } = action.payload;
+        const { data }: { data: Array<users> } = action.payload;
         state.suggestedData = { users: [...data] };
       }
     },
@@ -57,7 +55,7 @@ export const {
   toggle_dark_mode,
   set_media_items,
   set_my_uploads,
-  setUser,
+  set_Admin,
   set_onLineUsers,
   set_suggestedData
 } = counterSlice.actions;
@@ -68,5 +66,10 @@ export default counterSlice.reducer;
 
 interface suggestedDataPayloadType{
   _type:string;
-  data:Array<userTosendReq>
+  data:Array<users>
+}
+
+
+export interface onlineUsers extends users {
+  socketId: String;
 }

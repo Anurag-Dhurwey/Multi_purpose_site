@@ -2,21 +2,21 @@
 import React, { use, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getSuggestedUsers } from "@/utilities/functions/getSuggestedUsers";
-import { userTosendReq } from "@/typeScript/basics";
+import { users } from "@/typeScript/basics";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import {
-  setUser,
+  set_Admin,
   set_suggestedData,
 } from "@/redux_toolkit/features/indexSlice";
 import Image from "next/image";
 import { client } from "@/utilities/sanityClient";
 import { message } from "antd";
-import { getUserId } from "@/utilities/functions/getUserId";
+import { getAdminData } from "@/utilities/functions/getAdminData";
 const page = () => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
   const suggestedData = useAppSelector((state) => state.hooks.suggestedData);
-  const user = useAppSelector((state) => state.hooks.user);
+  const admin = useAppSelector((state) => state.hooks.admin);
   async function configureSuggestions() {
     if (session) {
       if (!suggestedData.users.length) {
@@ -30,8 +30,8 @@ const page = () => {
     }
   }
 
-  async function sendRequestHandler(userTosendReq: userTosendReq) {
-    if (user._id) {
+  async function sendRequestHandler(userTosendReq: users) {
+    if (admin._id) {
       console.log(userTosendReq.email, userTosendReq.name);
       try {
         const res = await client
@@ -39,10 +39,10 @@ const page = () => {
           .setIfMissing({ connections: { requests: [] } })
           .insert("after", "connections.requests[-1]", [
             {
-              name: user.name,
-              userId: user._id,
-              mail: user.email,
-              img: user.image,
+              name: admin.name,
+              userId: admin._id,
+              mail: admin.email,
+              img: admin.image,
             },
           ])
           .commit({ autoGenerateArrayKeys: true });
@@ -60,8 +60,8 @@ const page = () => {
 
   useEffect(() => {
     configureSuggestions();
-    if (!user._id && session) {
-      getUserId({ dispatch, setUser, user, session });
+    if (!admin._id && session) {
+      getAdminData({ dispatch, set_Admin, admin, session });
     }
   }, [session]);
 

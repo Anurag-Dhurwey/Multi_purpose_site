@@ -6,7 +6,7 @@ import { RootState } from "@/redux_toolkit/store";
 import {
   toggle_dark_mode,
   set_media_items,
-  setUser,
+  set_Admin,
 } from "../../redux_toolkit/features/indexSlice";
 import DesktopMetaData from "../metadataOfMedia/DesktopMetaData";
 import { useSession } from "next-auth/react";
@@ -19,7 +19,7 @@ import { message } from "antd";
 const Home = () => {
   const scrrenMode = useAppSelector((state: RootState) => state.hooks.darkmode);
   const { data: session } = useSession();
-  const user = useAppSelector((state) => state.hooks.user);
+  const admin = useAppSelector((state) => state.hooks.admin);
   const media_Items = useAppSelector(
     (state: RootState) => state.hooks.media_Items
   );
@@ -30,12 +30,12 @@ const Home = () => {
     if (!media_Items?.length) {
       getMediaItems({dispatch,set_media_items,messageApi});
     }
-    if (!user.email) {
+    if (session?.user?.name && session?.user?.email && !admin.email) {
       dispatch(
-        setUser({
-          ...user,
-          name: session?.user?.name,
-          email: session?.user?.email,
+        set_Admin({
+          ...admin,
+          name: session.user.name,
+          email: session.user.email,
         })
       );
     }

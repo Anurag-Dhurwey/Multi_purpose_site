@@ -2,13 +2,13 @@
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import { setUser } from "@/redux_toolkit/features/indexSlice";
-import { getUserId } from "@/lib";
+import { set_Admin } from "@/redux_toolkit/features/indexSlice";
+import { getAdminData } from "@/utilities/functions/getAdminData";
 const page = () => {
 
     const dispatch = useAppDispatch();
     const { data: session } = useSession();
-    const user = useAppSelector((state) => state.hooks.user);
+    const admin = useAppSelector((state) => state.hooks.admin);
     const onLineUsers=useAppSelector((state)=>state.hooks.onLineUsers)
   
     useEffect(() => {

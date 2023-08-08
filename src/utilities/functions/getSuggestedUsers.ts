@@ -1,10 +1,10 @@
 
 import {client} from '../sanityClient'
-import { userTosendReq} from '@/typeScript/basics'
+import { users} from '@/typeScript/basics'
 async function getSuggestedUsers() {
     try {
-        const usersArr:Array<userTosendReq> = await client.fetch(
-            `*[_type=="user" ]{_id,name,image,email,requests,connectedUsr}`
+        const usersArr:Array<users> = await client.fetch(
+            `*[_type=="user" ]{_id,name,image,email,connections{connectedUsr}}`
           );
 
           return usersArr

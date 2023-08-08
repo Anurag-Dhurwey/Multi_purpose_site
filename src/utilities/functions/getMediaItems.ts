@@ -3,7 +3,7 @@ import { client } from "../sanityClient";
 import { MessageInstance } from "antd/es/message/interface";
 interface states {
   dispatch: Function;
-  set_media_items: Function;
+  set_media_items: (payload:Array<media_Item>)=>void;
   messageApi:MessageInstance;
 }
 

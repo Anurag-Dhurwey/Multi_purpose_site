@@ -1,26 +1,26 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { user, uploadForm, media_Item } from "@/typeScript/basics";
+import { admin, uploadForm, media_Item } from "@/typeScript/basics";
 import style from "./upload.module.css";
 import { Upload } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 
 import {
-  setUser,
+  set_Admin,
   set_media_items,
   set_onLineUsers,
 } from "@/redux_toolkit/features/indexSlice";
 import { useSession } from "next-auth/react";
 import { client } from "@/utilities/sanityClient";
 import { getMediaItems } from "@/utilities/functions/getMediaItems";
-import { getUserId } from "@/utilities/functions/getUserId";
+import { getAdminData } from "@/utilities/functions/getAdminData";
 import { socketIoConnection } from "@/utilities/socketIo";
 import { message } from "antd";
 
 const Page = () => {
   const dispatch = useAppDispatch();
   const [messageApi, contextHolder] = message.useMessage();
-  const user = useAppSelector((state) => state.hooks.user);
+  const admin = useAppSelector((state) => state.hooks.admin);
   const meadia_items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
 
@@ -50,28 +50,28 @@ const Page = () => {
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (session && file) {
+    if (session && file && admin._id) {
       if (!isFileValid.length) {
         setModal(true);
-        const user_with_id = await getUserId({
-          dispatch,
-          setUser,
-          user,
-          session,
-          messageApi,
-        });
-        uploadingData(
+        // const user_with_id = await getAdminData({
+        //   dispatch,
+        //   set_Admin,
+        //   admin,
+        //   session,
+        //   messageApi,
+        // });
+        uploadingData({
           file,
           form,
-          user_with_id,
-          { set_media_items, setIsPosting, dispatch, setOnSuccess },
-          meadia_items
-        );
+          admin,
+          meadia_items,
+          States: { set_media_items, setIsPosting, dispatch, setOnSuccess },
+        });
       } else if (isFileValid.length) {
         alert(isFileValid[0].message);
       }
     } else {
-      console.log("session not found");
+      console.log("session or adminId not found");
     }
   };
 
@@ -85,7 +85,13 @@ const Page = () => {
 
   useEffect(() => {
     if (session) {
-      socketIoConnection({ session, set_onLineUsers, setUser, dispatch, user });
+      socketIoConnection({
+        session,
+        set_onLineUsers,
+        set_Admin,
+        dispatch,
+        admin,
+      });
     }
   }, [session]);
 
@@ -177,17 +183,23 @@ function checkFileSize(file: File, setIsFileValid: Function) {
 interface useStates {
   setIsPosting: Function;
   dispatch: Function;
-  set_media_items: Function;
+  set_media_items: (payload:Array<media_Item>)=>void;
   setOnSuccess: Function;
 }
 
-async function uploadingData(
-  file: File,
-  form: uploadForm,
-  user: user_with_id,
-  States: useStates,
-  meadia_items: Array<media_Item>
-) {
+async function uploadingData({
+  file,
+  form,
+  admin,
+  States,
+  meadia_items,
+}: {
+  file: File;
+  form: uploadForm;
+  admin: admin;
+  States: useStates;
+  meadia_items: Array<media_Item>;
+}) {
   const { dispatch, setIsPosting, set_media_items, setOnSuccess } = States;
   try {
     setIsPosting(true);
@@ -200,7 +212,7 @@ async function uploadingData(
       try {
         const postedData = await fetch("/api/upload", {
           method: "POST",
-          body: JSON.stringify({ uploadedFileRes, user, form }),
+          body: JSON.stringify({ uploadedFileRes, user: admin, form }),
         });
         const jsonData = await postedData.json();
         if (jsonData) {
@@ -223,14 +235,14 @@ async function uploadingData(
 }
 
 // below type is for resolving type script error
-type user_with_id =
-  | user
-  | {
-      _id: any;
-      name: string | null | undefined;
-      email: string | null | undefined;
-      image?: string | undefined;
-      desc?: string | undefined;
-      link?: string | undefined;
-    }
-  | undefined;
+// type user_with_id =
+//   | user
+//   | {
+//       _id: any;
+//       name: string | null | undefined;
+//       email: string | null | undefined;
+//       image?: string | undefined;
+//       desc?: string | undefined;
+//       link?: string | undefined;
+//     }
+//   | undefined;
