@@ -1,8 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { media_Item, suggestedData, admin, users } from "@/typeScript/basics";
+import {
+  media_Item,
+  suggestedData,
+  admin,
+  users,
+  usersMinData,
+  connections,
+} from "@/typeScript/basics";
 import type { PayloadAction } from "@reduxjs/toolkit";
-
-
 
 export interface CounterState {
   darkmode: boolean;
@@ -28,19 +33,54 @@ export const counterSlice = createSlice({
     toggle_dark_mode: (state) => {
       state.darkmode = !state.darkmode;
     },
-    set_Admin: (state, action:PayloadAction<admin>) => {
+    set_Admin: (state, action: PayloadAction<admin>) => {
       state.admin = action.payload;
     },
-    set_media_items: (state, action:PayloadAction<Array<media_Item>>) => {
+    set_Admins_Connections: (
+      state,
+      action: PayloadAction<setAdminConnectionsPayloadType>
+    ) => {
+      const { command, data, current } = action.payload;
+      console.log(command,data,current)
+      if (command == "accept") {
+        console.log('entered in Accept hook')
+        const updatedRequests = current.requests.filter((user) => {
+          return user.userId !== data.userId;
+        });
+        state.admin.connections = {
+          connectedUsr: [data, ...current.connectedUsr],
+          requests: [...updatedRequests],
+        };
+      } else if (command == "reject") {
+        console.log('entered in Reject hook')
+        const updatedConnectedUser = current.connectedUsr.filter((user) => {
+          return user.userId !== data.userId;
+        });
+        state.admin.connections = {
+          connectedUsr: [...updatedConnectedUser],
+          requests: [...current.requests],
+        };
+      }else if(command=="request"){
+        console.log('entered in Request hook')
+        state.admin.connections={
+          connectedUsr:current.connectedUsr,
+          requests:[data,...current.requests]
+        }
+      }
+    },
+    set_media_items: (state, action: PayloadAction<Array<media_Item>>) => {
       state.media_Items = [...action.payload];
     },
-    set_my_uploads: (state,  action:PayloadAction<Array<media_Item>>) => {
+    set_my_uploads: (state, action: PayloadAction<Array<media_Item>>) => {
       state.my_uploads = [...action.payload];
     },
-    set_onLineUsers: (state,  action:PayloadAction<Array<onlineUsers>>) => {
+    set_onLineUsers: (state, action: PayloadAction<Array<onlineUsers>>) => {
       state.onLineUsers = [...action.payload];
     },
-    set_suggestedData: (state, action:PayloadAction<suggestedDataPayloadType>) => {
+    set_suggestedData: (
+      state,
+      action: PayloadAction<suggestedDataPayloadType>
+    ) => {
       const { _type }: { _type: String } = action.payload;
       if (_type == "users") {
         const { data }: { data: Array<users> } = action.payload;
@@ -56,20 +96,24 @@ export const {
   set_media_items,
   set_my_uploads,
   set_Admin,
+  set_Admins_Connections,
   set_onLineUsers,
-  set_suggestedData
+  set_suggestedData,
 } = counterSlice.actions;
 
 export default counterSlice.reducer;
 
-
-
-interface suggestedDataPayloadType{
-  _type:string;
-  data:Array<users>
+interface suggestedDataPayloadType {
+  _type: string;
+  data: Array<users>;
 }
-
 
 export interface onlineUsers extends users {
   socketId: String;
 }
+
+type setAdminConnectionsPayloadType = {
+  command: string;
+  data: usersMinData;
+  current: connections;
+};

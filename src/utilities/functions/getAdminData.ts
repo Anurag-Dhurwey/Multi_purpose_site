@@ -27,13 +27,18 @@ export const getAdminData = async ({
         await client.fetch(
           `*[_type=="user" && email=="${session?.user?.email}"]{_id,connections}`
         );
+      console.log(res);
+      const con = res[0].connections;
       dispatch(
         set_Admin({
           ...admin,
           _id: res[0]._id,
           name: session?.user?.name,
           email: session?.user?.email,
-          connections: res[0].connections,
+          connections: {
+            connectedUsr: con?.connectedUsr ? [...con.connectedUsr] : [],
+            requests: con?.requests ? [...con.requests] : [],
+          },
           image: session?.user?.image,
         })
       );
@@ -42,7 +47,10 @@ export const getAdminData = async ({
         _id: res[0]._id,
         name: session?.user?.name,
         email: session?.user?.email,
-        connections: res[0].connections,
+        connections: {
+          connectedUsr: con?.connectedUsr ? [...con.connectedUsr] : [],
+          requests: con?.requests ? [...con.requests] : [],
+        },
         image: session?.user?.image,
       };
     } catch (error) {

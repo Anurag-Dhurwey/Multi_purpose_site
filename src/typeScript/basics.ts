@@ -1,5 +1,6 @@
-import { onlineUsers } from "@/redux_toolkit/features/indexSlice";
-
+import { CounterState, onlineUsers } from "@/redux_toolkit/features/indexSlice";
+import { MessageInstance } from "antd/es/message/interface";
+import { TypedUseSelectorHook } from "react-redux";
 export interface session {
   user?: sessionUser;
 }
@@ -20,7 +21,7 @@ export interface users {
   bio: string;
   desc: string;
   link: string;
-  connections?: { connectedUsr: connectedUsr };
+  connections?: { connectedUsr: usersMinData };
 }
 
 export interface admin {
@@ -37,21 +38,22 @@ export interface admin {
 export type me = admin;
 
 export interface connections {
-  connectedUsr: connectedUsr;
-  requests: requests;
+  connectedUsr: Array<usersMinData>;
+  requests: Array<usersMinData>;
 }
-type connectedUsr = Array<{
+export type usersMinData = {
+  _key: string;
   userId: string;
   name: string;
   mail: string;
   img: string;
-}>;
-type requests = Array<{
-  userId: string;
-  name: string;
-  mail: string;
-  img: string;
-}>;
+};
+// type requests = Array<{
+//   userId: string;
+//   name: string;
+//   mail: string;
+//   img: string;
+// }>;
 
 export interface uploadForm {
   caption: string;
@@ -112,6 +114,7 @@ export interface socketIoConnectionType {
   admin: admin;
   set_Admin: (action: admin) => void;
   set_onLineUsers: (action: Array<onlineUsers>) => void;
+  message: MessageInstance;
 }
 
 export interface suggestedData {

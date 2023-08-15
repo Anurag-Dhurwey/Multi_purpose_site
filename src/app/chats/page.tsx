@@ -2,8 +2,10 @@
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import { set_Admin } from "@/redux_toolkit/features/indexSlice";
+import { set_Admin, set_onLineUsers } from "@/redux_toolkit/features/indexSlice";
 import { getAdminData } from "@/utilities/functions/getAdminData";
+import { socketIoConnection } from "@/utilities/socketIo";
+import { Chat } from "@/components";
 const page = () => {
 
     const dispatch = useAppDispatch();
@@ -11,14 +13,21 @@ const page = () => {
     const admin = useAppSelector((state) => state.hooks.admin);
     const onLineUsers=useAppSelector((state)=>state.hooks.onLineUsers)
   
-    useEffect(() => {
-    console.log({onLineUsers})
-    }, [session]);
+    if(!session){
+      return null
+    }
+
+    // useEffect(() => {
+    //  if(session){
+    //   socketIoConnection({session,dispatch,admin,set_Admin,set_onLineUsers})
+    //   console.log({onLineUsers})
+    //  }
+    // }, [session]);
 
   return (
-    <div>
-      <h1>hello</h1>
-    </div>
+    <section>
+     <Chat/>
+    </section>
   )
 }
 

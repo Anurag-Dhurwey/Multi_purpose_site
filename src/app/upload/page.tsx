@@ -75,14 +75,10 @@ const Page = () => {
     }
   };
 
-  useEffect(() => {
-    if (session) {
-      if (!meadia_items.length) {
-        getMediaItems({ dispatch, set_media_items, messageApi });
-      }
-    }
-  }, [session]);
-
+  if (!session) {
+    return null;
+  }
+  
   useEffect(() => {
     if (session) {
       socketIoConnection({
@@ -91,7 +87,16 @@ const Page = () => {
         set_Admin,
         dispatch,
         admin,
+        message
       });
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (session) {
+      if (!meadia_items.length) {
+        getMediaItems({ dispatch, set_media_items, messageApi });
+      }
     }
   }, [session]);
 
@@ -183,7 +188,7 @@ function checkFileSize(file: File, setIsFileValid: Function) {
 interface useStates {
   setIsPosting: Function;
   dispatch: Function;
-  set_media_items: (payload:Array<media_Item>)=>void;
+  set_media_items: (payload: Array<media_Item>) => void;
   setOnSuccess: Function;
 }
 

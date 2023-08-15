@@ -12,16 +12,11 @@ import { client } from "@/utilities/sanityClient";
 import { socketIoConnection } from "@/utilities/socketIo";
 import Image from "next/image";
 import { Media } from "@/components";
+import { message } from "antd";
 const Page = () => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
 
-  const getAdminData = async () => {
-    const userData = await client.fetch(
-      `*[_type=="user" && email=="${session?.user?.email}"]`
-    );
-    dispatch(set_Admin({ ...userData[0] }));
-  };
 
   const getMyUploads = async () => {
     const media = await client.fetch(
@@ -37,25 +32,29 @@ const Page = () => {
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
   const my_uploads = useAppSelector((state) => state.hooks.my_uploads);
 
+  // useEffect(() => {
+  //   if (session) {
+  //     if (!admin.email || !admin.name || !admin.image) {
+  //       getAdminData();
+  //     }
+  //   }
+  // }, [session, media_Items]);
+
   useEffect(() => {
     if (session) {
-      if (!admin.email || !admin.name || !admin.image) {
-        getAdminData();
-      }
-
+      socketIoConnection({
+        session,
+        set_onLineUsers,
+        set_Admin,
+        dispatch,
+        admin,
+        message:message
+      });
       if (!my_uploads.length) {
         getMyUploads();
       }
-    } else {
-      console.log("session not found login again");
     }
-  }, [session, media_Items]);
-
-  useEffect(() => {
-    if (session) {
-      socketIoConnection({ session, set_onLineUsers, set_Admin, dispatch, admin });
-    }
-  }, [session]);
+  }, [session,media_Items]);
 
   if (!session) {
     return (
