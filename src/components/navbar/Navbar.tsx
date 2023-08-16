@@ -9,7 +9,7 @@ import Link from "next/link";
 import SideNavbar from "./miniComps/SideNavbar";
 
 const Navbar = () => {
-  const nav = ["home", "chats", "suggetions", "search"];
+  const nav = [ "chats", "suggetions","connections"];
   const { data: session } = useSession();
   const [sideNavbar, setSideNavbar] = useState<boolean>(false);
 

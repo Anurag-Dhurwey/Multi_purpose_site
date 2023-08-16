@@ -12,8 +12,6 @@ export async function socketIoConnection({
   set_onLineUsers,
   message,
 }: socketIoConnectionType) {
-  console.log("admin");
-  console.log(admin);
 
   const admin_with_id = await getAdminData({
     dispatch,
@@ -21,37 +19,36 @@ export async function socketIoConnection({
     set_Admin,
     session,
   });
-  console.log(admin_with_id);
-  // if (socket.disconnected) {
   socket.emit("onHnadshake", { user: admin_with_id });
-  // } else if (socket.connected) {
-  //   console.log("already connected");
-  // }
 
   socket.on("allOnlineUsers", (onLineUsers) => {
     dispatch(set_onLineUsers(onLineUsers));
-    console.log("allOnlineUsertest");
-    console.log(onLineUsers);
+    console.log({str:"allOnlineUsertest",onLineUsers});
   });
 
-  socket.on("ConnectionRequestToUser", (msg) => {
-    console.log(msg);
-    console.log("msg");
+  // this below variable is to prevent socket_io event "ConnectionRequestToUser" to running multiple time
+  let oneTimeRunner: string = "initial";
 
-    // setTimeout(() => {
-      if (admin_with_id?.connections && msg.user ) {
-        set_Admins_Connections({
-          command: "request",
-          data: msg.user,
-          current: admin_with_id.connections,
-        });
+  socket.on("ConnectionRequestToUser", (msg) => {
+
+    if (oneTimeRunner != msg.user._id) {
+      console.log(oneTimeRunner, msg.user._id);
+      oneTimeRunner = msg.user._id;
+      if (admin_with_id?.connections && msg.user) {
+        const {user,_key}=msg
+        dispatch(
+          set_Admins_Connections({
+            command: "request",
+            data: {userId:user._id,name:user.name,mail:user.email,img:user.image,_key},
+            current: admin_with_id.connections,
+          })
+        );
         message.info(`${msg.user.name} wants to connect with you.`);
-        console.log(`${msg.user.name} wants to connect with you.`);
       } else {
         console.log("something went wrong");
       }
-    // }, 1000);
-    console.log("connection request");
+    }else{console.log('same')}
+
   });
   socket.on("disconnect", () => {
     console.log("connection lost");

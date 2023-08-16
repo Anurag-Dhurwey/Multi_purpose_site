@@ -139,8 +139,8 @@ const Page = () => {
   const admin = useAppSelector((state) => state.hooks.admin);
   const { data: session } = useSession();
 
-  const emitConnectionRequestSent = (userTosendReq: users) => {
-    socket.emit("ConnectionRequest", { user: userTosendReq });
+  const emitConnectionRequestSent = ({userTosendReq,_key}: {userTosendReq:users,_key:string}) => {
+    socket.emit("ConnectionRequest", { user: userTosendReq ,me:admin,_key});
   };
 
   async function sendRequestHandler(userTosendReq: users) {
@@ -165,7 +165,7 @@ const Page = () => {
         );
         console.log(check);
         if (check) {
-          emitConnectionRequestSent(userTosendReq);
+          emitConnectionRequestSent({userTosendReq,_key:check._key});
           message.success("Request sent");
         } else {
           message.error("unable to add something went wrong");

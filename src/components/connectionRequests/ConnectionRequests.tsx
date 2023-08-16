@@ -120,12 +120,11 @@ const ConnectionRequests = () => {
           (usr:usersMinData) => usr.userId == userToRejectReq.userId
         );
         if(!check){
-          set_Admins_Connections({
+          dispatch(set_Admins_Connections({
             command: "reject",
             data: userToRejectReq,
             current: admin.connections,
-          });
-          console.log('enterd in hook')
+          }));
         }else{
           console.log('something went wrong')
         }
@@ -155,13 +154,13 @@ const ConnectionRequests = () => {
               key={req.userId ? i : i}
               className="py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
             >
-              <Image
+              {req.img?(<Image
                 src={`${req.img}`}
                 height={100}
                 width={100}
                 alt="image"
                 className=" max-sm:h-16 max-sm:w-16 rounded-full overflow-hidden"
-              />
+              />):(<p></p>)}
               <p className="text-xs">{req.name}</p>
               <button className="" onClick={() => acceptRequestHandler(req)}>
                 accept

@@ -41,9 +41,8 @@ export const counterSlice = createSlice({
       action: PayloadAction<setAdminConnectionsPayloadType>
     ) => {
       const { command, data, current } = action.payload;
-      console.log(command,data,current)
       if (command == "accept") {
-        console.log('entered in Accept hook')
+        console.log("entered in Accept hook");
         const updatedRequests = current.requests.filter((user) => {
           return user.userId !== data.userId;
         });
@@ -52,19 +51,28 @@ export const counterSlice = createSlice({
           requests: [...updatedRequests],
         };
       } else if (command == "reject") {
-        console.log('entered in Reject hook')
-        const updatedConnectedUser = current.connectedUsr.filter((user) => {
+        console.log("entered in Reject hook");
+        const updatedRequests = current.requests.filter((user) => {
           return user.userId !== data.userId;
         });
         state.admin.connections = {
-          connectedUsr: [...updatedConnectedUser],
-          requests: [...current.requests],
+          connectedUsr: [...current.connectedUsr],
+          requests: [...updatedRequests],
         };
-      }else if(command=="request"){
-        console.log('entered in Request hook')
-        state.admin.connections={
-          connectedUsr:current.connectedUsr,
-          requests:[data,...current.requests]
+      } else if (command == "request") {
+        console.log("entered in Request hook");
+        const isAlreadyExist = state.admin.connections?.requests.find(
+          (usr) => usr.userId == data.userId
+        );
+
+        if (!isAlreadyExist) {
+          state.admin.connections = {
+            connectedUsr: current.connectedUsr,
+            requests: [data, ...current.requests],
+          };
+        } else {
+          console.log("already exist in request array");
+          console.log(isAlreadyExist);
         }
       }
     },
