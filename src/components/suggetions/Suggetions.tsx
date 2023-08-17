@@ -14,29 +14,21 @@ import Image from "next/image";
 import { users } from "@/typeScript/basics";
 import { socketIoConnection } from "@/utilities/socketIo";
 
-interface propType {
-  sendRequestHandler: (userTosendReq: users) => void;
-}
 
 const Suggetions = ({ sendRequestHandler }: propType) => {
+
+  const admin = useAppSelector((state) => state.hooks.admin);
+  if(!admin){
+    return null
+  }
   const dispatch: Function = useAppDispatch();
   const { data: session } = useSession();
   const suggestedData = useAppSelector((state) => state.hooks.suggestedData);
-  const admin = useAppSelector((state) => state.hooks.admin);
 
   async function configureSuggestions() {
     if (session) {
       if (!suggestedData.users.length) {
-        try {
-          const userArr = await getSuggestedUsers();
-          console.log(userArr);
-          if (userArr) {
-            dispatch(set_suggestedData({ _type: "users", data: userArr }));
-          }
-        } catch (error) {
-          message.error("something went wrong");
-        } finally {
-        }
+        const userArr = await getSuggestedUsers({admin,session,suggestedData,dispatch,set_suggestedData,message});
       }
     }
   }
@@ -60,10 +52,10 @@ const Suggetions = ({ sendRequestHandler }: propType) => {
       <ul className="flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
         {suggestedData.users ? (
           suggestedData.users.map((user, i) => {
+            if(admin?._id == user._id){return null}
             return (
               <li
                 key={user._id ? user._id : i}
-                style={{ display: admin._id == user._id ? "none" : "" }}
                 className="py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
               >
                 <Image

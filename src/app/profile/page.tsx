@@ -32,13 +32,6 @@ const Page = () => {
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
   const my_uploads = useAppSelector((state) => state.hooks.my_uploads);
 
-  // useEffect(() => {
-  //   if (session) {
-  //     if (!admin.email || !admin.name || !admin.image) {
-  //       getAdminData();
-  //     }
-  //   }
-  // }, [session, media_Items]);
 
   useEffect(() => {
     if (session) {

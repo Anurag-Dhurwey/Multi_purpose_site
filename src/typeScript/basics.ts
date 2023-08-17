@@ -1,16 +1,16 @@
 import { CounterState, onlineUsers } from "@/redux_toolkit/features/indexSlice";
 import { MessageInstance } from "antd/es/message/interface";
 import { TypedUseSelectorHook } from "react-redux";
-export interface session {
+export type session ={
   user?: sessionUser;
-}
+}|null
 
 // below properties should not be null
 // null is assined because of typescript error
-export interface sessionUser {
-  image?: string | null;
-  name?: string | null;
-  email?: string | null;
+export type sessionUser= {
+  image?: string|null ;
+  name?: string|null ;
+  email?: string|null;
 }
 
 export interface users {
@@ -18,28 +18,29 @@ export interface users {
   name: string;
   email: string;
   image: string;
-  bio: string;
-  desc: string;
-  link: string;
-  connections?: { connectedUsr: usersMinData };
+  bio?: string;
+  desc?: string;
+  link?: string;
+  connections?: { connected?: usersMinData };
 }
 
-export interface admin {
+export type admin ={
   _id?: string;
   name?: string;
   email?: string;
   image?: string;
-  bio?: string;
-  desc?: string;
-  link?: string;
+  bio?: string ;
+  desc?: string ;
+  link?: string ;
   connections?: connections;
 }
 
 export type me = admin;
 
 export interface connections {
-  connectedUsr: Array<usersMinData>;
-  requests: Array<usersMinData>;
+  connected: Array<usersMinData>;
+  requests_got: Array<usersMinData>;
+  requests_sent:Array<usersMinData>;
 }
 export type usersMinData = {
   _key: string;
@@ -48,12 +49,7 @@ export type usersMinData = {
   mail: string;
   img: string;
 };
-// type requests = Array<{
-//   userId: string;
-//   name: string;
-//   mail: string;
-//   img: string;
-// }>;
+
 
 export interface uploadForm {
   caption: string;

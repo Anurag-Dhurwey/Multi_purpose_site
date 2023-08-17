@@ -239,15 +239,4 @@ async function uploadingData({
   }
 }
 
-// below type is for resolving type script error
-// type user_with_id =
-//   | user
-//   | {
-//       _id: any;
-//       name: string | null | undefined;
-//       email: string | null | undefined;
-//       image?: string | undefined;
-//       desc?: string | undefined;
-//       link?: string | undefined;
-//     }
-//   | undefined;
+

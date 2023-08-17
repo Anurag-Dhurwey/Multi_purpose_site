@@ -4,7 +4,6 @@ import Image from "next/image";
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { set_Admin, set_onLineUsers } from "@/redux_toolkit/features/indexSlice";
-import { getAdminData } from "@/utilities/functions/getAdminData";
 import { socketIoConnection } from "@/utilities/socketIo";
 import { message } from "antd";
 const Connections = () => {
@@ -12,7 +11,7 @@ const Connections = () => {
   const admin = useAppSelector((state) => state.hooks.admin);
   const { data: session } = useSession();
   const connectedUsr = useAppSelector(
-    (state) => state.hooks.admin.connections?.connectedUsr
+    (state) => state.hooks.admin?.connections?.connected
   );
   console.log(connectedUsr);
 

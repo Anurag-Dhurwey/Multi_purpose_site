@@ -1,10 +1,7 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import React, { useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { getAdminData } from "@/utilities/functions/getAdminData";
+import React from "react";
 import {
-  set_Admin,
   set_Admins_Connections,
 } from "@/redux_toolkit/features/indexSlice";
 import Image from "next/image";
@@ -15,7 +12,7 @@ const ConnectionRequests = () => {
   const dispatch = useAppDispatch();
   // const { data: session } = useSession();
   const requests = useAppSelector(
-    (state) => state.hooks.admin.connections?.requests
+    (state) => state.hooks.admin?.connections?.requests_got
   );
   const admin = useAppSelector((state) => state.hooks.admin);
   console.log(requests);
@@ -23,9 +20,8 @@ const ConnectionRequests = () => {
   // this below function will move requested user from requests to connectedUsr
   async function acceptRequestHandler(userToAcceptReq: usersMinData) {
     const { userId, name, mail, img, _key } = userToAcceptReq;
-    console.log(userId, name, mail, img, _key);
-    if (admin._id && admin.connections) {
-      const isAlreadyExist = admin.connections?.connectedUsr?.find(
+    if (admin?._id && admin.connections) {
+      const isAlreadyExist = admin.connections?.connected?.find(
         (user) => user.userId == userToAcceptReq.userId
       );
 
@@ -34,20 +30,21 @@ const ConnectionRequests = () => {
           // adding data to connectedUsr
           const added = await client
             .patch(admin._id)
-            .setIfMissing({ connections: { connectedUsr: [] } })
-            .insert("before", "connections.connectedUsr[-1]", [
+            .setIfMissing({ connections: { connected: [] } })
+            .insert("before", "connections.connected[-1]", [
               { userId: userId, name: name, mail: mail, img: img },
             ])
             .commit({ autoGenerateArrayKeys: true });
-          const check = added.connections.connectedUsr?.find(
+          const check = added.connections.connected?.find(
             (usr: usersMinData) => usr.userId == userId
           );
+          console.log(added)
           console.log(check);
           if (check) {
             // removing request from my connections
             const removed = await client
               .patch(admin._id)
-              .unset(["connections.requests[0]", `requests[_key==${_key}]`])
+              .unset(["connections.requests_got[0]", `requests_got[_key==${_key}]`])
               .commit();
 
             dispatch(
@@ -62,8 +59,8 @@ const ConnectionRequests = () => {
             // adding admin data on friends account who want's to connect with me
             const addedInFriendsAccount = await client
               .patch(userToAcceptReq.userId)
-              .setIfMissing({ connections: { connectedUsr: [] } })
-              .insert("before", "connections.connectedUsr[-1]", [
+              .setIfMissing({ connections: { connected: [] } })
+              .insert("before", "connections.connected[-1]", [
                 {
                   userId: admin._id,
                   name: admin.name,
@@ -72,7 +69,7 @@ const ConnectionRequests = () => {
                 },
               ])
               .commit({ autoGenerateArrayKeys: true });
-            const check2 = addedInFriendsAccount.connections.connectedUsr?.find(
+            const check2 = addedInFriendsAccount.connections.connected?.find(
               (usr: usersMinData) => usr.userId == admin._id
             );
             if (check2) {
@@ -95,7 +92,7 @@ const ConnectionRequests = () => {
         try {
           const removed = await client
             .patch(admin._id)
-            .unset(["connections.requests[0]", `requests[_key==${_key}]`])
+            .unset(["connections.requests_got[0]", `requests_got[_key==${_key}]`])
             .commit();
           message.success("request accepted");
         } catch (error) {
@@ -110,13 +107,13 @@ const ConnectionRequests = () => {
 
   async function onRejectHandler(userToRejectReq: usersMinData) {
     const { _key } = userToRejectReq;
-    if (admin._id && admin.connections) {
+    if (admin?._id && admin.connections) {
       try {
         const removed = await client
           .patch(admin._id)
-          .unset(["connections.requests[0]", `requests[_key==${_key}]`])
+          .unset(["connections.requests_got[0]", `requests_got[_key==${_key}]`])
           .commit();
-        const check = removed.connections.requets?.find(
+        const check = removed.connections.requets_got?.find(
           (usr:usersMinData) => usr.userId == userToRejectReq.userId
         );
         if(!check){
@@ -136,13 +133,6 @@ const ConnectionRequests = () => {
       }
     }
   }
-
-  // useEffect(() => {
-  //   if (session && !admin._id) {
-  //     getAdminData({ dispatch, admin, session, set_Admin });
-  //   }
-  //   console.log("hello");
-  // }, [session]);
 
   return (
     <section style={{ paddingTop: "8px" }}>
