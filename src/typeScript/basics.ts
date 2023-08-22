@@ -17,11 +17,11 @@ export interface users {
   _id: string;
   name: string;
   email: string;
-  image: string;
+  image?: string;
   bio?: string;
   desc?: string;
   link?: string;
-  connections?: { connected?: usersMinData };
+  connections?: {_id?:string; connected?: usersMinData };
 }
 
 export type admin ={
@@ -38,9 +38,10 @@ export type admin ={
 export type me = admin;
 
 export interface connections {
-  connected: Array<usersMinData>;
-  requests_got: Array<usersMinData>;
-  requests_sent:Array<usersMinData>;
+  _id?:string;
+  connected?: Array<usersMinData>;
+  requests_got?: Array<usersMinData>;
+  requests_sent?:Array<usersMinData>;
 }
 export type usersMinData = {
   _key: string;

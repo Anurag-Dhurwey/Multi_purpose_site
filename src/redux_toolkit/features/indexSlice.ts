@@ -27,7 +27,12 @@ const initialState: CounterState = {
     desc: "",
     bio: "",
     link: "",
-    connections: { connected: [], requests_got: [], requests_sent: [] },
+    connections: {
+      _id: "",
+      connected: [],
+      requests_got: [],
+      requests_sent: [],
+    },
   },
   media_Items: [],
   my_uploads: [],
@@ -45,6 +50,11 @@ export const counterSlice = createSlice({
     set_Admin: (state, action: PayloadAction<admin>) => {
       state.admin = action.payload;
     },
+    set_ConnectionsId: (state, action: PayloadAction<string>) => {
+      if (state.admin.connections && !state.admin.connections._id) {
+        state.admin.connections._id = action.payload;
+      }
+    },
     set_Admins_Connections: (
       state,
       action: PayloadAction<setAdminConnectionsPayloadType>
@@ -57,17 +67,19 @@ export const counterSlice = createSlice({
             return user.userId !== data.userId;
           });
           state.admin.connections = {
-            connected: [data, ...current.connected],
-            requests_got: [...updatedRequests],
+            connected: current.connected
+              ? [data, ...current.connected]
+              : [data],
+            requests_got: updatedRequests ? [...updatedRequests] : [],
             requests_sent: [],
           };
-        } else if (command == "reject") {
+        } else if (command == "reject" && current.requests_got) {
           console.log("entered in Reject hook");
           const updatedRequests = current.requests_got.filter((user) => {
             return user.userId !== data.userId;
           });
           state.admin.connections = {
-            connected: [...current.connected],
+            connected: current.connected ? [...current.connected] : [],
             requests_got: [...updatedRequests],
             requests_sent: [],
           };
@@ -80,7 +92,9 @@ export const counterSlice = createSlice({
           if (!isAlreadyExist) {
             state.admin.connections = {
               connected: current.connected,
-              requests_got: [data, ...current.requests_got],
+              requests_got: current.requests_got
+                ? [data, ...current.requests_got]
+                : [data],
               requests_sent: [],
             };
           } else {
@@ -103,9 +117,9 @@ export const counterSlice = createSlice({
       state,
       action: PayloadAction<suggestedDataPayloadType>
     ) => {
-      const { _type }: { _type: String } = action.payload;
+      const { _type } = action.payload;
       if (_type == "users") {
-        const { data }: { data: Array<users> } = action.payload;
+        const { data } = action.payload;
         state.suggestedData = { users: [...data] };
       }
     },
@@ -119,6 +133,7 @@ export const {
   set_my_uploads,
   set_Admin,
   set_Admins_Connections,
+  set_ConnectionsId,
   set_onLineUsers,
   set_suggestedData,
 } = counterSlice.actions;

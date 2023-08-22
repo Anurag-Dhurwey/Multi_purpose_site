@@ -2,11 +2,17 @@ import io from "socket.io-client";
 import { getAdminData } from "./functions/getAdminData";
 import { session, socketIoConnectionType } from "@/typeScript/basics";
 import { set_Admins_Connections } from "@/redux_toolkit/features/indexSlice";
+import { Socket } from "socket.io-client";
 
-export const getSocket=(session:session) =>{
-  if(session){
-   const socket= io(`${process.env.NEXT_PUBLIC_SOCKET_IO_SERVER_URL}`)
-   return socket
+let socket: Socket | undefined;
+export const getSocket =  (session: session) => {
+  if (session) {
+    if (!socket) {
+      socket = io(`${process.env.NEXT_PUBLIC_SOCKET_IO_SERVER_URL}`);
+      return socket;
+    } else {
+      return socket;
+    }
   }
 };
 export async function socketIoConnection({
@@ -17,10 +23,9 @@ export async function socketIoConnection({
   set_onLineUsers,
   message,
 }: socketIoConnectionType) {
+  const socket =  getSocket(session);
 
-const socket=getSocket(session)
-
-  if(socket){
+  if (socket) {
     const admin_with_id = await getAdminData({
       dispatch,
       admin,
@@ -28,26 +33,31 @@ const socket=getSocket(session)
       session,
     });
     socket.emit("onHnadshake", { user: admin_with_id });
-  
+
     socket.on("allOnlineUsers", (onLineUsers) => {
       dispatch(set_onLineUsers(onLineUsers));
-      console.log({str:"allOnlineUsertest",onLineUsers});
+      console.log({ str: "allOnlineUsertest", onLineUsers });
     });
-  
+
     // this below variable is to prevent socket_io event "ConnectionRequestToUser" to running multiple time
     let oneTimeRunner: string = "initial";
-  
+
     socket.on("ConnectionRequestToUser", (msg) => {
-  
       if (oneTimeRunner != msg.user._id) {
         console.log(oneTimeRunner, msg.user._id);
         oneTimeRunner = msg.user._id;
         if (admin_with_id?.connections && msg.user) {
-          const {user,_key}=msg
+          const { user, _key } = msg;
           dispatch(
             set_Admins_Connections({
               command: "request",
-              data: {userId:user._id,name:user.name,mail:user.email,img:user.image,_key},
+              data: {
+                userId: user._id,
+                name: user.name,
+                mail: user.email,
+                img: user.image,
+                _key,
+              },
               current: admin_with_id.connections,
             })
           );
@@ -55,13 +65,15 @@ const socket=getSocket(session)
         } else {
           console.log("something went wrong");
         }
-      }else{console.log('same')}
-  
+      } else {
+        console.log("same");
+      }
     });
     socket.on("disconnect", () => {
       console.log("connection lost");
+      
     });
-  }else{
-    console.log("unable to connect to web-socket")
+  } else {
+    console.log("unable to connect to web-socket");
   }
 }

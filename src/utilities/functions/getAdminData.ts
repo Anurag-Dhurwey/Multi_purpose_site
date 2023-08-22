@@ -1,6 +1,12 @@
 import { client } from "../sanityClient";
 import { MessageInstance } from "antd/es/message/interface";
-import { connections, session, sessionUser, admin } from "@/typeScript/basics";
+import {
+  connections,
+  session,
+  sessionUser,
+  admin,
+  usersMinData,
+} from "@/typeScript/basics";
 interface states {
   dispatch: Function;
   set_Admin: (action: admin) => void;
@@ -20,39 +26,59 @@ export const getAdminData = async ({
     if (!admin?._id) {
       try {
         const res: Array<resType> = await client.fetch(
-          `*[_type=="user" && email=="${session.user.email}"]{_id,bio,desc,link,connections}`
+          `*[(_type=="user" && email=="${session.user.email}")||(_type=="connections" && email=="${session.user.email}")]{_type,userId,_id,bio,desc,link,requests_got,requests_sent,connected}`
         );
-        const {connections,bio,desc,link,_id} = res[0];
-        dispatch(
-          set_Admin({
+        const connections: conType = res.find(
+          (item) => item._type == "connections"
+        );
+        const user: usrType = res.find((item) => item._type == "user");
+        if (user) {
+          const { _id, bio, desc, link } = user;
+          dispatch(
+            set_Admin({
+              _id: _id,
+              name: session.user.name,
+              email: session.user.email,
+              connections: {
+                _id: connections?._id,
+                connected: connections?.connected
+                  ? [...connections?.connected]
+                  : [],
+                requests_got: connections?.requests_got
+                  ? [...connections?.requests_got]
+                  : [],
+                requests_sent: connections?.requests_sent
+                  ? [...connections?.requests_sent]
+                  : [],
+              },
+              image: session.user.image,
+              bio: bio ? bio : undefined,
+              desc: desc ? desc : undefined,
+              link: link ? link : undefined,
+            })
+          );
+          return {
             _id: _id,
             name: session.user.name,
             email: session.user.email,
             connections: {
-              connected: connections?.connected ? [...connections.connected] : [],
-              requests_got: connections?.requests_got ? [...connections.requests_got] : [],
-              requests_sent: connections?.requests_sent ? [...connections.requests_sent] : [],
+              _id: connections?._id,
+              connected: connections?.connected
+                ? [...connections?.connected]
+                : [],
+              requests_got: connections?.requests_got
+                ? [...connections?.requests_got]
+                : [],
+              requests_sent: connections?.requests_sent
+                ? [...connections?.requests_sent]
+                : [],
             },
             image: session.user.image,
-            bio: bio?bio:undefined,
-            desc: desc?desc:undefined,
-            link: link?link:undefined,
-          })
-        );
-        return {
-          _id: res[0]._id,
-          name: session?.user?.name,
-          email: session?.user?.email,
-          connections: {
-            connected: connections?.connected ? [...connections.connected] : [],
-            requests_got: connections?.requests_got ? [...connections.requests_got] : [],
-            requests_sent: connections?.requests_sent ? [...connections.requests_sent] : [],
-          },
-          image: session?.user?.image,
-          bio: bio?bio:null,
-          desc: desc?desc:null,
-          link: link?link:null,
-        };
+            bio: bio ? bio : undefined,
+            desc: desc ? desc : undefined,
+            link: link ? link : undefined,
+          };
+        }
       } catch (error) {
         console.error(error);
         messageApi?.error(`internal server error `);
@@ -60,15 +86,37 @@ export const getAdminData = async ({
     } else {
       return admin;
     }
-  }else{
-    console.log('can not find user on sessions')
+  } else {
+    console.log("can not find user on sessions");
   }
 };
 
 type resType = {
   _id: string;
-  bio: string | null;
-  desc: string | null;
-  link: string | null;
-  connections: connections | null;
+  bio?: string;
+  desc?: string;
+  link?: string;
+  userId?: string;
+  connected?: Array<usersMinData>;
+  requests_got?: Array<usersMinData>;
+  requests_sent?: Array<usersMinData>;
+  _type: string;
 };
+
+type conType =
+  | {
+      _id: string;
+      connected?: Array<usersMinData>;
+      requests_got?: Array<usersMinData>;
+      requests_sent?: Array<usersMinData>;
+    }
+  | undefined;
+
+type usrType =
+  | {
+      _id: string;
+      bio?: string;
+      desc?: string;
+      link?: string;
+    }
+  | undefined;

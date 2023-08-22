@@ -1,6 +1,7 @@
 import { client } from "@/utilities/sanityClient";
 import { like } from "@/typeScript/basics";
 import { NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 
 
@@ -31,11 +32,9 @@ export async function POST(req: Request) {
         .patch(meadia_item._id)
         .setIfMissing({ likes: [] })
         .insert("after", "likes[-1]", [
-          { userId: user._id, name: user.name, email: user.email },
+          {_key:uuidv4(), userId: user._id, name: user.name, email: user.email },
         ])
-        .commit({
-          autoGenerateArrayKeys: true,
-        });
+        .commit();
       // to add on user's liked posts array
       // const userArray = await client
       //   .patch(user._id)

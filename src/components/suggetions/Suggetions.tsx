@@ -46,7 +46,7 @@ const Suggetions = ({ sendRequestHandler }: propType) => {
       });
     }
   }, [session]);
-
+console.log({suggestedData})
   return (
     <section style={{ paddingTop: "8px" }}>
       <ul className="flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
