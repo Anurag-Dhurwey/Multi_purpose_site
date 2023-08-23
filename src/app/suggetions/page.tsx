@@ -3,7 +3,10 @@
 import Suggetions from "@/components/suggetions/Suggetions";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { users, usersMinData } from "@/typeScript/basics";
-import { getAdminConnectionId,getUsrConnectionId } from "@/utilities/functions/getConnectionsId";
+import {
+  getAdminConnectionId,
+  getUsrConnectionId,
+} from "@/utilities/functions/getConnectionsId";
 import { client } from "@/utilities/sanityClient";
 import { getSocket } from "@/utilities/socketIo";
 import { message } from "antd";
@@ -14,12 +17,15 @@ const Page = () => {
   const admin = useAppSelector((state) => state.hooks.admin);
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
+
   async function mutation(userTosendReq: users) {
     const { _id, image, name, email } = userTosendReq;
     try {
-     const friendsConnectionId=userTosendReq.connections?._id?userTosendReq.connections:await getUsrConnectionId(_id)
+      const friendsConnectionId = userTosendReq.connections?._id
+        ? userTosendReq.connections
+        : await getUsrConnectionId(_id);
       if (friendsConnectionId?._id) {
-        const res = await client
+        const res: resType = await client
           .patch(friendsConnectionId._id)
           .setIfMissing({ requests_got: [] })
           .insert("after", "requests_got[-1]", [
@@ -32,10 +38,12 @@ const Page = () => {
             },
           ])
           .commit();
-        const check = res.connections.requests_got?.find(
+        const check = res.requests_got?.find(
           (usr: usersMinData) => usr.userId == admin._id
         );
-        return check;
+        if (check) {
+          return check;
+        }
       } else {
         const doc = {
           _type: "connections",
@@ -52,10 +60,12 @@ const Page = () => {
           ],
         };
         const createdDoc = await client.create(doc);
-        const check = createdDoc.requests_got.find(
+        const check = createdDoc.requests_got?.find(
           (usr) => usr.userId == admin._id
         );
-        return check;
+        if (check) {
+          return check;
+        }
       }
     } catch (error) {
       console.error(error);
@@ -84,11 +94,11 @@ const Page = () => {
   async function sendRequestHandler(userTosendReq: users) {
     if (admin._id) {
       const { _id, image, name, email } = userTosendReq;
-      
-      const adminConnectionsId:string|undefined = admin.connections?._id
+
+      const adminConnectionsId: string | undefined = admin.connections?._id
         ? admin.connections._id
         : await getAdminConnectionId({ dispatch, id: admin._id, admin });
-      console.log(userTosendReq.email, userTosendReq.name,adminConnectionsId);
+      console.log(userTosendReq.email, userTosendReq.name, adminConnectionsId);
       try {
         const check = await mutation(userTosendReq);
         console.log({ check });
@@ -154,8 +164,13 @@ const Page = () => {
 
 export default Page;
 
+interface FCtype {
+  _id: string;
+  requests_sent: Array<usersMinData>;
+}
 
-interface FCtype{
-  _id:string;
-  requests_sent:Array<usersMinData>
+interface resType {
+  userId: string;
+  email: string;
+  requests_got: Array<usersMinData>;
 }

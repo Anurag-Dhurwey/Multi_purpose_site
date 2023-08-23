@@ -104,16 +104,10 @@ const ConnectionRequests = () => {
                 (usr: usersMinData) => usr.userId == admin._id
               );
               if (check2) {
-                // if admin data on friends account then no need to perform again
-                // emitConnectionRequestSent(userTosendReq);
-                const arr = addedInFriendsAccount.request_sent?.find(
-                  (obj: usersMinData) => obj.userId == admin._id
-                );
+
                 console.log(addedInFriendsAccount);
-                console.log(arr);
                 console.log("added to friends account");
               } else {
-                // emitConnectionRequestSent(userTosendReq);
                 console.log("unable to add in friends account");
               }
             } else {
@@ -126,17 +120,17 @@ const ConnectionRequests = () => {
           console.error(error);
           message.error("error");
         }
-      } else if (isAlreadyExist && adminConnectionsId) {
-        try {
-          const removed = await client
-            .patch(adminConnectionsId)
-            .unset(["requests_got[0]", `requests_got[_key=="${_key}"]`])
-            .commit();
-          message.success("request accepted");
-        } catch (error) {
-          console.error(error);
-        }
-      }
+      } // else if (isAlreadyExist && adminConnectionsId) {
+      //   try {
+      //     const removed = await client
+      //       .patch(adminConnectionsId)
+      //       .unset(["requests_got[0]", `requests_got[_key=="${_key}"]`])
+      //       .commit();
+      //     message.success("request accepted");
+      //   } catch (error) {
+      //     console.error(error);
+      //   }
+      // }
     } else {
       console.error("admin not found");
       message.error("login to contineu");
@@ -151,8 +145,14 @@ const ConnectionRequests = () => {
         : await getAdminConnectionId({ dispatch, id: admin._id, admin });
       console.log({ adminConnectionsId });
       console.log({ admin: admin.connections._id });
+      const friendsConnectionId = await getUsrConnectionId(
+        userToRejectReq.userId
+      );
+      const element = friendsConnectionId?.requests_sent?.find(
+        (usr: usersMinData) => usr.userId == admin._id
+      );
       try {
-        if (adminConnectionsId) {
+        if (adminConnectionsId && friendsConnectionId && element) {
           const removed = await client
             .patch(adminConnectionsId)
             .unset(["requests_got[0]", `requests_got[_key=="${_key}"]`])
@@ -168,6 +168,13 @@ const ConnectionRequests = () => {
                 current: admin.connections,
               })
             );
+            const removed = await client
+              .patch(friendsConnectionId._id)
+              .unset([
+                "requests_sent[0]",
+                `requests_sent[_key=="${element._key}"]`,
+              ])
+              .commit();
           } else {
             console.log("something went wrong");
           }
