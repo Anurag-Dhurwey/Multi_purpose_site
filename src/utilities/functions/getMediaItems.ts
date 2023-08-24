@@ -10,7 +10,7 @@ interface states {
 export const getMediaItems = async ({ dispatch, set_media_items,messageApi }: states) => {
   try {
     const media:Array<media_Item> = await client.fetch(
-      `*[_type == "post"]{_id,_createdAt,_updatedAt,caption,desc,meadiaFile,postedBy->,tag,comments[]{comment,name},likes[]{_key,name,email,userId}}`
+      `*[_type == "post"]{_id,_createdAt,_updatedAt,caption,desc,meadiaFile,postedBy->,tag,comments[]{comment,name,email,userId},likes[]{_key,name,email,userId}}`
     );
     dispatch(set_media_items(media));
     console.log(media);

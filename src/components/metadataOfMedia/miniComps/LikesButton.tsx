@@ -4,129 +4,152 @@ import { AiFillLike } from "react-icons/ai";
 import { useSession } from "next-auth/react";
 import { client } from "@/utilities/sanityClient";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import {
-  set_Admin,
-  set_media_items,
-} from "@/redux_toolkit/features/indexSlice";
-import { getAdminData } from "@/utilities/functions/getAdminData";
+import { set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { like, media_Item, postedBy } from "@/typeScript/basics";
 import { message } from "antd";
+import { v4 as uuidv4 } from "uuid";
 
 const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
   const dispatch = useAppDispatch();
-  const [messageApi, contextHolder] = message.useMessage();
   const { data: session } = useSession();
   const admin = useAppSelector((state) => state.hooks.admin);
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
-  const [btnColor, setBtnColor] = useState<boolean>(false);
   const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [btnColor, setBtnColor] = useState<string>();
   const [api, setApi] = useState<boolean>(false);
+
+  async function like() {
+
+    try {
+      const res = await client
+        .patch(meadia_item._id)
+        .setIfMissing({ likes: [] })
+        .insert("after", "likes[-1]", [
+          {
+            _key: uuidv4(),
+            userId: admin._id,
+            name: admin.name,
+            email: admin.email,
+          },
+        ])
+        .commit();
+      const key: like | undefined = res.likes.find(
+        (item: like) => item.userId == admin._id
+      );
+      console.log({ key, isLiked, res });
+      if (key?._key) {
+        const updatedMeadia_Items = media_Items.map((item) => {
+          if (item._id == res._id && admin.email && admin.name && admin._id) {
+            return {
+              ...item,
+              likes: item.likes
+                ? [
+                    ...item.likes,
+                    {
+                      _key: key._key,
+                      userId: admin._id,
+                      email: admin.email,
+                      name: admin.name,
+                    },
+                  ]
+                : [
+                    {
+                      _key: key._key,
+                      userId: admin._id,
+                      email: admin.email,
+                      name: admin.name,
+                    },
+                  ],
+            };
+          } else {
+            return item;
+          }
+        });
+        // setIsLiked(true);
+        dispatch(set_media_items([...updatedMeadia_Items]));
+      } else {
+        throw new Error("_key not found");
+      }
+    } catch (error) {
+      setBtnColor((pre) => (pre == "white" ? "blue" : "white"));
+      console.error(error);
+    }
+  }
+
+  async function unLike() {
+    setBtnColor("white")
+    try {
+      const key = meadia_item.likes?.find(
+        (item: like) => item.email == admin.email
+      );
+      if (key?._key) {
+        const res = await client
+          .patch(meadia_item._id)
+          .unset(["likes[0]", `likes[_key=="${key._key}"]`])
+          .commit();
+
+        const updatedMeadia_Items = media_Items.map((item) => {
+          if (item._id == res._id && admin.email && admin.name && admin._id) {
+            const newLikesList = item.likes?.filter((like) => {
+              return like.email !== admin.email;
+            });
+            const returnVal = { ...item, likes: newLikesList };
+            return returnVal;
+          } else {
+            return item;
+          }
+        });
+        dispatch(set_media_items([...updatedMeadia_Items]));
+      } else {
+        throw new Error("_key not found");
+      }
+    } catch (error) {
+      setBtnColor((pre) => (pre == "white" ? "blue" : "white"));
+      console.error(error);
+    }
+  }
 
   const handleLikeButton = async () => {
     if (session && admin._id && admin.email) {
       setApi(true);
-      // const user_with_id = await getAdminData({
-      //   dispatch,
-      //   set_Admin,
-      //   admin,
-      //   session,
-      //   messageApi
-      // });
+
       try {
-        setBtnColor((val) => !val);
-        const res = await fetch("/api/likeButton", {
-          method: "POST",
-          body: JSON.stringify({ meadia_item, user: admin, isLiked }),
-        });
-        const jsonRes = await res.json();
-        // setBtnColor(true);
-        if (jsonRes) {
-          const updatedMeadia_Items = media_Items.map((item) => {
-            if (item._id == jsonRes._id && admin.email && admin.name && admin._id) {
-              if (isLiked) {
-                const newLikesList = item.likes?.filter((like) => {
-                  return like.email !== session?.user?.email;
-                });
-                setIsLiked(false);
-                const returnVal = { ...item, likes: newLikesList };
-                return returnVal;
-              } else  {
-                const _key: Array<string> = jsonRes?.likes.map((item: like) => {
-                  if (item.userId == admin._id) {
-                    return item._key;
-                  }
-                });
-                setIsLiked(true);
-                if (item.likes) {
-                  return {
-                    ...item,
-                    likes: [
-                      ...item.likes,
-                      {
-                        _key: _key[0],
-                        userId: admin._id,
-                        email: admin.email,
-                        name: admin.name,
-                      },
-                    ],
-                  };
-                } else {
-                  return {
-                    ...item,
-                    likes: [
-                      {
-                        _key: _key[0],
-                        userId: admin._id,
-                        email: admin.email,
-                        name: admin.name,
-                      },
-                    ],
-                  };
-                }
-              }
-            } else {
-              return item;
-            }
-          });
-          dispatch(set_media_items([...updatedMeadia_Items]));
-          console.log(jsonRes);
+        if (isLiked) {
+          await unLike();
+        } else {
+          await like();
         }
       } catch (error) {
-        setBtnColor((val) => !val);
         console.error(error);
-        messageApi.error("unable to like =>> Internal server error");
+        message.error("Internal server error");
       } finally {
         setApi(false);
       }
     } else {
-      console.log("session not found");
-      messageApi.error(
-        "login to contineu or if you are logged in then something went wrong"
-      );
+      console.error("session not found");
+      message.error("session not found");
     }
   };
 
   useEffect(() => {
-    const mapLikes = meadia_item.likes?.filter((item) => {
-      if (item._key) {
-        return item.email == session?.user?.email;
-      }
-    });
-    if (mapLikes?.length) {
+    const mapLikes = meadia_item.likes?.find((item) => item.email == admin.email && item.userId == admin._id);
+    if (mapLikes) {
       setIsLiked(true);
-      setBtnColor(true);
+      setBtnColor("blue");
+    }else{
+      setIsLiked(false);
+      setBtnColor("white");
     }
   }, [api, media_Items, session]);
 
   return (
     <>
-      {contextHolder}
       <button
         disabled={api}
         onClick={() => handleLikeButton()}
         className="text-2xl"
       >
-        <AiFillLike style={{ color: btnColor ? "blue" : "white" }} />
+        <AiFillLike style={{ color: btnColor }} />
       </button>
     </>
   );

@@ -62,11 +62,11 @@ export interface media_Item {
   _id: string;
   meadiaFile: meadiaFile;
   postedBy: postedBy;
-  caption: string;
-  desc: string;
-  tag: string;
-  likes: Array<like>;
-  comments: comments;
+  caption?: string;
+  desc?: string;
+  tag?: string;
+  likes?: Array<like>;
+  comments?: comments;
   _updatedAt?: string;
   _createdAt?: string;
 }

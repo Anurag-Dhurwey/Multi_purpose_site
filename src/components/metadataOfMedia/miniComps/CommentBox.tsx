@@ -1,4 +1,5 @@
-import React from "react";
+'use client'
+import React,{useState} from "react";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { RiDeleteBinLine } from "react-icons/ri";
 import style from "./commentBox.module.css";
@@ -25,35 +26,39 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
-  const [messageApi, contextHolder] = message.useMessage();
+const [api,setApi]=useState<boolean>(false)
   const OnDeleteHandle = async (_key: string) => {
+    setApi(true)
     try {
       const res = await client
         .patch(_id)
-        .unset(["comments[0]", `comments[_key==${_key}]`])
+        .unset(["comments[0]", `comments[_key=="${_key}"]`])
         .commit();
       if (res) {
-        const filteredComments = comments.filter((cmt) => {
+        const filteredComments = comments?.filter((cmt) => {
           return cmt._key !== _key;
         });
-        const updatedItems = media_Items.map((item) => {
-          if (item._id == _id) {
-            return { ...item, comments: [...filteredComments] };
-          } else {
-            return item;
-          }
-        });
-        dispatch(set_media_items([...updatedItems]));
+        if(filteredComments){
+          const updatedItems = media_Items.map((item) => {
+            if (item._id == _id) {
+              return { ...item, comments: [...filteredComments] };
+            } else {
+              return item;
+            }
+          });
+          dispatch(set_media_items([...updatedItems]));
+        }
       }
     } catch (error) {
-      messageApi.error("internal server error");
+      message.error("internal server error");
       console.error("unable to delete");
+    }finally{
+      setApi(false)
     }
   };
 
   return (
     <>
-      {contextHolder}
       {!descView && (
         <div className={`${style.commentBox} ${cmtView ? "h-full" : ""} `}>
           <div className={`${style.commentBoxInnerDiv}  `}>
@@ -68,8 +73,9 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
                   <span className="">
                     <button className={style.Img}></button>
                     <p>{name ? name : "unknown"}</p>
+                  
                     {email == session?.user?.email && (
-                      <button onClick={() => OnDeleteHandle(_key)}>
+                      <button onClick={() => OnDeleteHandle(_key)} disabled={api}>
                         <RiDeleteBinLine />
                       </button>
                     )}
@@ -86,7 +92,7 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
           </div>
 
           <span
-            className={`${style.commentBoxSpan} ${cmtView ? "pt-[80%]" : ""} `}
+            className={`${style.commentBoxSpan} ${cmtView ? "mt-[80%]" : ""} `}
           >
             {cmtView && session && (
               <div className="w-full ">

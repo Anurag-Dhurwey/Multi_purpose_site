@@ -1,38 +1,35 @@
 "use client";
 import { useAppSelector, useAppDispatch } from "@/redux_toolkit/hooks";
-import {
-  set_Admin,
-  set_media_items,
-} from "@/redux_toolkit/features/indexSlice";
+import { set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { IoMdSend } from "react-icons/io";
-import { getAdminData } from "@/utilities/functions/getAdminData";
 import { media_Item } from "@/typeScript/basics";
 import { message } from "antd";
 
 const CommentForm = ({ meadia_item }: { meadia_item: media_Item }) => {
   const dispatch = useAppDispatch();
-  const [messageApi, contextHolder] = message.useMessage();
   const admin = useAppSelector((state) => state.hooks.admin);
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
   const [form, setForm] = useState("");
+  const [onSubmit,setOnsubmit]=useState<boolean>(false)
 
   const onHnandleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
     e.preventDefault();
-    if (session && admin._id) {
-      // const user_with_id = await getAdminData({
-      //   dispatch,
-      //   set_Admin,
-      //   admin,
-      //   session,
-      //   messageApi,
-      // });
+
+    const formetedFormText = form
+      .split(/\s+/)
+      .filter((word) => word.length > 0)
+      .join(" ");
+
+    if (formetedFormText.length >= 3 && !onSubmit) {
+      setOnsubmit(true)
       try {
         const res = await fetch("/api/comment", {
           method: "POST",
-          body: JSON.stringify({ form, meadia_item, user: admin}),
+          body: JSON.stringify({ form:formetedFormText, meadia_item, user: admin }),
         });
         const jsonRes = await res.json();
         if (jsonRes) {
@@ -50,11 +47,15 @@ const CommentForm = ({ meadia_item }: { meadia_item: media_Item }) => {
         }
       } catch (error) {
         console.error(error);
-        messageApi.error("comment not posted");
+        message.error("comment not posted");
+      }finally{
+        setOnsubmit(false)
       }
+    }else if(onSubmit){
+      alert("submitting")
     } else {
-      console.log("session not found");
-      messageApi.error("login to contineu");
+      setForm(formetedFormText);
+      alert("text length should be greater then 3");
     }
   };
 
@@ -62,11 +63,15 @@ const CommentForm = ({ meadia_item }: { meadia_item: media_Item }) => {
     setForm(e.target.value);
   };
 
+
   return (
     <>
-      {contextHolder}
       <form
-        onSubmit={(e) => onHnandleSubmit(e)}
+        onSubmit={(e) =>
+          session && admin._id
+            ? onHnandleSubmit(e)
+            : message.error("login to contineu")
+        }
         className="mb-1 gap-x-1 w-full flex justify-center items-center"
       >
         <input
