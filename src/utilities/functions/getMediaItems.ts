@@ -16,6 +16,6 @@ export const getMediaItems = async ({ dispatch, set_media_items,messageApi }: st
     console.log(media);
     return media;
   } catch (error) {
-    messageApi.error('internal server error')
+    messageApi.error('not connected to internet')
   }
 };

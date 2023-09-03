@@ -33,6 +33,7 @@ export type admin ={
   desc?: string ;
   link?: string ;
   connections?: connections;
+  assetId?:string
 }
 
 export type me = admin;

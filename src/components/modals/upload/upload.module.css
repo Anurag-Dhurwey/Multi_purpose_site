@@ -1,0 +1,50 @@
+.uploadModalMain{
+    /* fixed top-0 bottom-0 left-0 right-0 min-h-[90vh] min-w-screen bg-[#8f8e8ea9] flex justify-center items-center */
+    position: fixed;
+    top: 0%;
+    bottom: 0%;
+    left: 0%;
+    right: 0%;
+    min-height: 90vh;
+    min-width: 100vw;
+    background-color: #8f8e8ea9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.uploadModalMainSecondDiv{
+    /* min-w-[320px] min-h-[320px] w-[90vw] bg-cyan-300 rounded-xl flex flex-col justify-center items-center gap-y-2 */
+    min-width: 320px;
+    min-height: 320px;
+    width: 90vw;
+    background-color: rgb(103 232 249 / var(--tw-bg-opacity));
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 0.5rem;
+
+}
+
+.secondDivSpanH4{
+    /* uppercase font-semibold text-center */
+    text-transform: uppercase;
+    font-weight: 600;
+    text-align: center;
+}
+
+.secondDivSpan2H3{
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.secondDivButton{
+    color: white;
+    border: 2px solid blue;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background-color: #0000ffc2;
+}

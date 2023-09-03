@@ -33,6 +33,7 @@ const initialState: CounterState = {
       requests_got: [],
       requests_sent: [],
     },
+    assetId: "",
   },
   media_Items: [],
   my_uploads: [],
@@ -54,6 +55,9 @@ export const counterSlice = createSlice({
       if (state.admin.connections && !state.admin.connections._id) {
         state.admin.connections._id = action.payload;
       }
+    },
+    set_AssetId: (state, action: PayloadAction<string>) => {
+      state.admin.assetId = action.payload;
     },
     set_Admins_Connections: (
       state,
@@ -134,6 +138,7 @@ export const {
   set_Admin,
   set_Admins_Connections,
   set_ConnectionsId,
+  set_AssetId,
   set_onLineUsers,
   set_suggestedData,
 } = counterSlice.actions;

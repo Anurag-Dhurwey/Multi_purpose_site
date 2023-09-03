@@ -11,13 +11,13 @@ import { client } from "@/utilities/sanityClient";
 import { getSocket } from "@/utilities/socketIo";
 import { message } from "antd";
 import { useSession } from "next-auth/react";
-import React from "react";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 const Page = () => {
   const admin = useAppSelector((state) => state.hooks.admin);
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
-
+const [onRequest,setOnRequest]=useState<boolean>(false)
   async function mutation(userTosendReq: users) {
     const { _id, image, name, email } = userTosendReq;
     try {
@@ -92,7 +92,8 @@ const Page = () => {
   };
 
   async function sendRequestHandler(userTosendReq: users) {
-    if (admin._id) {
+    if (admin._id && !onRequest) {
+      setOnRequest(true)
       const { _id, image, name, email } = userTosendReq;
 
       const adminConnectionsId: string | undefined = admin.connections?._id
@@ -144,7 +145,11 @@ const Page = () => {
       } catch (error) {
         message.error("something went wrong");
         console.error(error);
+      }finally{
+        setOnRequest(false)
       }
+    }else if(onRequest){
+      alert('wait a second')
     } else {
       console.error("user not found");
       message.error("user id not found");

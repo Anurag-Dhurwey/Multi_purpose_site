@@ -4,7 +4,7 @@ import { admin, uploadForm, media_Item } from "@/typeScript/basics";
 import style from "./upload.module.css";
 import { Upload } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-
+import { UploadClientConfig } from "next-sanity";
 import {
   set_Admin,
   set_media_items,
@@ -16,6 +16,9 @@ import { getMediaItems } from "@/utilities/functions/getMediaItems";
 import { getAdminData } from "@/utilities/functions/getAdminData";
 import { socketIoConnection } from "@/utilities/socketIo";
 import { message } from "antd";
+import { SanityAssetDocument } from "next-sanity";
+import { v4 } from "uuid";
+import { getAssetId } from "@/utilities/functions/getAssetId";
 
 const Page = () => {
   const dispatch = useAppDispatch();
@@ -23,10 +26,17 @@ const Page = () => {
   const admin = useAppSelector((state) => state.hooks.admin);
   const meadia_items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
-
-  const [onSuccess, setOnSuccess] = useState<boolean | null>(null);
+  // the below stage will be initially null and it will accept string ("start" || "failed"|| "completed") 
+  // stageOne is uploading asset and stageTwo is publishing post 
+  const [stage,setStage]=useState<stageType>({stageOne:null,stageTwo:null,})
+  const [onSuccess, setOnSuccess] = useState<{
+    asset: boolean | null;
+    post: boolean | null;
+  }>({ asset: null, post: null });
   const [modal, setModal] = useState<Boolean>(false);
-  const [isPosting, setIsPosting] = useState<boolean>(false);
+  const [isPosting, setIsPosting] = useState<{ asset: boolean; post: boolean }>(
+    { asset: false, post: false }
+  );
   const [isFileValid, setIsFileValid] = useState<
     Array<{ name: string; message: string }>
   >([]);
@@ -35,8 +45,8 @@ const Page = () => {
     desc: "",
     filePath: "",
   });
+  const [uploadedAsset,setUploadedAsset]=useState<SanityAssetDocument>()
   const [file, setFile] = useState<File>();
-
   const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     const file = e.target.files;
@@ -48,37 +58,98 @@ const Page = () => {
     }
   };
 
+
+
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (session && file && admin._id) {
-      if (!isFileValid.length) {
-        setModal(true);
-        // const user_with_id = await getAdminData({
-        //   dispatch,
-        //   set_Admin,
-        //   admin,
-        //   session,
-        //   messageApi,
-        // });
-        uploadingData({
-          file,
-          form,
-          admin,
-          meadia_items,
-          States: { set_media_items, setIsPosting, dispatch, setOnSuccess },
+    if (
+      session &&
+      file &&
+      admin._id &&
+      admin.email &&
+      !isFileValid.length &&
+      !isPosting.asset &&
+      !isPosting.post
+    ) {
+      setIsPosting({ asset: true, post: false });
+      setStage({stageOne:'start',stageTwo:null})
+      setModal(true);
+      try {
+        const uploadedAssetRes = await client.assets.upload("file", file, {
+          contentType: file.type,
+          filename: file.name,
         });
-      } else if (isFileValid.length) {
-        alert(isFileValid[0].message);
+        if (uploadedAssetRes) {
+          const assetId = admin.assetId
+            ? admin.assetId
+            : await getAssetId({
+                email: admin.email,
+                userId: admin._id,
+                dispatch,
+              });
+          if (assetId) {
+            const res: createdAssetResType = await client
+              .patch(assetId)
+              .setIfMissing({ assets: [] })
+              .insert("after", "assets[-1]", [
+                {
+                  _key: v4(),
+                  asset: {
+                    _type: "reference",
+                    _ref: uploadedAssetRes._id,
+                  },
+                },
+              ])
+              .commit();
+            const check = res.assets.find(
+              (ast) => ast.asset._ref == uploadedAssetRes._id
+            );
+            console.log({ res, check });
+            if (!check) {
+              throw new Error("unable to upload asset");
+            }
+          } else {
+            const asset = {
+              _type: "asset",
+              assets: [
+                {
+                  _key: v4(),
+                  asset: {
+                    _type: "reference",
+                    _ref: uploadedAssetRes._id,
+                  },
+                },
+              ],
+              email: admin.email,
+              userId: admin._id,
+            };
+            const createdAsset = await client.create(asset);
+          }
+          setUploadedAsset(uploadedAssetRes)
+          setOnSuccess({ asset: true, post: null });
+          setStage({stageOne:'completed',stageTwo:null})
+          //  publish(uploadedAssetRes)
+        }
+      } catch (error) {
+        setOnSuccess({ asset: false, post: null });
+        setStage({stageOne:'failed',stageTwo:null})
+        console.error(error);
+      } finally {
+        setIsPosting({ asset: false, post: false });
       }
+    } else if (isFileValid.length) {
+      alert(isFileValid[0].message);
+    } else if (isPosting.asset) {
+      alert("Asset is uploading, please wait!");
     } else {
-      console.log("session or adminId not found");
+      console.log("session not found");
     }
   };
 
   if (!session) {
     return null;
   }
-  
+
   useEffect(() => {
     if (session) {
       socketIoConnection({
@@ -87,7 +158,7 @@ const Page = () => {
         set_Admin,
         dispatch,
         admin,
-        message
+        message,
       });
     }
   }, [session]);
@@ -104,10 +175,16 @@ const Page = () => {
     <div className="flex justify-center items-start w-screen min-h-screen bg-slate-200">
       {contextHolder}
       <Upload
+      form={form}
+      uploadedFileRes={uploadedAsset}
+      setIsPosting={setIsPosting}
+      setOnSuccess={setOnSuccess}
         visibility={modal}
         setVisibility={setModal}
         isPosting={isPosting}
         onSuccess={onSuccess}
+        stage={stage}
+        setStage={setStage}
       />
       <div className="py-6 max-w-[800px] min-w-[325px] w-full h-full rounded-xl bg-red-200 flex justify-evenly items-center">
         <form
@@ -206,37 +283,45 @@ async function uploadingData({
   meadia_items: Array<media_Item>;
 }) {
   const { dispatch, setIsPosting, set_media_items, setOnSuccess } = States;
-  try {
-    setIsPosting(true);
+  // try {
+  //   setIsPosting(true);
 
-    const uploadedFileRes = await client.assets.upload("file", file, {
-      contentType: file.type,
-      filename: file.name,
-    });
-    if (uploadedFileRes) {
-      try {
-        const postedData = await fetch("/api/upload", {
-          method: "POST",
-          body: JSON.stringify({ uploadedFileRes, user: admin, form }),
-        });
-        const jsonData = await postedData.json();
-        if (jsonData) {
-          const { res, createdPost } = jsonData;
-          dispatch(set_media_items([{ ...createdPost }, ...meadia_items]));
-          setOnSuccess(true);
-          setIsPosting(false);
-        }
-      } catch (error) {
-        setIsPosting(false);
-        setOnSuccess(false);
-        console.error(error);
-      }
-    }
-  } catch (error) {
-    setOnSuccess(false);
-    setIsPosting(false);
-    console.error(error);
-  }
+  //   const uploadedAssetRes = await client.assets.upload("file", file, {
+  //     contentType: file.type,
+  //     filename: file.name,
+  //   });
+  //   if (uploadedAssetRes) {
+  //     try {
+  //       const postedData = await fetch("/api/upload", {
+  //         method: "POST",
+  //         body: JSON.stringify({ uploadedAssetRes, user: admin, form }),
+  //       });
+  //       const jsonData = await postedData.json();
+  //       if (jsonData) {
+  //         const { res, createdPost } = jsonData;
+  //         dispatch(set_media_items([{ ...createdPost }, ...meadia_items]));
+  //         setOnSuccess(true);
+  //       }
+  //     } catch (error) {
+  //       setOnSuccess(false);
+  //       console.error(error);
+  //     } finally {
+  //       setIsPosting(false);
+  //     }
+  //   }
+  // } catch (error) {
+  //   setOnSuccess(false);
+  //   setIsPosting(false);
+  //   console.error(error);
+  // }
+}
+
+interface createdAssetResType {
+  assets: [{ _key: string; asset: { _ref: string; _type: string } }];
 }
 
 
+export interface stageType {
+  stageOne:"start"|"failed"|"completed"|null;
+  stageTwo:"start"|"failed"|"completed"|null
+} 

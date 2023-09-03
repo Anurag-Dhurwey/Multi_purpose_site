@@ -1,9 +1,8 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import React from "react";
+import React, { useState } from "react";
 import {
-  set_Admins_Connections,
-  set_ConnectionsId,
+  set_Admins_Connections
 } from "@/redux_toolkit/features/indexSlice";
 import Image from "next/image";
 import { usersMinData } from "@/typeScript/basics";
@@ -17,7 +16,7 @@ import {
 
 const ConnectionRequests = () => {
   const dispatch = useAppDispatch();
-  // const { data: session } = useSession();
+  const [onRequest, setOnRequest] = useState<boolean>(false);
   const requests = useAppSelector(
     (state) => state.hooks.admin?.connections?.requests_got
   );
@@ -27,7 +26,8 @@ const ConnectionRequests = () => {
   // this below function will move requested user from requests to connectedUsr
   async function acceptRequestHandler(userToAcceptReq: usersMinData) {
     const { userId, name, mail, img, _key } = userToAcceptReq;
-    if (admin?._id) {
+    if (admin?._id && !onRequest) {
+      setOnRequest(true);
       const adminConnectionsId = admin.connections?._id
         ? admin.connections._id
         : await getAdminConnectionId({ dispatch, id: admin._id, admin });
@@ -104,7 +104,6 @@ const ConnectionRequests = () => {
                 (usr: usersMinData) => usr.userId == admin._id
               );
               if (check2) {
-
                 console.log(addedInFriendsAccount);
                 console.log("added to friends account");
               } else {
@@ -119,6 +118,8 @@ const ConnectionRequests = () => {
         } catch (error) {
           console.error(error);
           message.error("error");
+        } finally {
+          setOnRequest(false);
         }
       } // else if (isAlreadyExist && adminConnectionsId) {
       //   try {
@@ -131,6 +132,8 @@ const ConnectionRequests = () => {
       //     console.error(error);
       //   }
       // }
+    } else if (onRequest) {
+      alert("wait a second");
     } else {
       console.error("admin not found");
       message.error("login to contineu");
@@ -139,7 +142,8 @@ const ConnectionRequests = () => {
 
   async function onRejectHandler(userToRejectReq: usersMinData) {
     const { _key } = userToRejectReq;
-    if (admin?._id && admin.connections) {
+    if (admin?._id && admin.connections && !onRequest) {
+      setOnRequest(true)
       const adminConnectionsId = admin.connections._id
         ? admin.connections._id
         : await getAdminConnectionId({ dispatch, id: admin._id, admin });
@@ -184,7 +188,11 @@ const ConnectionRequests = () => {
       } catch (error) {
         console.log(error);
         message.error("try again after some time");
+      }finally{
+        setOnRequest(false)
       }
+    }else if(onRequest){
+      alert('wait a second')
     }
   }
 
