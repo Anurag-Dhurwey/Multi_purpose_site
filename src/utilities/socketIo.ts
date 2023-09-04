@@ -1,7 +1,7 @@
 import io from "socket.io-client";
 import { getAdminData } from "./functions/getAdminData";
 import { session, socketIoConnectionType } from "@/typeScript/basics";
-import { set_Admins_Connections } from "@/redux_toolkit/features/indexSlice";
+import { onlineUsers, set_Admins_Connections } from "@/redux_toolkit/features/indexSlice";
 import { Socket } from "socket.io-client";
 
 let socket: Socket | undefined;
@@ -34,9 +34,17 @@ export async function socketIoConnection({
     });
     socket.emit("onHnadshake", { user: admin_with_id });
 
-    socket.on("allOnlineUsers", (onLineUsers) => {
-      dispatch(set_onLineUsers(onLineUsers));
-      console.log({ str: "allOnlineUsertest", onLineUsers });
+    socket.on("allOnlineUsers", (onLineUsers:onlineUsers[]) => {
+
+      const onlineConnectedUsr=onLineUsers.filter(usr=>{
+        const isOnline=admin_with_id?.connections?.connected?.find((user)=>{
+          return user.email==usr.email
+        })
+        return isOnline?.email==usr.email
+      })
+      
+      dispatch(set_onLineUsers(onlineConnectedUsr));
+      console.log({ str: "allOnlineUsertest", onlineConnectedUsr });
     });
 
     // this below variable is to prevent socket_io event "ConnectionRequestToUser" to running multiple time
@@ -54,8 +62,8 @@ export async function socketIoConnection({
               data: {
                 userId: user._id,
                 name: user.name,
-                mail: user.email,
-                img: user.image,
+                email: user.email,
+                image: user.image,
                 _key,
               },
               current: admin_with_id.connections,

@@ -33,8 +33,8 @@ const [onRequest,setOnRequest]=useState<boolean>(false)
               _key: uuidv4(),
               name: admin.name,
               userId: admin._id,
-              mail: admin.email,
-              img: admin.image,
+              email: admin.email,
+              image: admin.image,
             },
           ])
           .commit();
@@ -54,8 +54,8 @@ const [onRequest,setOnRequest]=useState<boolean>(false)
               _key: uuidv4(),
               name: admin.name,
               userId: admin._id,
-              mail: admin.email,
-              img: admin.image,
+              email: admin.email,
+              image: admin.image,
             },
           ],
         };
@@ -117,8 +117,8 @@ const [onRequest,setOnRequest]=useState<boolean>(false)
                   _key: uuidv4(),
                   name: name,
                   userId: _id,
-                  mail: email,
-                  img: image,
+                  email: email,
+                  image: image,
                 },
               ])
               .commit();
@@ -132,8 +132,8 @@ const [onRequest,setOnRequest]=useState<boolean>(false)
                   _key: uuidv4(),
                   name: name,
                   userId: _id,
-                  mail: email,
-                  img: image,
+                  email: email,
+                  image: image,
                 },
               ],
             };

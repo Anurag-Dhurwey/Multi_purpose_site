@@ -25,7 +25,7 @@ const ConnectionRequests = () => {
 
   // this below function will move requested user from requests to connectedUsr
   async function acceptRequestHandler(userToAcceptReq: usersMinData) {
-    const { userId, name, mail, img, _key } = userToAcceptReq;
+    const { userId, name, email, image, _key } = userToAcceptReq;
     if (admin?._id && !onRequest) {
       setOnRequest(true);
       const adminConnectionsId = admin.connections?._id
@@ -47,8 +47,8 @@ const ConnectionRequests = () => {
                 _key: uuidv4(),
                 userId: userId,
                 name: name,
-                mail: mail,
-                img: img,
+                email: email,
+                image: image,
               },
             ])
             .commit();
@@ -91,8 +91,8 @@ const ConnectionRequests = () => {
                     _key: uuidv4(),
                     userId: admin._id,
                     name: admin.name,
-                    mail: admin.email,
-                    img: admin.image,
+                    email: admin.email,
+                    image: admin.image,
                   },
                 ])
                 .unset([
@@ -207,9 +207,9 @@ const ConnectionRequests = () => {
               key={req.userId ? i : i}
               className="py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
             >
-              {req.img.includes("https://") ? (
+              {req.image.includes("https://") ? (
                 <Image
-                  src={`${req.img}`}
+                  src={`${req.image}`}
                   height={100}
                   width={100}
                   alt="image"

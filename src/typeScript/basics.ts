@@ -1,6 +1,5 @@
-import { CounterState, onlineUsers } from "@/redux_toolkit/features/indexSlice";
+import {  onlineUsers } from "@/redux_toolkit/features/indexSlice";
 import { MessageInstance } from "antd/es/message/interface";
-import { TypedUseSelectorHook } from "react-redux";
 export type session ={
   user?: sessionUser;
 }|null
@@ -48,8 +47,8 @@ export type usersMinData = {
   _key: string;
   userId: string;
   name: string;
-  mail: string;
-  img: string;
+  email: string;
+  image: string;
 };
 
 
