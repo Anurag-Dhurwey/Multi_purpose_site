@@ -1,10 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { admin, uploadForm, media_Item } from "@/typeScript/basics";
+import { uploadForm, media_Item } from "@/typeScript/basics";
 import style from "./upload.module.css";
 import { Upload } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import { UploadClientConfig } from "next-sanity";
 import {
   set_Admin,
   set_media_items,
@@ -13,7 +12,6 @@ import {
 import { useSession } from "next-auth/react";
 import { client } from "@/utilities/sanityClient";
 import { getMediaItems } from "@/utilities/functions/getMediaItems";
-import { getAdminData } from "@/utilities/functions/getAdminData";
 import { socketIoConnection } from "@/utilities/socketIo";
 import { message } from "antd";
 import { SanityAssetDocument } from "next-sanity";
@@ -26,9 +24,12 @@ const Page = () => {
   const admin = useAppSelector((state) => state.hooks.admin);
   const meadia_items = useAppSelector((state) => state.hooks.media_Items);
   const { data: session } = useSession();
-  // the below stage will be initially null and it will accept string ("start" || "failed"|| "completed") 
-  // stageOne is uploading asset and stageTwo is publishing post 
-  const [stage,setStage]=useState<stageType>({stageOne:null,stageTwo:null,})
+  // the below stage will be initially null and it will accept string ("start" || "failed"|| "completed")
+  // stageOne is uploading asset and stageTwo is publishing post
+  const [stage, setStage] = useState<stageType>({
+    stageOne: null,
+    stageTwo: null,
+  });
   const [onSuccess, setOnSuccess] = useState<{
     asset: boolean | null;
     post: boolean | null;
@@ -45,7 +46,7 @@ const Page = () => {
     desc: "",
     filePath: "",
   });
-  const [uploadedAsset,setUploadedAsset]=useState<SanityAssetDocument>()
+  const [uploadedAsset, setUploadedAsset] = useState<SanityAssetDocument>();
   const [file, setFile] = useState<File>();
   const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -57,8 +58,6 @@ const Page = () => {
       checkFileSize(file[0], setIsFileValid);
     }
   };
-
-
 
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -72,7 +71,7 @@ const Page = () => {
       !isPosting.post
     ) {
       setIsPosting({ asset: true, post: false });
-      setStage({stageOne:'start',stageTwo:null})
+      setStage({ stageOne: "start", stageTwo: null });
       setModal(true);
       try {
         const uploadedAssetRes = await client.assets.upload("file", file, {
@@ -125,14 +124,14 @@ const Page = () => {
             };
             const createdAsset = await client.create(asset);
           }
-          setUploadedAsset(uploadedAssetRes)
+          setUploadedAsset(uploadedAssetRes);
           setOnSuccess({ asset: true, post: null });
-          setStage({stageOne:'completed',stageTwo:null})
+          setStage({ stageOne: "completed", stageTwo: null });
           //  publish(uploadedAssetRes)
         }
       } catch (error) {
         setOnSuccess({ asset: false, post: null });
-        setStage({stageOne:'failed',stageTwo:null})
+        setStage({ stageOne: "failed", stageTwo: null });
         console.error(error);
       } finally {
         setIsPosting({ asset: false, post: false });
@@ -172,13 +171,13 @@ const Page = () => {
   }, [session]);
 
   return (
-    <div className="flex justify-center items-start w-screen min-h-screen bg-slate-200">
+    <div className={style.uploadMainDiv}>
       {contextHolder}
       <Upload
-      form={form}
-      uploadedFileRes={uploadedAsset}
-      setIsPosting={setIsPosting}
-      setOnSuccess={setOnSuccess}
+        form={form}
+        uploadedFileRes={uploadedAsset}
+        setIsPosting={setIsPosting}
+        setOnSuccess={setOnSuccess}
         visibility={modal}
         setVisibility={setModal}
         isPosting={isPosting}
@@ -186,11 +185,8 @@ const Page = () => {
         stage={stage}
         setStage={setStage}
       />
-      <div className="py-6 max-w-[800px] min-w-[325px] w-full h-full rounded-xl bg-red-200 flex justify-evenly items-center">
-        <form
-          onSubmit={(e) => onSubmitHandler(e)}
-          className={`${style.form} flex flex-col justify-evenly items-center`}
-        >
+      <div className={style.chiledOfUploadMainDiv}>
+        <form onSubmit={(e) => onSubmitHandler(e)} className={`${style.form} `}>
           <div>
             <label htmlFor="caption">Caption</label>
             <input
@@ -230,17 +226,14 @@ const Page = () => {
             {isFileValid.length > 0 &&
               isFileValid.map((error, i) => {
                 return (
-                  <p className="text-red-700 text-xs" key={i}>
+                  <p className={style.validationError} key={i}>
                     {error.message}
                   </p>
                 );
               })}
           </div>
 
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 rounded text-white"
-          >
+          <button type="submit" className={style.uploadButton}>
             Upload
           </button>
         </form>
@@ -269,59 +262,11 @@ interface useStates {
   setOnSuccess: Function;
 }
 
-async function uploadingData({
-  file,
-  form,
-  admin,
-  States,
-  meadia_items,
-}: {
-  file: File;
-  form: uploadForm;
-  admin: admin;
-  States: useStates;
-  meadia_items: Array<media_Item>;
-}) {
-  const { dispatch, setIsPosting, set_media_items, setOnSuccess } = States;
-  // try {
-  //   setIsPosting(true);
-
-  //   const uploadedAssetRes = await client.assets.upload("file", file, {
-  //     contentType: file.type,
-  //     filename: file.name,
-  //   });
-  //   if (uploadedAssetRes) {
-  //     try {
-  //       const postedData = await fetch("/api/upload", {
-  //         method: "POST",
-  //         body: JSON.stringify({ uploadedAssetRes, user: admin, form }),
-  //       });
-  //       const jsonData = await postedData.json();
-  //       if (jsonData) {
-  //         const { res, createdPost } = jsonData;
-  //         dispatch(set_media_items([{ ...createdPost }, ...meadia_items]));
-  //         setOnSuccess(true);
-  //       }
-  //     } catch (error) {
-  //       setOnSuccess(false);
-  //       console.error(error);
-  //     } finally {
-  //       setIsPosting(false);
-  //     }
-  //   }
-  // } catch (error) {
-  //   setOnSuccess(false);
-  //   setIsPosting(false);
-  //   console.error(error);
-  // }
-}
-
 interface createdAssetResType {
   assets: [{ _key: string; asset: { _ref: string; _type: string } }];
 }
 
-
 export interface stageType {
-  stageOne:"start"|"failed"|"completed"|null;
-  stageTwo:"start"|"failed"|"completed"|null
-} 
+  stageOne: "start" | "failed" | "completed" | null;
+  stageTwo: "start" | "failed" | "completed" | null;
+}

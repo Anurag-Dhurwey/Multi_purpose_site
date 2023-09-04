@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { client } from "@/utilities/sanityClient";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { set_media_items } from "@/redux_toolkit/features/indexSlice";
-import { like, media_Item, postedBy } from "@/typeScript/basics";
+import { like, media_Item} from "@/typeScript/basics";
 import { message } from "antd";
 import { v4 as uuidv4 } from "uuid";
 

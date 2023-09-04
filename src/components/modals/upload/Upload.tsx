@@ -16,7 +16,7 @@ const Upload = ({
   isPosting,
   onSuccess,
   stage,
-  setStage
+  setStage,
 }: propType) => {
   const dispatch = useAppDispatch();
   const admin = useAppSelector((state) => state.hooks.admin);
@@ -30,7 +30,7 @@ const Upload = ({
       !onSuccess.post
     ) {
       setIsPosting({ asset: false, post: true });
-      setStage({stageOne:'completed',stageTwo:'start'})
+      setStage({ stageOne: "completed", stageTwo: "start" });
       try {
         const postedData = await fetch("/api/upload", {
           method: "POST",
@@ -44,13 +44,13 @@ const Upload = ({
           setOnSuccess((pre) => {
             return { asset: pre.asset, post: true };
           });
-          setStage({stageOne:'completed',stageTwo:'completed'})
+          setStage({ stageOne: "completed", stageTwo: "completed" });
         }
       } catch (error) {
         setOnSuccess((pre) => {
           return { asset: pre.asset, post: false };
         });
-        setStage({stageOne:'completed',stageTwo:'failed'})
+        setStage({ stageOne: "completed", stageTwo: "failed" });
         console.error(error);
       } finally {
         setIsPosting({ asset: false, post: false });
@@ -118,9 +118,9 @@ const Upload = ({
           </span>
         )}
 
-        {stage.stageOne && stage.stageTwo==null && (
+        {stage.stageOne && stage.stageTwo == null && (
           <>
-            {stage.stageOne=="start" && (
+            {stage.stageOne == "start" && (
               <button
                 onClick={() => setVisibility(false)}
                 className={style.secondDivButton}
@@ -129,7 +129,7 @@ const Upload = ({
               </button>
             )}
 
-            {stage.stageOne=="failed" && (
+            {stage.stageOne == "failed" && (
               <button
                 onClick={() => {
                   console.log("try Again");
@@ -138,7 +138,7 @@ const Upload = ({
                 Try again
               </button>
             )}
-            {stage.stageOne=="completed" && (
+            {stage.stageOne == "completed" && (
               <>
                 <button
                   onClick={() => saveAsDraft()}
@@ -161,19 +161,15 @@ const Upload = ({
           </>
         )}
 
-        {
-          stage.stageOne=="completed" && stage.stageTwo  && (
-            <>
-            {stage.stageTwo=="start" && (
-              <button
-                onClick={() => {}}
-                className={style.secondDivButton}
-              >
+        {stage.stageOne == "completed" && stage.stageTwo && (
+          <>
+            {stage.stageTwo == "start" && (
+              <button onClick={() => {}} className={style.secondDivButton}>
                 CANCEL
               </button>
             )}
 
-            {stage.stageTwo=="failed" && (
+            {stage.stageTwo == "failed" && (
               <button
                 onClick={() => {
                   console.log("try Again");
@@ -183,68 +179,23 @@ const Upload = ({
               </button>
             )}
 
-            {stage.stageTwo=="completed" && (
-              <>
-              <button onClick={() => {}} className={style.secondDivButton}>
-                Publish new post
-              </button>
-              <button onClick={() => {alert('got to home')}} className={style.secondDivButton}>
-                Go to home
-              </button>
-            </>
-            )}
-            </>
-          )
-        }
-
-        {/* {!isPosting.post ? (
-          <>
-            {!onSuccess.asset ? (
-              <button
-                onClick={() => setVisibility(false)}
-                className={style.secondDivButton}
-              >
-                CANCEL
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={() => saveAsDraft()}
-                  className={style.secondDivButton}
-                >
-                  Save as draft
-                </button>
-                <button
-                  onClick={() =>
-                    uploadedFileRes
-                      ? publish(uploadedFileRes)
-                      : alert("something went wrong")
-                  }
-                  className={style.secondDivButton}
-                >
-                  Publish
-                </button>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            {onSuccess.post ? (
+            {stage.stageTwo == "completed" && (
               <>
                 <button onClick={() => {}} className={style.secondDivButton}>
                   Publish new post
                 </button>
-                <button onClick={() => {}} className={style.secondDivButton}>
+                <button
+                  onClick={() => {
+                    alert("got to home");
+                  }}
+                  className={style.secondDivButton}
+                >
                   Go to home
                 </button>
               </>
-            ) : (
-              <button onClick={() => {}} className={style.secondDivButton}>
-                Cancel
-              </button>
             )}
           </>
-        )} */}
+        )}
       </div>
     </div>
   );
@@ -271,6 +222,6 @@ interface propType {
   >;
   isPosting: { asset: boolean; post: boolean };
   onSuccess: { asset: boolean | null; post: boolean | null };
-  stage:stageType;
-  setStage:React.Dispatch<React.SetStateAction<stageType>>
+  stage: stageType;
+  setStage: React.Dispatch<React.SetStateAction<stageType>>;
 }
