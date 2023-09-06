@@ -15,6 +15,7 @@ import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 const Page = () => {
   const admin = useAppSelector((state) => state.hooks.admin);
+  const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
 const [onRequest,setOnRequest]=useState<boolean>(false)
@@ -80,14 +81,19 @@ const [onRequest,setOnRequest]=useState<boolean>(false)
     _key: string;
   }) => {
     const socket = getSocket(session);
-    if (socket) {
+    const isOnline = onLineUsers.find((usr) => {
+      return usr._id == userTosendReq._id;
+    });
+    if (socket && isOnline) {
       socket.emit("ConnectionRequest", {
-        user: userTosendReq,
+        user: {...userTosendReq,socketId:isOnline.socketId},
         me: admin,
         _key,
       });
+    } else if (!socket) {
+      console.error('socket not found');
     } else {
-      console.log("unable to connect to web-socket");
+      console.log("user is offline");
     }
   };
 

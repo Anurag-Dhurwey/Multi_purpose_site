@@ -77,6 +77,9 @@ export async function socketIoConnection({
         console.log("same");
       }
     });
+
+    
+
     socket.on("disconnect", () => {
       console.log("connection lost");
       

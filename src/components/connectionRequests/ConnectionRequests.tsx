@@ -121,17 +121,7 @@ const ConnectionRequests = () => {
         } finally {
           setOnRequest(false);
         }
-      } // else if (isAlreadyExist && adminConnectionsId) {
-      //   try {
-      //     const removed = await client
-      //       .patch(adminConnectionsId)
-      //       .unset(["requests_got[0]", `requests_got[_key=="${_key}"]`])
-      //       .commit();
-      //     message.success("request accepted");
-      //   } catch (error) {
-      //     console.error(error);
-      //   }
-      // }
+      } 
     } else if (onRequest) {
       alert("wait a second");
     } else {
