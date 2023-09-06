@@ -56,7 +56,7 @@ console.log({suggestedData})
             return (
               <li
                 key={user._id ? user._id : i}
-                className="py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
+                className="  py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
               >
                 <Image
                   src={`${user.image}`}

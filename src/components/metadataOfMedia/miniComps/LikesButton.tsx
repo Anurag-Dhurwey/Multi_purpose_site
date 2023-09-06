@@ -15,11 +15,11 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
   const admin = useAppSelector((state) => state.hooks.admin);
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
   const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [btnColor, setBtnColor] = useState<string>();
+  const [btnColor, setBtnColor] = useState<"blue"|"white">();
   const [api, setApi] = useState<boolean>(false);
 
   async function like() {
-
+    setBtnColor("blue");
     try {
       const res = await client
         .patch(meadia_item._id)
@@ -71,7 +71,7 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
         throw new Error("_key not found");
       }
     } catch (error) {
-      setBtnColor((pre) => (pre == "white" ? "blue" : "white"));
+      setBtnColor("white");
       console.error(error);
     }
   }
@@ -104,7 +104,7 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
         throw new Error("_key not found");
       }
     } catch (error) {
-      setBtnColor((pre) => (pre == "white" ? "blue" : "white"));
+      setBtnColor("blue");
       console.error(error);
     }
   }
@@ -135,10 +135,14 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
     const mapLikes = meadia_item.likes?.find((item) => item.email == admin.email && item.userId == admin._id);
     if (mapLikes) {
       setIsLiked(true);
-      setBtnColor("blue");
+      if(!btnColor){
+        setBtnColor("blue");
+      }
     }else{
       setIsLiked(false);
+     if(!btnColor){
       setBtnColor("white");
+     }
     }
   }, [api, media_Items, session]);
 

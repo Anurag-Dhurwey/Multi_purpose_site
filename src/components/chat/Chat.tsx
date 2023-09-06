@@ -9,6 +9,8 @@ import { socketIoConnection } from "@/utilities/socketIo";
 import { message } from "antd";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 const Chat = () => {
   const dispatch = useAppDispatch();
@@ -18,6 +20,9 @@ const Chat = () => {
 
   const [offlineUsers, setOfflineUsers] = useState<usersMinData[]>([]);
 
+  if(!session){
+    return null
+  }
   function filterOfflineUsr() {
     const offlineUsr = admin.connections?.connected?.filter((usr) => {
       const isOnline = onLineUsers.find((Onusr) => {
@@ -29,6 +34,16 @@ const Chat = () => {
       setOfflineUsers(offlineUsr);
     }
   }
+
+
+  // function onChatHandler() {
+  //   try {
+      
+  //   } catch (error) {
+      
+  //   }
+  // }
+
 
   useEffect(() => {
     if (session) {
@@ -51,11 +66,26 @@ const Chat = () => {
       <span>
         <ul>
           {onLineUsers?.map((item, i) => {
-            const { name, email, image } = item;
+            const { name, email, image ,_id} = item;
+            const serializedObject = encodeURIComponent(JSON.stringify({_id,email,name}));
             return (
-              <li key={i} >
-                <p style={{color:'green'}}>{name}</p>
-              </li>
+              <li
+              key={_id}
+              className="w-fit py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
+            >
+              <Image
+                src={`${image}`}
+                height={100}
+                width={100}
+                alt="image"
+                className=" max-sm:h-16 max-sm:w-16 rounded-full overflow-hidden"
+              />
+              <p style={{color:'green'}} className="text-xs">{name}</p>
+              <Link href={`/chats/${serializedObject}`}>
+              Chat
+              </Link>
+              {/* <button onClick={()=>onChatHandler()}>Chat</button> */}
+            </li>
             );
           })}
         </ul>
@@ -63,11 +93,26 @@ const Chat = () => {
       <span>
       <ul>
           {offlineUsers?.map((item, i) => {
-            const { name, email, image } = item;
+            const { name, email, image,userId:_id } = item;
+            const serializedObject = encodeURIComponent(JSON.stringify({_id,email,name}));
             return (
-              <li key={i}>
-                <p>{name}</p>
-              </li>
+              <li
+              key={_id}
+              className="w-fit py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
+            >
+              <Image
+                src={`${image}`}
+                height={100}
+                width={100}
+                alt="image"
+                className=" max-sm:h-16 max-sm:w-16 rounded-full overflow-hidden"
+              />
+              <p className="text-xs">{name}</p>
+              <Link href={`/chats/${serializedObject}`}>
+              Chat
+              </Link>
+              {/* <button onClick={()=>onChatHandler()}>Chat</button> */}
+            </li>
             );
           })}
         </ul>
