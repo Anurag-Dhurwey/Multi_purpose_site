@@ -28,7 +28,7 @@ const UserChatBox = ({ parsedObject }: propType) => {
     });
     if (socket && isOnline) {
       console.log(arg)
-      socket.emit("chat_message", {...arg,socketId:isOnline.socketId});
+      socket.emit("chat_message", {...arg,receiver_socketId:isOnline.socketId});
     } else if (!socket) {
       console.error('socket not found');
     } else {
@@ -45,6 +45,7 @@ const UserChatBox = ({ parsedObject }: propType) => {
       // return chatMessages[0];
     }
   }
+
 
   async function onHandleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -133,7 +134,7 @@ const UserChatBox = ({ parsedObject }: propType) => {
         <span className=" self-start">
           <p> {parsedObject.name}</p>
         </span>
-        <div className="border-2 p-2 border-blue-500 h-[70%] w-[80%] flex flex-col justify-start items-start">
+        <div className=" overflow-auto border-2 p-2 border-blue-500 h-[70%] w-[80%] flex flex-col justify-start items-start">
           {chatData?.chat_messages.map((chat, i) => {
             const { message, date_time, sender_id, receiver_id } = chat;
             const uploadDate = new Date(date_time);

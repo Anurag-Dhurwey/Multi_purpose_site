@@ -3,6 +3,7 @@ import { getAdminData } from "./functions/getAdminData";
 import { session, socketIoConnectionType } from "@/typeScript/basics";
 import { onlineUsers, set_Admins_Connections } from "@/redux_toolkit/features/indexSlice";
 import { Socket } from "socket.io-client";
+import { type } from "os";
 
 let socket: Socket | undefined;
 export const getSocket =  (session: session) => {
@@ -50,7 +51,7 @@ export async function socketIoConnection({
     // this below variable is to prevent socket_io event "ConnectionRequestToUser" to running multiple time
     let oneTimeRunner: string = "initial";
 
-    socket.on("ConnectionRequestToUser", (msg) => {
+    socket.on("ConnectionRequestToUser", (msg:CRTU) => {
       if (oneTimeRunner != msg.user._id) {
         console.log(oneTimeRunner, msg.user._id);
         oneTimeRunner = msg.user._id;
@@ -78,7 +79,9 @@ export async function socketIoConnection({
       }
     });
 
-    
+socket.on("chat_message",(msg:chat_message)=>{
+  message.info(`${msg.message}`)
+})
 
     socket.on("disconnect", () => {
       console.log("connection lost");
@@ -87,4 +90,30 @@ export async function socketIoConnection({
   } else {
     console.log("unable to connect to web-socket");
   }
+}
+
+
+
+
+interface ConnectionRequestToUserType{
+  socketId:string;
+  _id:string;
+  name:string;
+  email:string;
+  image:string
+}
+
+type CRTU={
+  user:ConnectionRequestToUserType;
+  _key:string
+}
+
+
+export interface chat_message {
+  sender_id: string;
+  receiver_id: string;
+  message: string;
+  date_time: Date;
+  receiver_email:string;
+  receiver_socketId:string;
 }

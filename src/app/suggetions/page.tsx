@@ -18,7 +18,7 @@ const Page = () => {
   const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
-const [onRequest,setOnRequest]=useState<boolean>(false)
+  const [onRequest, setOnRequest] = useState<boolean>(false);
   async function mutation(userTosendReq: users) {
     const { _id, image, name, email } = userTosendReq;
     try {
@@ -84,14 +84,21 @@ const [onRequest,setOnRequest]=useState<boolean>(false)
     const isOnline = onLineUsers.find((usr) => {
       return usr._id == userTosendReq._id;
     });
+
     if (socket && isOnline) {
       socket.emit("ConnectionRequest", {
-        user: {...userTosendReq,socketId:isOnline.socketId},
-        me: admin,
+        sendTo: { ...userTosendReq, socketId: isOnline.socketId },
+        sentBy: {
+          _id: admin._id,
+          name: admin.name,
+          image: admin.image,
+          email: admin.email,
+          socketId: socket.id,
+        },
         _key,
       });
     } else if (!socket) {
-      console.error('socket not found');
+      console.error("socket not found");
     } else {
       console.log("user is offline");
     }
@@ -99,7 +106,7 @@ const [onRequest,setOnRequest]=useState<boolean>(false)
 
   async function sendRequestHandler(userTosendReq: users) {
     if (admin._id && !onRequest) {
-      setOnRequest(true)
+      setOnRequest(true);
       const { _id, image, name, email } = userTosendReq;
 
       const adminConnectionsId: string | undefined = admin.connections?._id
@@ -151,11 +158,11 @@ const [onRequest,setOnRequest]=useState<boolean>(false)
       } catch (error) {
         message.error("something went wrong");
         console.error(error);
-      }finally{
-        setOnRequest(false)
+      } finally {
+        setOnRequest(false);
       }
-    }else if(onRequest){
-      alert('wait a second')
+    } else if (onRequest) {
+      alert("wait a second");
     } else {
       console.error("user not found");
       message.error("user id not found");

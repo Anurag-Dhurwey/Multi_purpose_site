@@ -36,13 +36,6 @@ const Chat = () => {
   }
 
 
-  // function onChatHandler() {
-  //   try {
-      
-  //   } catch (error) {
-      
-  //   }
-  // }
 
 
   useEffect(() => {
@@ -84,7 +77,6 @@ const Chat = () => {
               <Link href={`/chats/${serializedObject}`}>
               Chat
               </Link>
-              {/* <button onClick={()=>onChatHandler()}>Chat</button> */}
             </li>
             );
           })}
