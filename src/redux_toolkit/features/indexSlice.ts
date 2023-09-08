@@ -89,11 +89,11 @@ export const counterSlice = createSlice({
           };
         } else if (command == "request") {
           console.log("entered in Request hook");
-          const isAlreadyExist = state.admin?.connections?.requests_got?.find(
-            (usr) => usr.userId == data.userId
-          );
+          // const isAlreadyExist = state.admin?.connections?.requests_got?.find(
+          //   (usr) => usr.userId == data.userId
+          // );
 
-          if (!isAlreadyExist) {
+          // if (!isAlreadyExist) {
             state.admin.connections = {
               connected: current.connected,
               requests_got: current.requests_got
@@ -101,10 +101,10 @@ export const counterSlice = createSlice({
                 : [data],
               requests_sent: [],
             };
-          } else {
-            console.log("already exist in request array");
-            console.log(isAlreadyExist);
-          }
+          // } else {
+          //   console.log("already exist in request array");
+          //   console.log(isAlreadyExist);
+          // }
         }
       }
     },

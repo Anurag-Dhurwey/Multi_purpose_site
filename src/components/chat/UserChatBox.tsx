@@ -20,9 +20,9 @@ const UserChatBox = ({ parsedObject }: propType) => {
   const dispatch = useAppDispatch();
   const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
 
-  const socket = getSocket(session);
-
-  const emitChatMessage = (arg: emitArg) => {
+  
+  const emitChatMessage = async(arg: emitArg) => {
+    const {socket} =await getSocket({session,dispatch,admin,set_Admin});
     const isOnline = onLineUsers.find((usr) => {
       return usr._id == arg.receiver_id;
     });

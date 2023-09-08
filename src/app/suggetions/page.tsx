@@ -1,6 +1,7 @@
 "use client";
 
 import Suggetions from "@/components/suggetions/Suggetions";
+import { set_Admin } from "@/redux_toolkit/features/indexSlice";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { users, usersMinData } from "@/typeScript/basics";
 import {
@@ -80,7 +81,7 @@ const Page = () => {
     userTosendReq: users;
     _key: string;
   }) => {
-    const socket = getSocket(session);
+    const {socket} =await getSocket({session,dispatch,admin,set_Admin});
     const isOnline = onLineUsers.find((usr) => {
       return usr._id == userTosendReq._id;
     });
