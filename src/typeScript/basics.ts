@@ -117,3 +117,23 @@ export interface socketIoConnectionType {
 export interface suggestedData {
   users: Array<users>;
 }
+
+
+export interface oldChats {
+  _id: string;
+  userOne: {
+    userId: string;
+    email: string;
+  };
+  userTwo: {
+    userId: string;
+    email: string;
+  };
+  chat_messages: {
+    _key: string;
+    sender_id: string;
+    receiver_id: string;
+    message: string;
+    date_time: Date;
+  }[];
+}
