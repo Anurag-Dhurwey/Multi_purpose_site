@@ -5,7 +5,6 @@ import {
   set_suggestedData,
 } from "@/redux_toolkit/features/indexSlice";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import { getAdminData } from "@/utilities/functions/getAdminData";
 import { getSuggestedUsers } from "@/utilities/functions/getSuggestedUsers";
 import { message } from "antd";
 import { useSession } from "next-auth/react";
@@ -18,11 +17,11 @@ import { socketIoConnection } from "@/utilities/socketIo";
 const Suggetions = ({ sendRequestHandler }: propType) => {
 
   const admin = useAppSelector((state) => state.hooks.admin);
-  if(!admin){
+  const { data: session } = useSession();
+  if(!admin._id){
     return null
   }
   const dispatch: Function = useAppDispatch();
-  const { data: session } = useSession();
   const suggestedData = useAppSelector((state) => state.hooks.suggestedData);
 
   async function configureSuggestions() {

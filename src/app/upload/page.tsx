@@ -48,6 +48,8 @@ const Page = () => {
   });
   const [uploadedAsset, setUploadedAsset] = useState<SanityAssetDocument>();
   const [file, setFile] = useState<File>();
+
+
   const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     const file = e.target.files;
@@ -255,12 +257,12 @@ function checkFileSize(file: File, setIsFileValid: Function) {
   }
 }
 
-interface useStates {
-  setIsPosting: Function;
-  dispatch: Function;
-  set_media_items: (payload: Array<media_Item>) => void;
-  setOnSuccess: Function;
-}
+// interface useStates {
+//   setIsPosting: Function;
+//   dispatch: Function;
+//   set_media_items: (payload: Array<media_Item>) => void;
+//   setOnSuccess: Function;
+// }
 
 interface createdAssetResType {
   assets: [{ _key: string; asset: { _ref: string; _type: string } }];

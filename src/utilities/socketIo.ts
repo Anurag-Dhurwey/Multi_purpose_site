@@ -1,6 +1,6 @@
 import io from "socket.io-client";
 import { getAdminData } from "./functions/getAdminData";
-import { admin, session, socketIoConnectionType } from "@/typeScript/basics";
+import { admin, chat_messages, session, socketIoConnectionType } from "@/typeScript/basics";
 import {
   onlineUsers,
   set_Admins_Connections,
@@ -15,7 +15,7 @@ export const getSocket = async ({
   set_Admin,
   dispatch,
 }: getSocketArgType) => {
-  // if (session) {
+
   const admin_with_id = await getAdminData({
     dispatch,
     admin,
@@ -24,7 +24,7 @@ export const getSocket = async ({
   });
   if (!socket) {
     socket = io(`${process.env.NEXT_PUBLIC_SOCKET_IO_SERVER_URL}`);
-    socket.emit("onHnadshake", { user: admin_with_id });
+    socket.emit("onHnadshake", { user: {...admin_with_id,connections:{connected:admin_with_id?.connections?.connected}} });
     return { socket, admin_with_id };
   } else {
     return { socket, admin_with_id };
@@ -51,19 +51,12 @@ export async function socketIoConnection({
       admin,
     });
 
-    // if (socket) {
+  
       socket.on("allOnlineUsers", (onLineUsers: onlineUsers[]) => {
-        const onlineConnectedUsr = onLineUsers.filter((usr) => {
-          const isOnline = admin_with_id?.connections?.connected?.find(
-            (user) => {
-              return user.email == usr.email;
-            }
-          );
-          return isOnline?.email == usr.email;
-        });
 
-        dispatch(set_onLineUsers(onlineConnectedUsr));
-        console.log({ str: "allOnlineUsertest", onlineConnectedUsr });
+        dispatch(set_onLineUsers(onLineUsers));
+        console.log({ str: "allOnlineUsertest", onLineUsers });
+
       });
 
       
@@ -81,10 +74,12 @@ export async function socketIoConnection({
             set_Admins_Connections({
               command: "request",
               data: {
-                userId: user._id,
-                name: user.name,
-                email: user.email,
-                image: user.image,
+                user:{
+                  _id: user._id,
+                  name: user.name,
+                  email: user.email,
+                  image: user.image,
+                },
                 _key,
               },
               current: admin_with_id.connections,
@@ -99,7 +94,7 @@ export async function socketIoConnection({
         }
       });
 
-      socket.on("chat_message", (msg: chat_message) => {
+      socket.on("chat_message", (msg: importedChat_msg) => {
         if (msg.date_time != stop_to_run_chat_message) {
           message.info(`${msg.message}`);
           stop_to_run_chat_message = msg.date_time;
@@ -111,9 +106,6 @@ export async function socketIoConnection({
       socket.on("disconnect", () => {
         console.log("connection lost");
       });
-    // } else {
-    //   console.log("unable to connect to web-socket");
-    // }
   }
 }
 
@@ -130,13 +122,8 @@ type CRTU = {
   _key: string;
 };
 
-export interface chat_message {
-  sender_id: string;
-  receiver_id: string;
-  message: string;
-  date_time: Date;
-  receiver_email: string;
-  receiver_socketId: string;
+export interface importedChat_msg extends chat_messages{
+  receiver_socketId:string
 }
 
 interface getSocketArgType {

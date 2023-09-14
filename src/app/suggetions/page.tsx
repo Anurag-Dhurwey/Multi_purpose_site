@@ -3,7 +3,7 @@
 import Suggetions from "@/components/suggetions/Suggetions";
 import { set_Admin } from "@/redux_toolkit/features/indexSlice";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import { users, usersMinData } from "@/typeScript/basics";
+import { _ref, min_id_of_usr } from "@/typeScript/basics";
 import {
   getAdminConnectionId,
   getUsrConnectionId,
@@ -14,18 +14,19 @@ import { message } from "antd";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+
+
 const Page = () => {
   const admin = useAppSelector((state) => state.hooks.admin);
   const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
   const [onRequest, setOnRequest] = useState<boolean>(false);
-  async function mutation(userTosendReq: users) {
+
+  async function mutation(userTosendReq: min_id_of_usr) {
     const { _id, image, name, email } = userTosendReq;
     try {
-      const friendsConnectionId = userTosendReq.connections?._id
-        ? userTosendReq.connections
-        : await getUsrConnectionId(_id);
+      const friendsConnectionId = await getUsrConnectionId(_id);
       if (friendsConnectionId?._id) {
         const res: resType = await client
           .patch(friendsConnectionId._id)
@@ -33,15 +34,15 @@ const Page = () => {
           .insert("after", "requests_got[-1]", [
             {
               _key: uuidv4(),
-              name: admin.name,
-              userId: admin._id,
-              email: admin.email,
-              image: admin.image,
+              user: {
+                _type: "reference",
+                _ref: admin._id,
+              },
             },
           ])
           .commit();
         const check = res.requests_got?.find(
-          (usr: usersMinData) => usr.userId == admin._id
+          (usr: { _key: string; user: _ref }) => usr.user._ref == admin._id
         );
         if (check) {
           return check;
@@ -49,21 +50,23 @@ const Page = () => {
       } else {
         const doc = {
           _type: "connections",
-          userId: _id,
-          email: email,
+          user: {
+            _type: "reference",
+            _ref: _id,
+          },
           requests_got: [
             {
               _key: uuidv4(),
-              name: admin.name,
-              userId: admin._id,
-              email: admin.email,
-              image: admin.image,
+              user: {
+                _type: "reference",
+                _ref: admin._id,
+              },
             },
           ],
         };
         const createdDoc = await client.create(doc);
         const check = createdDoc.requests_got?.find(
-          (usr) => usr.userId == admin._id
+          (usr) => usr.user._ref == admin._id
         );
         if (check) {
           return check;
@@ -78,17 +81,14 @@ const Page = () => {
     userTosendReq,
     _key,
   }: {
-    userTosendReq: users;
+    userTosendReq: min_id_of_usr;
     _key: string;
   }) => {
-    const {socket} =await getSocket({session,dispatch,admin,set_Admin});
-    const isOnline = onLineUsers.find((usr) => {
-      return usr._id == userTosendReq._id;
-    });
+    const { socket } = await getSocket({ session, dispatch, admin, set_Admin });
 
-    if (socket && isOnline) {
+    if (socket) {
       socket.emit("ConnectionRequest", {
-        sendTo: { ...userTosendReq, socketId: isOnline.socketId },
+        sendTo: { ...userTosendReq},
         sentBy: {
           _id: admin._id,
           name: admin.name,
@@ -98,14 +98,12 @@ const Page = () => {
         },
         _key,
       });
-    } else if (!socket) {
+    } else{
       console.error("socket not found");
-    } else {
-      console.log("user is offline");
-    }
+    } 
   };
 
-  async function sendRequestHandler(userTosendReq: users) {
+  async function sendRequestHandler(userTosendReq: min_id_of_usr) {
     if (admin._id && !onRequest) {
       setOnRequest(true);
       const { _id, image, name, email } = userTosendReq;
@@ -129,25 +127,27 @@ const Page = () => {
               .insert("after", "requests_sent[-1]", [
                 {
                   _key: uuidv4(),
-                  name: name,
-                  userId: _id,
-                  email: email,
-                  image: image,
+                  user: {
+                    _type: "reference",
+                    _ref: _id,
+                  },
                 },
               ])
               .commit();
           } else {
             const doc = {
               _type: "connections",
-              userId: _id,
-              email: email,
+              user: {
+                _type: "reference",
+                _ref: admin._id,
+              },
               requests_sent: [
                 {
                   _key: uuidv4(),
-                  name: name,
-                  userId: _id,
-                  email: email,
-                  image: image,
+                  user: {
+                    _type: "reference",
+                    _ref: _id,
+                  },
                 },
               ],
             };
@@ -183,13 +183,10 @@ const Page = () => {
 
 export default Page;
 
-interface FCtype {
-  _id: string;
-  requests_sent: Array<usersMinData>;
-}
+
 
 interface resType {
   userId: string;
   email: string;
-  requests_got: Array<usersMinData>;
+  requests_got: { _key: string; user: _ref }[];
 }

@@ -5,7 +5,7 @@ import {
   set_Admins_Connections
 } from "@/redux_toolkit/features/indexSlice";
 import Image from "next/image";
-import { usersMinData } from "@/typeScript/basics";
+import { _ref,  usr_and_key_in_array } from "@/typeScript/basics";
 import { client } from "@/utilities/sanityClient";
 import { message } from "antd";
 import { v4 as uuidv4 } from "uuid";
@@ -24,8 +24,9 @@ const ConnectionRequests = () => {
   console.log(requests);
 
   // this below function will move requested user from requests to connectedUsr
-  async function acceptRequestHandler(userToAcceptReq: usersMinData) {
-    const { userId, name, email, image, _key } = userToAcceptReq;
+  async function acceptRequestHandler(userToAcceptReq: usr_and_key_in_array) {
+    const {user, _key } = userToAcceptReq;
+    const { _id, name, email, image}=user
     if (admin?._id && !onRequest) {
       setOnRequest(true);
       const adminConnectionsId = admin.connections?._id
@@ -33,7 +34,7 @@ const ConnectionRequests = () => {
         : await getAdminConnectionId({ dispatch, id: admin._id, admin });
 
       const isAlreadyExist = admin.connections?.connected?.find(
-        (user) => user.userId == userToAcceptReq.userId
+        (user) => user.user._id == _id
       );
 
       if (!isAlreadyExist && adminConnectionsId) {
@@ -45,15 +46,15 @@ const ConnectionRequests = () => {
             .insert("after", "connected[-1]", [
               {
                 _key: uuidv4(),
-                userId: userId,
-                name: name,
-                email: email,
-                image: image,
+                user:{
+                  _type:'reference',
+                  _ref:_id
+                }
               },
             ])
             .commit();
           const check = added.connected?.find(
-            (usr: usersMinData) => usr.userId == userId
+            (usr:{_key:string,user:_ref}) => usr.user._ref == _id
           );
           console.log(added);
           console.log(check);
@@ -76,23 +77,23 @@ const ConnectionRequests = () => {
             message.success("request accepted");
 
             // adding admin data on friends account who want's to connect with me
-            const friendsConnectionId = await getUsrConnectionId(userId);
+            const friendsConnection = await getUsrConnectionId(_id);
             // this below variable is to get _key to delete element from requests_sent array after accepting connection request
-            const element = friendsConnectionId?.requests_sent?.find(
-              (usr: usersMinData) => usr.userId == admin._id
+            const element = friendsConnection?.requests_sent?.find(
+              (usr) => usr.user._ref == admin._id
             );
             console.log({ element });
-            if (friendsConnectionId?._id && element) {
+            if (friendsConnection?._id && element) {
               const addedInFriendsAccount = await client
-                .patch(friendsConnectionId._id)
+                .patch(friendsConnection._id)
                 .setIfMissing({ connected: [] })
                 .insert("after", "connected[-1]", [
                   {
                     _key: uuidv4(),
-                    userId: admin._id,
-                    name: admin.name,
-                    email: admin.email,
-                    image: admin.image,
+                    user:{
+                      _type:'reference',
+                      _ref:admin._id
+                    }
                   },
                 ])
                 .unset([
@@ -101,7 +102,7 @@ const ConnectionRequests = () => {
                 ])
                 .commit();
               const check2 = addedInFriendsAccount.connected?.find(
-                (usr: usersMinData) => usr.userId == admin._id
+                (usr:{_key:string;user:_ref}) => usr.user._ref == admin._id
               );
               if (check2) {
                 console.log(addedInFriendsAccount);
@@ -130,8 +131,9 @@ const ConnectionRequests = () => {
     }
   }
 
-  async function onRejectHandler(userToRejectReq: usersMinData) {
-    const { _key } = userToRejectReq;
+  async function onRejectHandler(userToRejectReq: usr_and_key_in_array) {
+    const {user, _key } = userToRejectReq;
+    const { _id, name, email, image}=user
     if (admin?._id && admin.connections && !onRequest) {
       setOnRequest(true)
       const adminConnectionsId = admin.connections._id
@@ -139,20 +141,21 @@ const ConnectionRequests = () => {
         : await getAdminConnectionId({ dispatch, id: admin._id, admin });
       console.log({ adminConnectionsId });
       console.log({ admin: admin.connections._id });
-      const friendsConnectionId = await getUsrConnectionId(
-        userToRejectReq.userId
+      const friendsConnection = await getUsrConnectionId(
+        _id
       );
-      const element = friendsConnectionId?.requests_sent?.find(
-        (usr: usersMinData) => usr.userId == admin._id
+      const element = friendsConnection?.requests_sent?.find(
+        (usr) => usr.user._ref == admin._id
       );
       try {
-        if (adminConnectionsId && friendsConnectionId && element) {
+        if (adminConnectionsId && friendsConnection && element) {
           const removed = await client
             .patch(adminConnectionsId)
             .unset(["requests_got[0]", `requests_got[_key=="${_key}"]`])
             .commit();
+           
           const check = removed.requets_got?.find(
-            (usr: usersMinData) => usr.userId == userToRejectReq.userId
+            (usr:{_key:string;user:_ref}) => usr.user._ref == _id
           );
           if (!check) {
             dispatch(
@@ -163,7 +166,7 @@ const ConnectionRequests = () => {
               })
             );
             const removed = await client
-              .patch(friendsConnectionId._id)
+              .patch(friendsConnection._id)
               .unset([
                 "requests_sent[0]",
                 `requests_sent[_key=="${element._key}"]`,
@@ -191,15 +194,15 @@ const ConnectionRequests = () => {
       <p>Requests</p>
       <ul className="flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
         {requests?.map((req, i) => {
-          if (req.userId == "test") return null;
+          if (req.user._id == "test") return null;
           return (
             <li
-              key={req.userId ? i : i}
+              key={i}
               className="py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
             >
-              {req.image.includes("https://") ? (
+              {req.user.image.includes("https://") ? (
                 <Image
-                  src={`${req.image}`}
+                  src={`${req.user.image}`}
                   height={100}
                   width={100}
                   alt="image"
@@ -208,7 +211,7 @@ const ConnectionRequests = () => {
               ) : (
                 <p></p>
               )}
-              <p className="text-xs">{req.name}</p>
+              <p className="text-xs">{req.user.name}</p>
               <button className="" onClick={() => acceptRequestHandler(req)}>
                 accept
               </button>

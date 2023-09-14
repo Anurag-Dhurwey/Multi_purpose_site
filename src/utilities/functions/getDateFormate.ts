@@ -22,7 +22,6 @@ const days = [
   "Saturday",
 ];
 
-// const date = new Date();
 const now = new Date();
 
 let previousDate: string | undefined;

@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 import {
   set_Admin,
   set_my_uploads,
-  set_media_items,
   set_onLineUsers,
 } from "@/redux_toolkit/features/indexSlice";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";

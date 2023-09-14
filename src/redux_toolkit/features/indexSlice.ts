@@ -4,8 +4,9 @@ import {
   suggestedData,
   admin,
   users,
-  usersMinData,
   connections,
+  usr_and_key_in_array,
+  min_id_of_usr,
 } from "@/typeScript/basics";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -66,9 +67,10 @@ export const counterSlice = createSlice({
       const { command, data, current } = action.payload;
       if (state.admin) {
         if (command == "accept") {
+
           console.log("entered in Accept hook");
           const updatedRequests = current.requests_got?.filter((user) => {
-            return user.userId !== data.userId;
+            return user.user._id !== data.user._id;
           });
           state.admin.connections = {
             connected: current.connected
@@ -77,34 +79,30 @@ export const counterSlice = createSlice({
             requests_got: updatedRequests ? [...updatedRequests] : [],
             requests_sent: [],
           };
+          
         } else if (command == "reject" && current.requests_got) {
+
           console.log("entered in Reject hook");
           const updatedRequests = current.requests_got.filter((user) => {
-            return user.userId !== data.userId;
+            return user.user._id !== data.user._id;
           });
           state.admin.connections = {
             connected: current.connected ? [...current.connected] : [],
             requests_got: [...updatedRequests],
             requests_sent: [],
           };
-        } else if (command == "request") {
-          console.log("entered in Request hook");
-          // const isAlreadyExist = state.admin?.connections?.requests_got?.find(
-          //   (usr) => usr.userId == data.userId
-          // );
 
-          // if (!isAlreadyExist) {
-            state.admin.connections = {
-              connected: current.connected,
-              requests_got: current.requests_got
-                ? [data, ...current.requests_got]
-                : [data],
-              requests_sent: [],
-            };
-          // } else {
-          //   console.log("already exist in request array");
-          //   console.log(isAlreadyExist);
-          // }
+        } else if (command == "request") {
+
+          console.log("entered in Request hook");
+          state.admin.connections = {
+            connected: current.connected,
+            requests_got: current.requests_got
+              ? [data, ...current.requests_got]
+              : [data],
+            requests_sent: [],
+          };
+
         }
       }
     },
@@ -147,7 +145,7 @@ export default counterSlice.reducer;
 
 export interface suggestedDataPayloadType {
   _type: string;
-  data: Array<users>;
+  data: min_id_of_usr[];
 }
 
 export interface onlineUsers extends users {
@@ -156,6 +154,6 @@ export interface onlineUsers extends users {
 
 type setAdminConnectionsPayloadType = {
   command: string;
-  data: usersMinData;
+  data: usr_and_key_in_array;
   current: connections;
 };

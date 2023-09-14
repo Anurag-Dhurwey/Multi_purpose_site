@@ -35,22 +35,26 @@ const Connections = () => {
       <p>connections</p>
       <ul className="flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
         {connectedUsr?.map((user, i) => {
-          if (user.userId == "test") {
+          if (user.user._id == "test") {
             return null;
           }
           return (
             <li
-              key={user.userId ? i : i}
+              key={ user._key}
               className="py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
             >
-              <Image
-                src={`${user.image}`}
-                height={100}
-                width={100}
-                alt="image"
-                className=" max-sm:h-16 max-sm:w-16 rounded-full overflow-hidden"
-              />
-              <p className="text-xs">{user.name}</p>
+               {user.user.image.includes("https://") ? (
+                <Image
+                  src={`${user.user.image}`}
+                  height={100}
+                  width={100}
+                  alt="image"
+                  className=" max-sm:h-16 max-sm:w-16 rounded-full overflow-hidden"
+                />
+              ) : (
+                null
+              )}
+              <p className="text-xs">{user.user.name}</p>
             </li>
           );
         })}

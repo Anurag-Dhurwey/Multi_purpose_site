@@ -23,9 +23,9 @@ const SideNavbar = ({
             return (
               <li key={nav + i}>
                 <button>
-                  {/* <Link href={"/"}> */}
+                  <Link href={`/${nav}`}>
                     {nav}
-                    {/* </Link> */}
+                    </Link>
                 </button>
               </li>
             );

@@ -9,8 +9,8 @@ interface Iprops {
     setDescView: Function;
   };
   user: string;
-  caption: string;
-  desc: string;
+  caption: string|undefined;
+  desc: string|undefined;
 }
 const TitleDesc = ({ useStates, user, caption, desc }: Iprops) => {
   const { cmtView, descView, setCmtView, setDescView } = useStates;
@@ -22,7 +22,7 @@ const TitleDesc = ({ useStates, user, caption, desc }: Iprops) => {
             <button className="h-8 w-8 bg-blue-600 rounded-3xl"></button>
             <h4>{user}</h4>
           </span>
-          <h3>{descView ? caption : caption.slice(0, 30) + "....."}</h3>
+          <h3>{descView ? caption : caption?.slice(0, 30) + "....."}</h3>
           <p className={`text-sm ${descView ? "" : "hidden"}`}>{desc}</p>
           <span className={style.titleDescSpan2}>
             <button

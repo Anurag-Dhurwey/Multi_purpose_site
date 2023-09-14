@@ -1,56 +1,55 @@
-import {  onlineUsers } from "@/redux_toolkit/features/indexSlice";
+import { onlineUsers } from "@/redux_toolkit/features/indexSlice";
 import { MessageInstance } from "antd/es/message/interface";
-export type session ={
+import { type } from "os";
+export type session = {
   user?: sessionUser;
-}|null
+} | null;
 
-// below properties should not be null
-// null is assined because of typescript error
-export type sessionUser= {
-  image?: string|null ;
-  name?: string|null ;
-  email?: string|null;
-}
 
-export interface users {
-  _id: string;
-  name: string;
-  email: string;
-  image?: string;
+export type sessionUser = {
+  image?: string | null;
+  name?: string | null;
+  email?: string | null;
+};
+
+export interface users extends min_id_of_usr {
   bio?: string;
   desc?: string;
   link?: string;
-  connections?: {_id?:string; connected?: usersMinData };
+  connections?: { _id?: string; connected?: usr_and_key_in_array };
 }
 
-export type admin ={
+export interface min_id_of_usr {
+  _id: string;
+  email: string;
+  image?: string;
+  name: string;
+}
+
+export type admin = {
   _id?: string;
   name?: string;
   email?: string;
   image?: string;
-  bio?: string ;
-  desc?: string ;
-  link?: string ;
+  bio?: string;
+  desc?: string;
+  link?: string;
   connections?: connections;
-  assetId?:string
-}
+  assetId?: string;
+};
 
 export type me = admin;
 
 export interface connections {
-  _id?:string;
-  connected?: Array<usersMinData>;
-  requests_got?: Array<usersMinData>;
-  requests_sent?:Array<usersMinData>;
+  _id?: string;
+  connected?: usr_and_key_in_array[];
+  requests_got?: usr_and_key_in_array[];
+  requests_sent?: usr_and_key_in_array[];
 }
-export type usersMinData = {
+export type usr_and_key_in_array = {
   _key: string;
-  userId: string;
-  name: string;
-  email: string;
-  image: string;
+  user: { _id: string; name: string; email: string; image: string };
 };
-
 
 export interface uploadForm {
   caption: string;
@@ -65,45 +64,47 @@ export interface media_Item {
   caption?: string;
   desc?: string;
   tag?: string;
-  likes?: Array<like>;
-  comments?: comments;
+  likes?: like[];
+  comments?: comment[];
   _updatedAt?: string;
   _createdAt?: string;
 }
 
-type comments = Array<{
+export interface like {
   _key: string;
-  comment: string;
-  name: string;
-  email: string;
-  userId: string;
-}>;
-
-export interface meadiaFile {
-  _type: string;
-  asset: {
-    _ref: string;
-    _type: string;
+  postedBy: {
+    _id: string;
+    name: string;
+    email: string;
   };
 }
 
-export interface postedBy {
-  _id: string;
-  _updatedAt: string;
-  email: string;
-  image: string;
-  _createdAt: string;
-  _rev: string;
+export interface _ref{
   _type: string;
-  name: string;
+  _ref: string;
+};
+
+export interface like_ref {
+  _key: string;
+  postedBy: _ref
 }
 
-export interface like {
-  _key: string;
-  name: string;
-  email: string;
-  userId: string;
+interface comment extends like {
+  comment: string;
 }
+
+export interface comment_ref {
+  _key: string;
+  comment: string;
+  postedBy: _ref
+}
+
+export interface meadiaFile {
+  _type: string;
+  asset: _ref
+}
+
+export type postedBy =min_id_of_usr
 
 export interface socketIoConnectionType {
   session: session;
@@ -115,25 +116,25 @@ export interface socketIoConnectionType {
 }
 
 export interface suggestedData {
-  users: Array<users>;
+  users: min_id_of_usr[];
 }
-
 
 export interface oldChats {
   _id: string;
-  userOne: {
-    userId: string;
-    email: string;
-  };
-  userTwo: {
-    userId: string;
-    email: string;
-  };
-  chat_messages: {
-    _key: string;
-    sender_id: string;
-    receiver_id: string;
-    message: string;
-    date_time: Date;
-  }[];
+  userOne: min_id_of_usr;
+  userTwo: min_id_of_usr;
+ 
+}
+
+export interface  chat_messages {
+  _key: string;
+  sender: _ref;
+  receiver: _ref;
+  message: string;
+  date_time: Date;
+};
+
+export interface currentUser_On_Chat{
+  chat_id?:string
+  user:min_id_of_usr;
 }

@@ -1,14 +1,9 @@
 "use client";
 import { Connections } from "@/components";
 import ConnectionRequests from "@/components/connectionRequests/ConnectionRequests";
-import {
-  set_Admin,
-  set_onLineUsers,
-} from "@/redux_toolkit/features/indexSlice";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import { socketIoConnection } from "@/utilities/socketIo";
 import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const Page = () => {
   const dispatch = useAppDispatch();
@@ -23,17 +18,6 @@ const Page = () => {
     return null;
   }
 
-  // useEffect(() => {
-  //   if (session) {
-  //     socketIoConnection({
-  //       session,
-  //       dispatch,
-  //       admin,
-  //       set_Admin,
-  //       set_onLineUsers,
-  //     });
-  //   }
-  // }, [session]);
 
   return (
     <section>

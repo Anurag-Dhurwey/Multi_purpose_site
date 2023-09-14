@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { client } from "@/utilities/sanityClient";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { set_media_items } from "@/redux_toolkit/features/indexSlice";
-import { like, media_Item} from "@/typeScript/basics";
+import { like, like_ref, media_Item} from "@/typeScript/basics";
 import { message } from "antd";
 import { v4 as uuidv4 } from "uuid";
 
@@ -27,38 +27,37 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
         .insert("after", "likes[-1]", [
           {
             _key: uuidv4(),
-            userId: admin._id,
-            name: admin.name,
-            email: admin.email,
+            postedBy:{
+              _type:"reference",
+              _ref:admin._id
+            }
           },
         ])
         .commit();
-      const key: like | undefined = res.likes.find(
-        (item: like) => item.userId == admin._id
+      const key: like_ref | undefined = res.likes.find(
+        (item: like_ref) => item.postedBy._ref == admin._id
       );
       console.log({ key, isLiked, res });
       if (key?._key) {
         const updatedMeadia_Items = media_Items.map((item) => {
           if (item._id == res._id && admin.email && admin.name && admin._id) {
+            const doc={
+              _key: key._key,
+              postedBy:{
+               _id:admin._id,
+               name:admin.name,
+               email:admin.email
+              }
+            }
             return {
               ...item,
               likes: item.likes
                 ? [
                     ...item.likes,
-                    {
-                      _key: key._key,
-                      userId: admin._id,
-                      email: admin.email,
-                      name: admin.name,
-                    },
+                   doc
                   ]
                 : [
-                    {
-                      _key: key._key,
-                      userId: admin._id,
-                      email: admin.email,
-                      name: admin.name,
-                    },
+                    doc
                   ],
             };
           } else {
@@ -80,7 +79,7 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
     setBtnColor("white")
     try {
       const key = meadia_item.likes?.find(
-        (item: like) => item.email == admin.email
+        (item: like) => item.postedBy.email == admin.email
       );
       if (key?._key) {
         const res = await client
@@ -91,7 +90,7 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
         const updatedMeadia_Items = media_Items.map((item) => {
           if (item._id == res._id && admin.email && admin.name && admin._id) {
             const newLikesList = item.likes?.filter((like) => {
-              return like.email !== admin.email;
+              return like.postedBy.email !== admin.email;
             });
             const returnVal = { ...item, likes: newLikesList };
             return returnVal;
@@ -132,7 +131,7 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
   };
 
   useEffect(() => {
-    const mapLikes = meadia_item.likes?.find((item) => item.email == admin.email && item.userId == admin._id);
+    const mapLikes = meadia_item.likes?.find((item) => item.postedBy.email == admin.email && item.postedBy._id == admin._id);
     if (mapLikes) {
       setIsLiked(true);
       if(!btnColor){

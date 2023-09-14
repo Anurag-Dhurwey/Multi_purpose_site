@@ -1,11 +1,11 @@
-'use client'
-import React,{useState} from "react";
+"use client";
+import React, { useState } from "react";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { RiDeleteBinLine } from "react-icons/ri";
 import style from "./commentBox.module.css";
 import { useSession } from "next-auth/react";
 import CommentForm from "./CommentForm";
-import { media_Item } from "@/typeScript/basics";
+import { comment_ref, media_Item } from "@/typeScript/basics";
 import { client } from "@/utilities/sanityClient";
 import { set_media_items } from "@/redux_toolkit/features/indexSlice";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
@@ -26,19 +26,21 @@ const CommentBox = ({ useStates, meadia_item }: Iprops) => {
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
-const [api,setApi]=useState<boolean>(false)
+  const [api, setApi] = useState<boolean>(false);
+
   const OnDeleteHandle = async (_key: string) => {
-    setApi(true)
+    setApi(true);
     try {
       const res = await client
         .patch(_id)
         .unset(["comments[0]", `comments[_key=="${_key}"]`])
         .commit();
+
       if (res) {
         const filteredComments = comments?.filter((cmt) => {
-          return cmt._key !== _key;
+          return cmt._key != _key;
         });
-        if(filteredComments){
+        if (filteredComments) {
           const updatedItems = media_Items.map((item) => {
             if (item._id == _id) {
               return { ...item, comments: [...filteredComments] };
@@ -52,8 +54,8 @@ const [api,setApi]=useState<boolean>(false)
     } catch (error) {
       message.error("internal server error");
       console.error("unable to delete");
-    }finally{
-      setApi(false)
+    } finally {
+      setApi(false);
     }
   };
 
@@ -63,7 +65,8 @@ const [api,setApi]=useState<boolean>(false)
         <div className={`${style.commentBox} ${cmtView ? "h-full" : ""} `}>
           <div className={`${style.commentBoxInnerDiv}  `}>
             {comments?.map((cmnt, i) => {
-              const { comment, name, _key, email } = cmnt;
+              const { comment, postedBy, _key } = cmnt;
+              const { name, email } = postedBy;
               return (
                 <div
                   key={comment + i}
@@ -73,9 +76,12 @@ const [api,setApi]=useState<boolean>(false)
                   <span className="">
                     <button className={style.Img}></button>
                     <p>{name ? name : "unknown"}</p>
-                  
+
                     {email == session?.user?.email && (
-                      <button onClick={() => OnDeleteHandle(_key)} disabled={api}>
+                      <button
+                        onClick={() => OnDeleteHandle(_key)}
+                        disabled={api}
+                      >
                         <RiDeleteBinLine />
                       </button>
                     )}

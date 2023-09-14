@@ -1,6 +1,6 @@
 import { set_ConnectionsId } from "@/redux_toolkit/features/indexSlice";
 import { client } from "../sanityClient";
-import { admin, usersMinData } from "@/typeScript/basics";
+import { _ref, admin, usr_and_key_in_array } from "@/typeScript/basics";
 
 export async function getAdminConnectionId({
   dispatch,
@@ -13,7 +13,7 @@ export async function getAdminConnectionId({
 }) {
   try {
     const res:Array<{_id:string}> = await client.fetch(
-      `*[_type=="connections" && userId=="${id}" ]{_id}`
+      `*[_type=="connections" && user._ref=="${id}" ]{_id}`
     );
 
     if (res[0]) {
@@ -35,7 +35,7 @@ export async function getAdminConnectionId({
 export async function getUsrConnectionId(id:string) {
   try {
     const res:Array<resType> = await client.fetch(
-      `*[_type=="connections" && userId=="${id}" ]{_id,requests_sent}`
+      `*[_type=="connections" && user._ref=="${id}" ]{_id,requests_sent}`
     );
     if(res[0]){
       return res[0]
@@ -48,5 +48,5 @@ export async function getUsrConnectionId(id:string) {
 
 interface resType{
   _id:string;
-  requests_sent:Array<usersMinData>
+  requests_sent:{_key:string;user:_ref}[]
 }

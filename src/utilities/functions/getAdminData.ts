@@ -1,11 +1,10 @@
 import { client } from "../sanityClient";
 import { MessageInstance } from "antd/es/message/interface";
 import {
-  connections,
   session,
-  sessionUser,
   admin,
-  usersMinData,
+  _ref,
+  usr_and_key_in_array,
 } from "@/typeScript/basics";
 interface states {
   dispatch: Function;
@@ -26,38 +25,17 @@ export const getAdminData = async ({
     if (!admin?._id) {
       try {
         const res: Array<resType> = await client.fetch(
-          `*[(_type=="user" && email=="${session.user.email}")||(_type=="connections" && email=="${session.user.email}")]{_type,userId,_id,bio,desc,link,requests_got,requests_sent,connected}`
+          `*[(_type=="user" && email=="${session.user.email}")]{_type,_id,bio,desc,link,image}`
         );
-        const connections: conType = res.find(
-          (item) => item._type == "connections"
+        const user = res[0];
+        const conRes: conType[] = await client.fetch(
+          `*[(_type=="connections" && user._ref=="${user._id}")]{user,_id,requests_got[]{_key,user->{_id,name,email,image}},requests_sent[]{_key,user->{_id,name,email,image}},connected[]{_key,user->{_id,name,email,image}}}`
         );
-        const user: usrType = res.find((item) => item._type == "user");
+        const connections = conRes[0];
+        console.log({ user, connections });
         if (user) {
           const { _id, bio, desc, link } = user;
-          dispatch(
-            set_Admin({
-              _id: _id,
-              name: session.user.name,
-              email: session.user.email,
-              connections: {
-                _id: connections?._id,
-                connected: connections?.connected
-                  ? [...connections?.connected]
-                  : [],
-                requests_got: connections?.requests_got
-                  ? [...connections?.requests_got]
-                  : [],
-                requests_sent: connections?.requests_sent
-                  ? [...connections?.requests_sent]
-                  : [],
-              },
-              image: session.user.image,
-              bio: bio ? bio : undefined,
-              desc: desc ? desc : undefined,
-              link: link ? link : undefined,
-            })
-          );
-          return {
+          const obj={
             _id: _id,
             name: session.user.name,
             email: session.user.email,
@@ -70,14 +48,18 @@ export const getAdminData = async ({
                 ? [...connections?.requests_got]
                 : [],
               requests_sent: connections?.requests_sent
-                ? [...connections?.requests_sent]
+                ? [...connections.requests_sent]
                 : [],
             },
-            image: session.user.image,
+            image: user.image ? user.image : session.user.image,
             bio: bio ? bio : undefined,
             desc: desc ? desc : undefined,
             link: link ? link : undefined,
-          };
+          }
+          dispatch(
+            set_Admin(obj)
+          );
+          return obj
         }
       } catch (error) {
         console.error(error);
@@ -96,27 +78,13 @@ type resType = {
   bio?: string;
   desc?: string;
   link?: string;
-  userId?: string;
-  connected?: Array<usersMinData>;
-  requests_got?: Array<usersMinData>;
-  requests_sent?: Array<usersMinData>;
+  image?: string;
   _type: string;
 };
 
-type conType =
-  | {
-      _id: string;
-      connected?: Array<usersMinData>;
-      requests_got?: Array<usersMinData>;
-      requests_sent?: Array<usersMinData>;
-    }
-  | undefined;
-
-type usrType =
-  | {
-      _id: string;
-      bio?: string;
-      desc?: string;
-      link?: string;
-    }
-  | undefined;
+type conType = {
+  _id: string;
+  connected?: usr_and_key_in_array[];
+  requests_got?: usr_and_key_in_array[];
+  requests_sent?: usr_and_key_in_array[];
+};
