@@ -1,15 +1,15 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // webpack: (config, { isServer }) => {
-  //   // Fixes npm packages that depend on `fs` module
-  //   if (!isServer) {
-  //     config.node = {
-  //       fs: "empty",
-  //     };
-  //   }
+  reactStrictMode: true,
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.externals.push({ bufferutil: "bufferutil", "utf-8-validate": "utf-8-validate", "supports-color": "supports-color" }); 
+    }
 
-  //   return config;
-  // },
+    return config;
+  },
+
   images: {
     remotePatterns: [
       {

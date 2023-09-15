@@ -1,7 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { Chat } from "@/components";
-const page = () => {
+const Page = () => {
   const { data: session } = useSession();
 
   if (!session) {
@@ -16,4 +16,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
