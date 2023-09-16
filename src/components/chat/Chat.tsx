@@ -28,13 +28,9 @@ const Chat = () => {
   const [oldChats, setOldChats] = useState<oldChats[]>();
   const [remaining_Users, setRemainingUsr] = useState<usr_and_key_in_array[]>();
   const [currentUser, setCurrentUsr] = useState<currentUser_On_Chat>();
-  if (!session) {
-    return null;
-  }
 
   function setRemainingUsers() {
-    if(session && oldChats){
-  
+    if (session && oldChats) {
       const remain_Usr = admin.connections?.connected?.filter((usr) => {
         const isExist = oldChats.find((oldUsr) => {
           const { userOne, userTwo } = oldUsr;
@@ -42,14 +38,14 @@ const Chat = () => {
             userOne.email == usr.user.email || userTwo.email == usr.user.email
           );
         });
-        return !isExist
+        return !isExist;
       });
       setRemainingUsr(remain_Usr);
     }
   }
 
   async function get_Old_ChatMessages() {
-    if(!oldChats && session){
+    if (!oldChats && session) {
       try {
         const admins_all_old_chats = await client.fetch(
           `*[_type=="chat" && (userOne._ref=="${admin._id}"|| userTwo._ref=="${admin._id}") ]{_id,userOne->{_id,name,email,image},userTwo->{_id,name,email,image}}`
@@ -64,14 +60,18 @@ const Chat = () => {
     }
   }
 
-  useEffect(()=>{
-    if(session&&oldChats){
+  function withUseEffec_two() {
+    if (session && oldChats) {
       setRemainingUsers();
-      console.log({remaining_Users,onLineUsers})
+      console.log({ remaining_Users, onLineUsers });
     }
-  },[onLineUsers.length,session,oldChats])
+  }
 
   useEffect(() => {
+    withUseEffec_two();
+  }, [onLineUsers.length, session, oldChats]);
+
+  function withUseEffect() {
     if (session) {
       socketIoConnection({
         session,
@@ -82,10 +82,15 @@ const Chat = () => {
         message: message,
       });
       get_Old_ChatMessages();
-      
     }
-  }, [session]);
+  }
 
+  useEffect(() => {
+    withUseEffect();
+  }, [session]);
+  if (!session) {
+    return null;
+  }
   return (
     <div>
       {remaining_Users && (
@@ -105,7 +110,11 @@ const Chat = () => {
             />
           </aside>
         )}
-        <div>{currentUser && <ChatBox currentUser={currentUser} setCurrentUsr={setCurrentUsr} />}</div>
+        <div>
+          {currentUser && (
+            <ChatBox currentUser={currentUser} setCurrentUsr={setCurrentUsr} />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -113,10 +122,7 @@ const Chat = () => {
 
 export default Chat;
 
-
-
 interface remaining_Users {
   onLine: onlineUsers[] | undefined;
   connected: usr_and_key_in_array[] | undefined;
 }
-

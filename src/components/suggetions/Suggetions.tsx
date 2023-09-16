@@ -18,23 +18,21 @@ const Suggetions = ({ sendRequestHandler }: propType) => {
 
   const admin = useAppSelector((state) => state.hooks.admin);
   const { data: session } = useSession();
-  if(!admin._id){
-    return null
-  }
-  const dispatch: Function = useAppDispatch();
+ 
+  const dispatch = useAppDispatch();
   const suggestedData = useAppSelector((state) => state.hooks.suggestedData);
 
   async function configureSuggestions() {
     if (session) {
       if (!suggestedData.users.length) {
-        const userArr = await getSuggestedUsers({admin,session,suggestedData,dispatch,set_suggestedData,message});
+        await getSuggestedUsers({admin,session,suggestedData,dispatch,set_suggestedData,message});
       }
     }
   }
 
-  useEffect(() => {
-    configureSuggestions();
+  function withUseEffect() {
     if (session) {
+      configureSuggestions();
       socketIoConnection({
         session,
         dispatch,
@@ -44,7 +42,15 @@ const Suggetions = ({ sendRequestHandler }: propType) => {
         message
       });
     }
+  }
+
+  useEffect(() => {
+   withUseEffect()
   }, [session]);
+
+  if(!admin._id){
+    return null
+  }
 console.log({suggestedData})
   return (
     <section style={{ paddingTop: "8px" }}>

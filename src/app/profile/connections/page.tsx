@@ -1,13 +1,10 @@
 "use client";
 import { Connections } from "@/components";
 import ConnectionRequests from "@/components/connectionRequests/ConnectionRequests";
-import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 
 const Page = () => {
-  const dispatch = useAppDispatch();
-  const admin = useAppSelector((state) => state.hooks.admin);
 
   // connectedUsr=0
   // connecctions-requests=1

@@ -26,7 +26,7 @@ const Home = () => {
   const dispatch = useAppDispatch();
   const [messageApi, contextHolder]=message.useMessage()
 
-  useEffect(() => {
+  function withUseEffect() {
     if (!media_Items?.length) {
       getMediaItems({dispatch,set_media_items,messageApi});
     }
@@ -40,6 +40,10 @@ const Home = () => {
       );
     }
 
+  }
+
+  useEffect(() => {
+   withUseEffect()
   }, [session]);
   console.log(media_Items);
   

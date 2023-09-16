@@ -113,10 +113,13 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
     }
   }
 
-  useEffect(() => {
+  function withUseEffect() {
     if (session) {
       getChatMessages();
     }
+  }
+  useEffect(() => {
+   withUseEffect()
   }, [user._id]);
 
   return (

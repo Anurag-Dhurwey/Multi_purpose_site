@@ -15,8 +15,7 @@ const Connections = () => {
   );
   console.log(connectedUsr);
 
-
-  useEffect(() => {
+  function withUseEffect() {
     if (session) {
       socketIoConnection({
         session,
@@ -27,6 +26,10 @@ const Connections = () => {
         message:message
       });
     }
+  }
+
+  useEffect(() => {
+    withUseEffect()
   }, [session]);
 
 

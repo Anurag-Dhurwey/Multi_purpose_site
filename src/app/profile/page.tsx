@@ -52,13 +52,7 @@ const Page = () => {
   }, [session,media_Items]);
 
   if (!session) {
-    return (
-      <>
-        <div>
-          <h3>Session not found</h3>
-        </div>
-      </>
-    );
+    return null
   }
   console.log(my_uploads);
 

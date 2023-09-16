@@ -130,7 +130,7 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
     }
   };
 
-  useEffect(() => {
+  function withUseEffect() {
     const mapLikes = meadia_item.likes?.find((item) => item.postedBy.email == admin.email && item.postedBy._id == admin._id);
     if (mapLikes) {
       setIsLiked(true);
@@ -143,6 +143,10 @@ const LikesButton = ({ meadia_item }: { meadia_item: media_Item }) => {
       setBtnColor("white");
      }
     }
+  }
+
+  useEffect(() => {
+   withUseEffect()
   }, [api, media_Items, session]);
 
   return (

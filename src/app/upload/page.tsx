@@ -146,9 +146,7 @@ const Page = () => {
     }
   };
 
-  if (!session) {
-    return null;
-  }
+ 
   function withUseEffect() {
     if (session) {
       socketIoConnection({
@@ -168,7 +166,9 @@ const Page = () => {
     withUseEffect();
   }, [session]);
 
-
+  if (!session) {
+    return null;
+  }
   return (
     <div className={style.uploadMainDiv}>
       {contextHolder}
