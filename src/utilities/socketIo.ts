@@ -1,6 +1,11 @@
 import io from "socket.io-client";
 import { getAdminData } from "./functions/getAdminData";
-import { admin, chat_messages, session, socketIoConnectionType } from "@/typeScript/basics";
+import {
+  admin,
+  chat_messages,
+  session,
+  socketIoConnectionType,
+} from "@/typeScript/basics";
 import {
   onlineUsers,
   set_Admins_Connections,
@@ -15,21 +20,27 @@ export const getSocket = async ({
   set_Admin,
   dispatch,
 }: getSocketArgType) => {
-
   const admin_with_id = await getAdminData({
     dispatch,
     admin,
     set_Admin,
     session,
   });
+  if (!session) {
+    return { socket: undefined, admin_with_id: undefined };
+  }
   if (!socket) {
     socket = io(`${process.env.NEXT_PUBLIC_SOCKET_IO_SERVER_URL}`);
-    socket.emit("onHnadshake", { user: {...admin_with_id,connections:{connected:admin_with_id?.connections?.connected}} });
+    socket.emit("onHnadshake", {
+      user: {
+        ...admin_with_id,
+        connections: { connected: admin_with_id?.connections?.connected },
+      },
+    });
     return { socket, admin_with_id };
   } else {
     return { socket, admin_with_id };
   }
-  // }
 };
 // these below variables are to prevent socket_io events to running multiple times
 let stop_to_run_OCRTU: string | undefined;
@@ -50,16 +61,11 @@ export async function socketIoConnection({
       set_Admin,
       admin,
     });
-
-  
+    if (socket) {
       socket.on("allOnlineUsers", (onLineUsers: onlineUsers[]) => {
-
         dispatch(set_onLineUsers(onLineUsers));
         console.log({ str: "allOnlineUsertest", onLineUsers });
-
       });
-
-      
 
       socket.on("ConnectionRequestToUser", (msg: CRTU) => {
         if (
@@ -74,7 +80,7 @@ export async function socketIoConnection({
             set_Admins_Connections({
               command: "request",
               data: {
-                user:{
+                user: {
                   _id: user._id,
                   name: user.name,
                   email: user.email,
@@ -106,6 +112,7 @@ export async function socketIoConnection({
       socket.on("disconnect", () => {
         console.log("connection lost");
       });
+    }
   }
 }
 
@@ -122,8 +129,8 @@ type CRTU = {
   _key: string;
 };
 
-export interface importedChat_msg extends chat_messages{
-  receiver_socketId:string
+export interface importedChat_msg extends chat_messages {
+  receiver_socketId: string;
 }
 
 interface getSocketArgType {

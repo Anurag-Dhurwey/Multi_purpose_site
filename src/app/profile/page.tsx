@@ -30,9 +30,8 @@ const Page = () => {
   const { name, email, image, _id } = admin;
   const media_Items = useAppSelector((state) => state.hooks.media_Items);
   const my_uploads = useAppSelector((state) => state.hooks.my_uploads);
-
-
-  useEffect(() => {
+ 
+  function withUseEffect() {
     if (session) {
       socketIoConnection({
         session,
@@ -46,6 +45,10 @@ const Page = () => {
         getMyUploads();
       }
     }
+  }
+
+  useEffect(() => {
+   withUseEffect()
   }, [session,media_Items]);
 
   if (!session) {

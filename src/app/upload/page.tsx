@@ -49,7 +49,6 @@ const Page = () => {
   const [uploadedAsset, setUploadedAsset] = useState<SanityAssetDocument>();
   const [file, setFile] = useState<File>();
 
-
   const onChageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     const file = e.target.files;
@@ -150,8 +149,7 @@ const Page = () => {
   if (!session) {
     return null;
   }
-
-  useEffect(() => {
+  function withUseEffect() {
     if (session) {
       socketIoConnection({
         session,
@@ -161,16 +159,15 @@ const Page = () => {
         admin,
         message,
       });
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (session) {
       if (!meadia_items.length) {
         getMediaItems({ dispatch, set_media_items, messageApi });
       }
     }
+  }
+  useEffect(() => {
+    withUseEffect();
   }, [session]);
+
 
   return (
     <div className={style.uploadMainDiv}>
@@ -256,13 +253,6 @@ function checkFileSize(file: File, setIsFileValid: Function) {
     ]);
   }
 }
-
-// interface useStates {
-//   setIsPosting: Function;
-//   dispatch: Function;
-//   set_media_items: (payload: Array<media_Item>) => void;
-//   setOnSuccess: Function;
-// }
 
 interface createdAssetResType {
   assets: [{ _key: string; asset: { _ref: string; _type: string } }];

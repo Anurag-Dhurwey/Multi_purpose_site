@@ -18,7 +18,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const Page = () => {
   const admin = useAppSelector((state) => state.hooks.admin);
-  const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
+  // const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
   const { data: session } = useSession();
   const dispatch = useAppDispatch();
   const [onRequest, setOnRequest] = useState<boolean>(false);
