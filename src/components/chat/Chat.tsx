@@ -77,8 +77,6 @@ const Chat = () => {
         session,
         dispatch,
         admin,
-        set_Admin,
-        set_onLineUsers,
         message: message,
       });
       get_Old_ChatMessages();

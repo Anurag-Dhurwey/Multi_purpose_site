@@ -12,7 +12,7 @@ const Navbar = () => {
   const nav = [ "chats", "suggetions"];
   const { data: session } = useSession();
   const [sideNavbar, setSideNavbar] = useState<boolean>(false);
-
+const slug=encodeURIComponent(JSON.stringify({...session?.user}))
   return (
     <div className="max-[430px]:h-[42px] h-[56px]">
       <div
@@ -71,7 +71,7 @@ const Navbar = () => {
               {session && (
                 <>
                   <button>
-                    <Link href={"/profile"}>Profile</Link>
+                    <Link href={`/profile/${slug}`}>Profile</Link>
                   </button>
                   <button ><Link href={'/profile/connections'}>Connections</Link></button>
                   {/* <button ><Link href={'/profile/connections'}>connections</Link></button> */}

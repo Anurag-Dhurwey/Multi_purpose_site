@@ -1,4 +1,4 @@
-import { suggestedDataPayloadType } from "@/redux_toolkit/features/indexSlice";
+import { set_suggestedData, suggestedDataPayloadType } from "@/redux_toolkit/features/indexSlice";
 import { client } from "../sanityClient";
 import {
   admin,
@@ -13,7 +13,7 @@ type argType = {
   session: session;
   suggestedData: suggestedData;
   dispatch: Function;
-  set_suggestedData: (payload: suggestedDataPayloadType) => void;
+  // set_suggestedData: (payload: suggestedDataPayloadType) => void;
   message: MessageInstance;
 };
 
@@ -22,7 +22,7 @@ async function getSuggestedUsers({
   admin,
   suggestedData,
   dispatch,
-  set_suggestedData,
+  // set_suggestedData,
   message,
 }: argType) {
   if (!suggestedData.users.length && session?.user && admin) {

@@ -1,11 +1,9 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import React, { useState } from "react";
-import {
-  set_Admins_Connections
-} from "@/redux_toolkit/features/indexSlice";
+import { set_Admins_Connections } from "@/redux_toolkit/features/indexSlice";
 import Image from "next/image";
-import { _ref,  usr_and_key_in_array } from "@/typeScript/basics";
+import { _ref, usr_and_key_in_array } from "@/typeScript/basics";
 import { client } from "@/utilities/sanityClient";
 import { message } from "antd";
 import { v4 as uuidv4 } from "uuid";
@@ -13,6 +11,7 @@ import {
   getAdminConnectionId,
   getUsrConnectionId,
 } from "@/utilities/functions/getConnectionsId";
+import UserGui from "../userMinData/UserGui";
 
 const ConnectionRequests = () => {
   const dispatch = useAppDispatch();
@@ -25,8 +24,8 @@ const ConnectionRequests = () => {
 
   // this below function will move requested user from requests to connectedUsr
   async function acceptRequestHandler(userToAcceptReq: usr_and_key_in_array) {
-    const {user, _key } = userToAcceptReq;
-    const { _id, name, email, image}=user
+    const { user, _key } = userToAcceptReq;
+    const { _id, name, email, image } = user;
     if (admin?._id && !onRequest) {
       setOnRequest(true);
       const adminConnectionsId = admin.connections?._id
@@ -46,15 +45,15 @@ const ConnectionRequests = () => {
             .insert("after", "connected[-1]", [
               {
                 _key: uuidv4(),
-                user:{
-                  _type:'reference',
-                  _ref:_id
-                }
+                user: {
+                  _type: "reference",
+                  _ref: _id,
+                },
               },
             ])
             .commit();
           const check = added.connected?.find(
-            (usr:{_key:string,user:_ref}) => usr.user._ref == _id
+            (usr: { _key: string; user: _ref }) => usr.user._ref == _id
           );
           console.log(added);
           console.log(check);
@@ -90,10 +89,10 @@ const ConnectionRequests = () => {
                 .insert("after", "connected[-1]", [
                   {
                     _key: uuidv4(),
-                    user:{
-                      _type:'reference',
-                      _ref:admin._id
-                    }
+                    user: {
+                      _type: "reference",
+                      _ref: admin._id,
+                    },
                   },
                 ])
                 .unset([
@@ -102,7 +101,8 @@ const ConnectionRequests = () => {
                 ])
                 .commit();
               const check2 = addedInFriendsAccount.connected?.find(
-                (usr:{_key:string;user:_ref}) => usr.user._ref == admin._id
+                (usr: { _key: string; user: _ref }) =>
+                  usr.user._ref == admin._id
               );
               if (check2) {
                 console.log(addedInFriendsAccount);
@@ -122,7 +122,7 @@ const ConnectionRequests = () => {
         } finally {
           setOnRequest(false);
         }
-      } 
+      }
     } else if (onRequest) {
       alert("wait a second");
     } else {
@@ -132,18 +132,16 @@ const ConnectionRequests = () => {
   }
 
   async function onRejectHandler(userToRejectReq: usr_and_key_in_array) {
-    const {user, _key } = userToRejectReq;
-    const { _id, name, email, image}=user
+    const { user, _key } = userToRejectReq;
+    const { _id, name, email, image } = user;
     if (admin?._id && admin.connections && !onRequest) {
-      setOnRequest(true)
+      setOnRequest(true);
       const adminConnectionsId = admin.connections._id
         ? admin.connections._id
         : await getAdminConnectionId({ dispatch, id: admin._id, admin });
       console.log({ adminConnectionsId });
       console.log({ admin: admin.connections._id });
-      const friendsConnection = await getUsrConnectionId(
-        _id
-      );
+      const friendsConnection = await getUsrConnectionId(_id);
       const element = friendsConnection?.requests_sent?.find(
         (usr) => usr.user._ref == admin._id
       );
@@ -153,9 +151,9 @@ const ConnectionRequests = () => {
             .patch(adminConnectionsId)
             .unset(["requests_got[0]", `requests_got[_key=="${_key}"]`])
             .commit();
-           
+
           const check = removed.requets_got?.find(
-            (usr:{_key:string;user:_ref}) => usr.user._ref == _id
+            (usr: { _key: string; user: _ref }) => usr.user._ref == _id
           );
           if (!check) {
             dispatch(
@@ -181,11 +179,11 @@ const ConnectionRequests = () => {
       } catch (error) {
         console.log(error);
         message.error("try again after some time");
-      }finally{
-        setOnRequest(false)
+      } finally {
+        setOnRequest(false);
       }
-    }else if(onRequest){
-      alert('wait a second')
+    } else if (onRequest) {
+      alert("wait a second");
     }
   }
 
@@ -194,28 +192,16 @@ const ConnectionRequests = () => {
       <p>Requests</p>
       <ul className="flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
         {requests?.map((req, i) => {
-          if (req.user._id == "test") return null;
+          const { user: usr, _key } = req;
+          if (usr._id == "test") return null;
           return (
-            <li
-              key={i}
-              className="py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500"
-            >
-              {req.user.image.includes("https://") ? (
-                <Image
-                  src={`${req.user.image}`}
-                  height={100}
-                  width={100}
-                  alt="image"
-                  className=" max-sm:h-16 max-sm:w-16 rounded-full overflow-hidden"
-                />
-              ) : (
-                <p></p>
-              )}
-              <p className="text-xs">{req.user.name}</p>
+            <li key={i}>
+              <UserGui user={{ ...usr, _key }}>
               <button className="" onClick={() => acceptRequestHandler(req)}>
                 accept
               </button>
               <button onClick={() => onRejectHandler(req)}>reject</button>
+            </UserGui>
             </li>
           );
         })}

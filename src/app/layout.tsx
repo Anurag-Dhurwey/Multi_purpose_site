@@ -1,14 +1,12 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { Provider } from "react-redux";
-import { store } from "@/redux_toolkit/store";
 import { Providers } from "@/redux_toolkit/provider";
 const inter = Inter({ subsets: ["latin"] });
 import { Navbar } from "@/components";
 
 export const metadata = {
-  title: "Multi_Purpose",
-  description: "This Multi_Pupose App can help in your daily task",
+  title: "Project_M",
+  description: "A social media project created by anurag dhurwey",
 };
 
 export default function RootLayout({

@@ -6,9 +6,10 @@ import {
   _ref,
   usr_and_key_in_array,
 } from "@/typeScript/basics";
+import { set_Admin } from "@/redux_toolkit/features/indexSlice";
 interface states {
   dispatch: Function;
-  set_Admin: (action: admin) => void;
+  // set_Admin: (action: admin) => void;
   admin: admin;
   session: session;
   messageApi?: MessageInstance;
@@ -16,7 +17,7 @@ interface states {
 
 export const getAdminData = async ({
   dispatch,
-  set_Admin,
+  // set_Admin,
   admin,
   session,
   messageApi,

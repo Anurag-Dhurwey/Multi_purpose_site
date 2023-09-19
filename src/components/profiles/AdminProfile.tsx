@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -12,8 +13,8 @@ import { socketIoConnection } from "@/utilities/socketIo";
 import Image from "next/image";
 import { Media } from "@/components";
 import { message } from "antd";
-const Page = () => {
-  const dispatch = useAppDispatch();
+const AdminProfile = () => {
+    const dispatch = useAppDispatch();
   const { data: session } = useSession();
 
 
@@ -33,14 +34,14 @@ const Page = () => {
  
   function withUseEffect() {
     if (session) {
-      socketIoConnection({
-        session,
-        set_onLineUsers,
-        set_Admin,
-        dispatch,
-        admin,
-        message:message
-      });
+    //   socketIoConnection({
+    //     session,
+    //     // set_onLineUsers,
+    //     // set_Admin,
+    //     dispatch,
+    //     admin,
+    //     message:message
+    //   });
       if (!my_uploads.length) {
         getMyUploads();
       }
@@ -48,15 +49,14 @@ const Page = () => {
   }
 
   useEffect(() => {
-   withUseEffect()
-  }, [session,media_Items]);
-
-  if (!session) {
-    return null
-  }
-  console.log(my_uploads);
-
-  return (
+    withUseEffect()
+   }, [session,media_Items]);
+ 
+   if (!session) {
+     return null
+   }
+   console.log(my_uploads);
+   return (
     <div className="w-full flex flex-col justify-center items-start">
       <div className="flex justify-between items-center gap-x-5">
         {admin.image && session.user?.image && (
@@ -92,6 +92,6 @@ const Page = () => {
       </div>
     </div>
   );
-};
+}
 
-export default Page;
+export default AdminProfile

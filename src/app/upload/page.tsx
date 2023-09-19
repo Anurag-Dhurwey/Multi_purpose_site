@@ -17,6 +17,7 @@ import { message } from "antd";
 import { SanityAssetDocument } from "next-sanity";
 import { v4 } from "uuid";
 import { getAssetId } from "@/utilities/functions/getAssetId";
+import { imgFormates, videoFormates } from "@/components/media/Media";
 
 const Page = () => {
   const dispatch = useAppDispatch();
@@ -39,8 +40,8 @@ const Page = () => {
     { asset: false, post: false }
   );
   const [isFileValid, setIsFileValid] = useState<
-    Array<{ name: string; message: string }>
-  >([]);
+  { name: string; message: string }[]
+  >();
   const [form, setForm] = useState<uploadForm>({
     caption: "",
     desc: "",
@@ -54,9 +55,11 @@ const Page = () => {
     const file = e.target.files;
 
     if (file) {
+      setIsFileValid(undefined)
       setFile(file[0]);
       setForm({ ...form, filePath: e.target.value });
-      checkFileSize(file[0], setIsFileValid);
+      checkFileSize({file:file[0], setIsFileValid});
+      checkFileType({file:file[0], setIsFileValid})
     }
   };
 
@@ -67,7 +70,7 @@ const Page = () => {
       file &&
       admin._id &&
       admin.email &&
-      !isFileValid.length &&
+      !isFileValid &&
       !isPosting.asset &&
       !isPosting.post
     ) {
@@ -137,7 +140,7 @@ const Page = () => {
       } finally {
         setIsPosting({ asset: false, post: false });
       }
-    } else if (isFileValid.length) {
+    } else if (isFileValid) {
       alert(isFileValid[0].message);
     } else if (isPosting.asset) {
       alert("Asset is uploading, please wait!");
@@ -151,8 +154,8 @@ const Page = () => {
     if (session) {
       socketIoConnection({
         session,
-        set_onLineUsers,
-        set_Admin,
+        // set_onLineUsers,
+        // set_Admin,
         dispatch,
         admin,
         message,
@@ -220,10 +223,11 @@ const Page = () => {
               type="file"
               onChange={(e) => onChageHandler(e)}
               value={form.filePath}
+              accept="video/* ,image/png, image/jpeg, image/svg, image/gif"
             />
 
-            {isFileValid.length > 0 &&
-              isFileValid.map((error, i) => {
+            {isFileValid && isFileValid.length > 0 &&
+              isFileValid?.map((error, i) => {
                 return (
                   <p className={style.validationError} key={i}>
                     {error.message}
@@ -243,15 +247,40 @@ const Page = () => {
 
 export default Page;
 
-function checkFileSize(file: File, setIsFileValid: Function) {
+function checkFileSize({file,setIsFileValid}:checkFile) {
   const size: boolean = file.size <= 1000 * 1024 * 10;
-  if (size) {
-    setIsFileValid([]);
-  } else if (!size) {
-    setIsFileValid([
-      { name: "size", message: "File size should be less than 10 MB" },
-    ]);
+  // if (size) {
+  //   setIsFileValid([]);
+  // } else
+ if (!size) {
+  const errorDoc=
+    { name: "size", message: "File size should be less than 10 MB" }
+    setIsFileValid((pre)=>{
+      return pre?[...pre,errorDoc]:[errorDoc]
+    });
   }
+}
+
+function checkFileType({file,setIsFileValid}:checkFile) {
+  const fileType=file.type.split('/').pop()
+ if(fileType){
+  const check= videoFormates.includes(fileType) || imgFormates.includes(fileType)
+ if(!check){
+  const errorDoc=
+  { name: "type", message: `sorry ${file.type} file not supported yet` }
+  setIsFileValid((pre)=>{
+    return pre?[...pre,errorDoc]:[errorDoc]
+  })
+ }
+ }
+}
+
+
+interface checkFile{
+  file: File, setIsFileValid: React.Dispatch<React.SetStateAction<{
+    name: string;
+    message: string;
+  }[]|undefined >>
 }
 
 interface createdAssetResType {

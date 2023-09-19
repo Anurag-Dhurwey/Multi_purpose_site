@@ -28,24 +28,13 @@ const Home = () => {
 
   function withUseEffect() {
     if (!media_Items?.length) {
-      getMediaItems({dispatch,set_media_items,messageApi});
+      getMediaItems({dispatch,messageApi});
     }
-    if (session?.user?.name && session?.user?.email && !admin.email) {
-      dispatch(
-        set_Admin({
-          ...admin,
-          name: session.user.name,
-          email: session.user.email,
-        })
-      );
-    }
-
   }
 
   useEffect(() => {
    withUseEffect()
   }, [session]);
-  console.log(media_Items);
   
   return (
     <div className={style.main}>

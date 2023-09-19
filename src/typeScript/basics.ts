@@ -26,6 +26,14 @@ export interface min_id_of_usr {
   name: string;
 }
 
+export interface profileSlugObjType{
+  _id?: string;
+  email?: string;
+  image?: string;
+  name?: string;
+  _key?: string;
+}
+
 export type admin = {
   _id?: string;
   name?: string;
@@ -110,8 +118,8 @@ export interface socketIoConnectionType {
   session: session;
   dispatch: Function;
   admin: admin;
-  set_Admin: (action: admin) => void;
-  set_onLineUsers: (action: Array<onlineUsers>) => void;
+  // set_Admin: (action: admin) => void;
+  // set_onLineUsers: (action: Array<onlineUsers>) => void;
   message: MessageInstance;
 }
 

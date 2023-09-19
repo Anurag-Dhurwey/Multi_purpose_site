@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { _ref, chat_messages, currentUser_On_Chat } from "@/typeScript/basics";
 import { getDateFormate } from "@/utilities/functions/getDateFormate";
 import { client } from "@/utilities/sanityClient";
-import { getSocket, socketIoConnection } from "@/utilities/socketIo";
+import { getSocket } from "@/utilities/socketIo";
 
 import { message } from "antd";
 import { useSession } from "next-auth/react";
@@ -23,17 +23,17 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
   const { chat_id, user } = currentUser;
 
   const emitChatMessage = async (arg: chat_messages) => {
-    const { socket } = await getSocket({ session, dispatch, admin, set_Admin });
+    const { socket } = await getSocket({ session, dispatch, admin });
     const isOnline = onLineUsers.find((usr) => {
       return usr._id == arg.receiver._ref;
     });
-    if (socket && isOnline) {
+    if (socket?.connected && isOnline) {
       console.log(arg);
       socket.emit("chat_message", {
         ...arg,
         receiver_socketId: isOnline.socketId,
       });
-    } else if (!socket) {
+    } else if (!socket?.disconnected) {
       console.error("socket not found");
     } else {
       console.log("user is offline");

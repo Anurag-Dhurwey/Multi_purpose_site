@@ -9,6 +9,7 @@ import {
 import {
   onlineUsers,
   set_Admins_Connections,
+  set_onLineUsers,
 } from "@/redux_toolkit/features/indexSlice";
 import { Socket } from "socket.io-client";
 
@@ -17,13 +18,13 @@ let socket: Socket | undefined;
 export const getSocket = async ({
   session,
   admin,
-  set_Admin,
+  // set_Admin,
   dispatch,
 }: getSocketArgType) => {
   const admin_with_id = await getAdminData({
     dispatch,
     admin,
-    set_Admin,
+    // set_Admin,
     session,
   });
   if (!session) {
@@ -50,18 +51,18 @@ export async function socketIoConnection({
   session,
   dispatch,
   admin,
-  set_Admin,
-  set_onLineUsers,
+  // set_Admin,
+  // set_onLineUsers,
   message,
 }: socketIoConnectionType) {
   if (session) {
     const { socket, admin_with_id } = await getSocket({
       session,
       dispatch,
-      set_Admin,
+      // set_Admin,
       admin,
     });
-    if (socket) {
+    if (socket?.connected) {
       socket.on("allOnlineUsers", (onLineUsers: onlineUsers[]) => {
         dispatch(set_onLineUsers(onLineUsers));
         console.log({ str: "allOnlineUsertest", onLineUsers });
@@ -136,6 +137,6 @@ export interface importedChat_msg extends chat_messages {
 interface getSocketArgType {
   session: session;
   admin: admin;
-  set_Admin: (action: admin) => void;
+  // set_Admin: (action: admin) => void;
   dispatch: Function;
 }

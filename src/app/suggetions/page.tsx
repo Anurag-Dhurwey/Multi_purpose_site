@@ -84,9 +84,9 @@ const Page = () => {
     userTosendReq: min_id_of_usr;
     _key: string;
   }) => {
-    const { socket } = await getSocket({ session, dispatch, admin, set_Admin });
+    const { socket } = await getSocket({ session, dispatch, admin});
 
-    if (socket) {
+    if (socket?.connected) {
       socket.emit("ConnectionRequest", {
         sendTo: { ...userTosendReq},
         sentBy: {
