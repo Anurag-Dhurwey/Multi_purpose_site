@@ -4,11 +4,6 @@ import { uploadForm, media_Item } from "@/typeScript/basics";
 import style from "./upload.module.css";
 import { Upload } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import {
-  set_Admin,
-  set_media_items,
-  set_onLineUsers,
-} from "@/redux_toolkit/features/indexSlice";
 import { useSession } from "next-auth/react";
 import { client } from "@/utilities/sanityClient";
 import { getMediaItems } from "@/utilities/functions/getMediaItems";
@@ -161,7 +156,7 @@ const Page = () => {
         message,
       });
       if (!meadia_items.length) {
-        getMediaItems({ dispatch, set_media_items, messageApi });
+        getMediaItems({ dispatch,  messageApi });
       }
     }
   }
@@ -249,9 +244,6 @@ export default Page;
 
 function checkFileSize({file,setIsFileValid}:checkFile) {
   const size: boolean = file.size <= 1000 * 1024 * 10;
-  // if (size) {
-  //   setIsFileValid([]);
-  // } else
  if (!size) {
   const errorDoc=
     { name: "size", message: "File size should be less than 10 MB" }
@@ -272,6 +264,12 @@ function checkFileType({file,setIsFileValid}:checkFile) {
     return pre?[...pre,errorDoc]:[errorDoc]
   })
  }
+ }else{
+  const errorDoc=
+  { name: "type", message: `sorry file extension not found` }
+  setIsFileValid((pre)=>{
+    return pre?[...pre,errorDoc]:[errorDoc]
+  })
  }
 }
 
