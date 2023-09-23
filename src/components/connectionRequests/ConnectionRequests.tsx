@@ -2,7 +2,7 @@
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import React, { useState } from "react";
 import { set_Admins_Connections } from "@/redux_toolkit/features/indexSlice";
-import Image from "next/image";
+import style from './connectionRequests.module.css'
 import { _ref, usr_and_key_in_array } from "@/typeScript/basics";
 import { client } from "@/utilities/sanityClient";
 import { message } from "antd";
@@ -190,7 +190,7 @@ const ConnectionRequests = () => {
   return (
     <section style={{ paddingTop: "8px" }}>
       <p>Requests</p>
-      <ul className="flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
+      <ul className={style.connectionrequestsUl}>
         {requests?.map((req, i) => {
           const { user: usr, _key } = req;
           if (usr._id == "test") return null;

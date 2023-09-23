@@ -1,4 +1,5 @@
 "use client";
+import style from './suggetions.module.css'
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { getSuggestedUsers } from "@/utilities/functions/getSuggestedUsers";
 import { message } from "antd";
@@ -50,13 +51,12 @@ const Suggetions = ({ sendRequestHandler }: propType) => {
   }
   return (
     <section style={{ paddingTop: "8px" }}>
-      <ul className="flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
+      <ul className={style.suggetionsUl}>
         {suggestedData.users ? (
           suggestedData.users.map((user, i) => {
             if (admin?._id == user._id) {
               return null;
             }
-            const slug=encodeURIComponent(JSON.stringify({...user}))
             return (
              <li key={i}>
                <UserGui user={{...user}}>

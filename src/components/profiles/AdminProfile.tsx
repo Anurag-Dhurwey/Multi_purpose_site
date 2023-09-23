@@ -1,18 +1,15 @@
 
 "use client";
+import style from './adminProfile.module.css'
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import {
-  set_Admin,
   set_my_uploads,
-  set_onLineUsers,
 } from "@/redux_toolkit/features/indexSlice";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { client } from "@/utilities/sanityClient";
-import { socketIoConnection } from "@/utilities/socketIo";
 import Image from "next/image";
 import { Media } from "@/components";
-import { message } from "antd";
 const AdminProfile = () => {
     const dispatch = useAppDispatch();
   const { data: session } = useSession();
@@ -34,14 +31,6 @@ const AdminProfile = () => {
  
   function withUseEffect() {
     if (session) {
-    //   socketIoConnection({
-    //     session,
-    //     // set_onLineUsers,
-    //     // set_Admin,
-    //     dispatch,
-    //     admin,
-    //     message:message
-    //   });
       if (!my_uploads.length) {
         getMyUploads();
       }
@@ -57,15 +46,15 @@ const AdminProfile = () => {
    }
    console.log(my_uploads);
    return (
-    <div className="w-full flex flex-col justify-center items-start">
-      <div className="flex justify-between items-center gap-x-5">
+    <div className={style.adminProfileParentDiv}>
+      <div className={style.adminProfile_firstChildDiv}>
         {admin.image && session.user?.image && (
           <Image
             src={session.user?.image}
             width={1000}
             height={1000}
             alt="profile"
-            className="w-[100px] h-[100px] rounded-full overflow-hidden"
+            className={style.adminProfile_firstChildDiv_Image}
           />
         )}
         <div className="">
@@ -77,13 +66,13 @@ const AdminProfile = () => {
           </h4>
         </div>
       </div>
-      <div className="w-full flex flex-wrap justify-center items-center gap-x-4 gap-y-2">
+      <div className={style.adminProfile_secondChildDiv}>
         {my_uploads.map((my_post, i) => {
           const { meadiaFile } = my_post;
           return (
             <div
               key={i}
-              className={`h-40 w-40 overflow-hidden flex justify-center items-center`}
+              className={style.mappedUploads}
             >
               <Media meadiaFile={meadiaFile} profileView={true} key={i} />
             </div>

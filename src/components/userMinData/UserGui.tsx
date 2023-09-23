@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { isUserOnline } from "../chat/miniComps/OnlineOffline";
 import { useAppSelector } from "@/redux_toolkit/hooks";
-
+import style from './userGui.module.css'
 
 interface propType {
   user: profileSlugObjType;
@@ -21,7 +21,7 @@ const UserGui = ({ children, user, disableProfineNav }: propType) => {
       ? isUserOnline({ _id, name, email, image }, onLineUsers)
       : false;
   return (
-    <span className="py-2 px-1 rounded-xl  overflow-hidden flex flex-col justify-evenly items-center border-2 border-blue-500">
+    <span className={style.userguiSpan}>
       {disableProfineNav ? (
         <ImageComp image={image} />
       ) : (
@@ -31,7 +31,7 @@ const UserGui = ({ children, user, disableProfineNav }: propType) => {
       )}
 
       <p style={{ color: isOnline ? "green" : "black" }} className="text-xs">
-        {name}
+        {name?.length && name.length <=10?name:name?.slice(0,9)+'...'}
       </p>
       <>{children}</>
     </span>
@@ -49,7 +49,7 @@ const ImageComp = ({ image }: { image: string | undefined }) => {
           height={100}
           width={100}
           alt="image"
-          className=" max-sm:h-16 max-sm:w-16 rounded-full overflow-hidden"
+          className={style.userGuiImage}
         />
       ) : null}
     </>

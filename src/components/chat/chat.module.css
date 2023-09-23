@@ -1,0 +1,31 @@
+.chatMain{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chatAside{
+    width: 20vw;
+    min-width: 280px;
+    height: 90vh;
+    border: 2px solid yellowgreen;
+    border-radius: 5px;
+}
+
+.chatMainChatbox{
+    width: 70vw;
+
+}
+
+
+@media (max-width:475px) {
+    .chatMainChatbox{
+        width: 95vw;
+    min-width: 300px;
+    /* display: none; */
+    }
+    .chatAside{
+        width: 90vw;
+        min-width: 300px;
+    }
+}

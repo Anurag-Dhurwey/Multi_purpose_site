@@ -1,4 +1,4 @@
-import Image from "next/image";
+
 import { onlineUsers } from "@/redux_toolkit/features/indexSlice";
 import { useAppSelector } from "@/redux_toolkit/hooks";
 import { useSession } from "next-auth/react";
@@ -17,12 +17,15 @@ interface propType {
 }
 const OnlineOffline = ({ remain_usr, setCurrentUsr }: propType) => {
   return (
-    <ul>
+    <ul className="onlineoffline_Ul">
+      {/* this component will map all ony Online Connected users  */}
       <MapUsr
         remain_usr={remain_usr}
         setCurrentUsr={setCurrentUsr}
         onlyOnline
       />
+
+      {/* this component will map all ofline Connected users  */}
       <MapUsr remain_usr={remain_usr} setCurrentUsr={setCurrentUsr} />
     </ul>
   );

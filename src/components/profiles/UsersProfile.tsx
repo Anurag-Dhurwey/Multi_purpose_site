@@ -1,18 +1,19 @@
 import { profileSlugObjType } from '@/typeScript/basics'
+import style from './userProfile.module.css'
 import React from 'react'
 import Image from 'next/image'
 const UsersProfile = ({user}:{user:profileSlugObjType}) => {
   const {_id,name,email,image,_key}=user
   return (
-    <div className="w-full flex flex-col justify-center items-start">
-      <div className="flex justify-between items-center gap-x-5">
+    <div className={style.userProfileParentDiv}>
+      <div className={style.userProfile_firstChildDiv}>
         {image && (
           <Image
             src={image}
             width={1000}
             height={1000}
             alt="profile"
-            className="w-[100px] h-[100px] rounded-full overflow-hidden"
+            className={style.userProfile_firstChildDiv_Image}
           />
         )}
         <div className="">

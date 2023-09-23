@@ -1,7 +1,6 @@
 import { useAppSelector } from "@/redux_toolkit/hooks";
 import { currentUser_On_Chat, oldChats } from "@/typeScript/basics";
 import React from "react";
-import Image from "next/image";
 import { isUserOnline } from "./OnlineOffline";
 import UserGui from "@/components/userMinData/UserGui";
 interface propType {
@@ -14,7 +13,6 @@ const OldConnectedUsr = ({ users_with_old_chats, setCurrentUsr }: propType) => {
   const admin = useAppSelector((state) => state.hooks.admin);
   const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
   return (
-    <div className=" border-2 border-blue-800 p-2">
       <ul>
         {users_with_old_chats?.map((usr, i) => {
           const { userOne, userTwo } = usr;
@@ -33,7 +31,6 @@ const OldConnectedUsr = ({ users_with_old_chats, setCurrentUsr }: propType) => {
           );
         })}
       </ul>
-    </div>
   );
 };
 

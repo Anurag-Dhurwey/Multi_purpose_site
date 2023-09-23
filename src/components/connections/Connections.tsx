@@ -1,9 +1,8 @@
 "use client";
+import style from './connections.module.css'
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
-import Image from "next/image";
 import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { set_Admin, set_onLineUsers } from "@/redux_toolkit/features/indexSlice";
 import { socketIoConnection } from "@/utilities/socketIo";
 import { message } from "antd";
 import UserGui from "../userMinData/UserGui";
@@ -22,8 +21,6 @@ const Connections = () => {
         session,
         dispatch,
         admin,
-        // set_Admin,
-        // set_onLineUsers,
         message:message
       });
     }
@@ -37,7 +34,7 @@ const Connections = () => {
   return (
     <section style={{ paddingTop: "8px" }}>
       <p>connections</p>
-      <ul className="flex flex-wrap justify-center items-center gap-x-2 gap-y-2">
+      <ul className={style.connectionsUl}>
         {connectedUsr?.map((user, i) => {
           const { user:usr,_key}=user
           if (usr._id == "test") {

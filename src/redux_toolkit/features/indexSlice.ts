@@ -7,6 +7,7 @@ import {
   connections,
   usr_and_key_in_array,
   min_id_of_usr,
+  oldChats,
 } from "@/typeScript/basics";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -17,6 +18,7 @@ export interface CounterState {
   my_uploads: Array<media_Item>;
   onLineUsers: Array<onlineUsers>;
   suggestedData: suggestedData;
+  oldChats: oldChats[] | undefined;
 }
 const initialState: CounterState = {
   darkmode: false,
@@ -40,6 +42,7 @@ const initialState: CounterState = {
   my_uploads: [],
   onLineUsers: [],
   suggestedData: { users: [] },
+  oldChats: [],
 };
 
 export const counterSlice = createSlice({
@@ -67,7 +70,6 @@ export const counterSlice = createSlice({
       const { command, data, current } = action.payload;
       if (state.admin) {
         if (command == "accept") {
-
           console.log("entered in Accept hook");
           const updatedRequests = current.requests_got?.filter((user) => {
             return user.user._id !== data.user._id;
@@ -79,9 +81,7 @@ export const counterSlice = createSlice({
             requests_got: updatedRequests ? [...updatedRequests] : [],
             requests_sent: [],
           };
-          
         } else if (command == "reject" && current.requests_got) {
-
           console.log("entered in Reject hook");
           const updatedRequests = current.requests_got.filter((user) => {
             return user.user._id !== data.user._id;
@@ -91,9 +91,7 @@ export const counterSlice = createSlice({
             requests_got: [...updatedRequests],
             requests_sent: [],
           };
-
         } else if (command == "request") {
-
           console.log("entered in Request hook");
           state.admin.connections = {
             connected: current.connected,
@@ -102,7 +100,6 @@ export const counterSlice = createSlice({
               : [data],
             requests_sent: [],
           };
-
         }
       }
     },
@@ -125,6 +122,10 @@ export const counterSlice = createSlice({
         state.suggestedData = { users: [...data] };
       }
     },
+    set_OldChats: (state, action: PayloadAction<oldChats[]>) => {
+      state.oldChats = action.payload;
+      console.log({slice:action.payload,s:state.oldChats})
+    },
   },
 });
 
@@ -139,6 +140,7 @@ export const {
   set_AssetId,
   set_onLineUsers,
   set_suggestedData,
+  set_OldChats,
 } = counterSlice.actions;
 
 export default counterSlice.reducer;

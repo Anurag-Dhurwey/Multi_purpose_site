@@ -1,14 +1,9 @@
 "use client";
-import {
-  onlineUsers,
-  set_Admin,
-  set_onLineUsers,
-} from "@/redux_toolkit/features/indexSlice";
+import style from "./chat.module.css";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import {
   _ref,
   currentUser_On_Chat,
-  oldChats,
   usr_and_key_in_array,
 } from "@/typeScript/basics";
 import { socketIoConnection } from "@/utilities/socketIo";
@@ -19,13 +14,15 @@ import OnlineOffline from "./miniComps/OnlineOffline";
 import { client } from "@/utilities/sanityClient";
 import OldConnectedUsr from "./miniComps/OldConnectedUsr";
 import ChatBox from "./ChatBox";
+import { get_Old_ChatMessages } from "@/utilities/functions/getOldChatMessages";
 
 const Chat = () => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
   const admin = useAppSelector((state) => state.hooks.admin);
   const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
-  const [oldChats, setOldChats] = useState<oldChats[]>();
+  const oldChats = useAppSelector((state) => state.hooks.oldChats);
+
   const [remaining_Users, setRemainingUsr] = useState<usr_and_key_in_array[]>();
   const [currentUser, setCurrentUsr] = useState<currentUser_On_Chat>();
 
@@ -41,22 +38,6 @@ const Chat = () => {
         return !isExist;
       });
       setRemainingUsr(remain_Usr);
-    }
-  }
-
-  async function get_Old_ChatMessages() {
-    if (!oldChats && session) {
-      try {
-        const admins_all_old_chats = await client.fetch(
-          `*[_type=="chat" && (userOne._ref=="${admin._id}"|| userTwo._ref=="${admin._id}") ]{_id,userOne->{_id,name,email,image},userTwo->{_id,name,email,image}}`
-        );
-        if (admins_all_old_chats.length) {
-          setOldChats(admins_all_old_chats);
-          // return chatMessages[0];
-        }
-      } catch (error) {
-        console.error(error);
-      }
     }
   }
 
@@ -79,18 +60,33 @@ const Chat = () => {
         admin,
         message: message,
       });
-      get_Old_ChatMessages();
+     if(!oldChats?.length){
+      get_Old_ChatMessages({session,oldChats,admin,dispatch});
+     }
     }
   }
 
   useEffect(() => {
     withUseEffect();
   }, [session]);
+
   if (!session) {
     return null;
   }
+
+  const toggleAsside = {
+    ...(window.innerWidth <= 475 && {
+      display: currentUser ? "none" : "",
+    }),
+  };
+  const toggleMain = {
+    ...(window.innerWidth <= 475 && {
+      display: currentUser ? "" : "none",
+    }),
+  };
+
   return (
-    <div>
+    <div style={{ paddingBottom: "4px" }}>
       {remaining_Users && (
         <span>
           <OnlineOffline
@@ -99,28 +95,23 @@ const Chat = () => {
           />
         </span>
       )}
-      <div>
+      <div className={style.chatMain}>
         {oldChats && (
-          <aside>
+          <aside className={style.chatAside} style={toggleAsside}>
             <OldConnectedUsr
               users_with_old_chats={oldChats}
               setCurrentUsr={setCurrentUsr}
             />
           </aside>
         )}
-        <div>
+        <main className={style.chatMainChatbox} style={toggleMain}>
           {currentUser && (
             <ChatBox currentUser={currentUser} setCurrentUsr={setCurrentUsr} />
           )}
-        </div>
+        </main>
       </div>
     </div>
   );
 };
 
 export default Chat;
-
-interface remaining_Users {
-  onLine: onlineUsers[] | undefined;
-  connected: usr_and_key_in_array[] | undefined;
-}

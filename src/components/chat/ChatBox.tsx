@@ -1,12 +1,10 @@
-import {
-  set_Admin,
-} from "@/redux_toolkit/features/indexSlice";
+import style from "./chatbox.module.css";
 import { useAppDispatch, useAppSelector } from "@/redux_toolkit/hooks";
 import { _ref, chat_messages, currentUser_On_Chat } from "@/typeScript/basics";
 import { getDateFormate } from "@/utilities/functions/getDateFormate";
 import { client } from "@/utilities/sanityClient";
 import { getSocket } from "@/utilities/socketIo";
-
+import { IoArrowBackOutline } from "react-icons/io5";
 import { message } from "antd";
 import { useSession } from "next-auth/react";
 import React, { FormEvent, useEffect, useState } from "react";
@@ -71,7 +69,6 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
         date_time: new Date(),
       };
       if (chat_id) {
-
         const addMessageToArray: chatDataType_ref = await client
           .patch(chat_id)
           .insert("after", "chat_messages[-1]", [obj])
@@ -119,59 +116,53 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
     }
   }
   useEffect(() => {
-   withUseEffect()
+    withUseEffect();
   }, [user._id]);
 
   return (
-    <main className=" flex justify-center items-start">
-      <div className=" flex flex-col justify-start items-center h-[90vh] w-[80vw] gap-y-2">
-        <span className=" self-start">
-          <p> {user.name}</p>
-        </span>
-        <div className=" overflow-auto border-2 p-2 border-blue-500 h-[70%] w-[80%] flex flex-col justify-start items-start">
-          {chatData?.map((chat, i) => {
-            const { sender, receiver, message, _key, date_time } = chat;
-            const uploadDate = new Date(date_time);
-            const date = getDateFormate(uploadDate);
-            return (
-              <span
-                key={i}
-                className="h-fit w-full flex flex-col justify-start items-start"
-              >
-                {date && <p className=" self-center px-1 py-[2px]">{date}</p>}
-                <p
-                  className="px-1 py-[2px]"
-                  style={{
-                    alignSelf: sender._ref == admin._id ? "end" : "",
-                  }}
-                >
-                  {message}
-                  <span className=" text-xs pl-2">{`${uploadDate.getHours()}:${uploadDate.getMinutes()}`}</span>
-                </p>
-              </span>
-            );
-          })}
-        </div>
-        <form
-          onSubmit={(e) => onHandleSubmit(e)}
-          className="w-[80%] gap-x-2 flex justify-center items-start"
-        >
-          <input
-            type="text"
-            className="border-2 border-teal-400 h-8 w-[90%]"
-            name="message"
-            id="message"
-            value={form}
-            onChange={(e) => setForm(e.target.value)}
-          ></input>
-          <button
-            className=" border-2 border-r-emerald-700 px-2 py-[2px]"
-            type="submit"
-          >
-            send
-          </button>
-        </form>
+    <main className={style.chatboxParentDiv}>
+      <div style={{ alignSelf: "start" }}>
+        <button onClick={() => setCurrentUsr(undefined)}>
+          <IoArrowBackOutline />
+        </button>{" "}
+        <span> {user.name}</span>
       </div>
+      <div className={style.chatboxChildDiv}>
+        {chatData?.map((chat, i) => {
+          const { sender, receiver, message, _key, date_time } = chat;
+          const uploadDate = new Date(date_time);
+          const date = getDateFormate(uploadDate);
+          return (
+            <span key={i} className={style.chatboxChildDivChildSpan}>
+              {date && <p className={style.chatboxChat}>{date}</p>}
+              <p
+                style={{
+                  alignSelf: sender._ref == admin._id ? "end" : "",
+                  padding: "2px 4px 2px 4px",
+                }}
+              >
+                {message}
+                <span
+                  style={{ fontSize: "12px", paddingLeft: "8px" }}
+                >{`${uploadDate.getHours()}:${uploadDate.getMinutes()}`}</span>
+              </p>
+            </span>
+          );
+        })}
+      </div>
+      <form onSubmit={(e) => onHandleSubmit(e)} className={style.chatboxForm}>
+        <input
+          type="text"
+          className={style.chatboxFormInput}
+          name="message"
+          id="message"
+          value={form}
+          onChange={(e) => setForm(e.target.value)}
+        ></input>
+        <button className={style.chatboxFormButton} type="submit">
+          send
+        </button>
+      </form>
     </main>
   );
 };
@@ -184,8 +175,6 @@ interface chatDataType_ref {
   userTwo: _ref;
   chat_messages: chat_messages[];
 }
-
-
 
 interface propType {
   currentUser: currentUser_On_Chat;
