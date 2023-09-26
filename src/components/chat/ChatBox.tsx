@@ -50,6 +50,26 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
     }
   }
 
+  async function save(chat_id: string, obj: objType, uuid: string) {
+    if (admin._id && admin.email) {
+      const addMessageToArray: chatDataType_ref = await client
+        .patch(chat_id)
+        .insert("after", "chat_messages[-1]", [obj])
+        .commit();
+      console.log(addMessageToArray);
+      const isSent = addMessageToArray.chat_messages.find((item) => {
+        return item._key == uuid;
+      });
+      if (isSent) {
+        console.log(isSent);
+        emitChatMessage(obj);
+        setChatData(addMessageToArray.chat_messages);
+      }
+    } else {
+      console.error("admin id not found");
+    }
+  }
+
   async function onHandleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     // console.log({ chatData });
@@ -69,40 +89,37 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
         date_time: new Date(),
       };
       if (chat_id) {
-        const addMessageToArray: chatDataType_ref = await client
-          .patch(chat_id)
-          .insert("after", "chat_messages[-1]", [obj])
-          .commit();
-        console.log(addMessageToArray);
-        const isSent = addMessageToArray.chat_messages.find((item) => {
-          return item._key == uuid;
-        });
-        if (isSent) {
-          console.log(isSent);
-          emitChatMessage(obj);
-          setChatData(addMessageToArray.chat_messages);
-        }
+        save(chat_id, obj, uuid);
       } else {
-        const doc = {
-          _type: "chat",
-          userOne: {
-            _type: "reference",
-            _ref: admin._id,
-          },
-          userTwo: {
-            _type: "reference",
-            _ref: user._id,
-          },
-          chat_messages: [obj],
-        };
-        try {
-          const createdDoc = await client.create(doc);
-          emitChatMessage(obj);
-          setChatData(createdDoc.chat_messages);
-          setCurrentUsr({ chat_id: createdDoc._id, user });
-        } catch (error) {
-          console.error(error);
-          message.error("internal server error");
+        // here checking agin if document is already created by admin's friend user
+        const isDocExist: [{ _id: string }] = await client.fetch(
+          `*[ _type == "chat" && ((userOne._ref == "${admin._id}" || userTwo._ref == "${admin._id}") && (userOne._ref == "${user._id}" || userTwo._ref == "${user._id}") ) ]`
+        );
+        if (isDocExist.length) {
+          save(isDocExist[0]._id, obj, uuid);
+          setCurrentUsr({ chat_id: isDocExist[0]._id, user });
+        } else {
+          const doc = {
+            _type: "chat",
+            userOne: {
+              _type: "reference",
+              _ref: admin._id,
+            },
+            userTwo: {
+              _type: "reference",
+              _ref: user._id,
+            },
+            chat_messages: [obj],
+          };
+          try {
+            const createdDoc = await client.create(doc);
+            emitChatMessage(obj);
+            setChatData(createdDoc.chat_messages);
+            setCurrentUsr({ chat_id: createdDoc._id, user });
+          } catch (error) {
+            console.error(error);
+            message.error("internal server error");
+          }
         }
       }
     } else {
@@ -181,4 +198,18 @@ interface propType {
   setCurrentUsr: React.Dispatch<
     React.SetStateAction<currentUser_On_Chat | undefined>
   >;
+}
+
+interface objType {
+  _key: string;
+  sender: {
+    _type: string;
+    _ref: string;
+  };
+  receiver: {
+    _type: string;
+    _ref: string;
+  };
+  message: string;
+  date_time: Date;
 }

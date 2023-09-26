@@ -11,7 +11,6 @@ import { message } from "antd";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import OnlineOffline from "./miniComps/OnlineOffline";
-import { client } from "@/utilities/sanityClient";
 import OldConnectedUsr from "./miniComps/OldConnectedUsr";
 import ChatBox from "./ChatBox";
 import { get_Old_ChatMessages } from "@/utilities/functions/getOldChatMessages";
@@ -25,7 +24,10 @@ const Chat = () => {
 
   const [remaining_Users, setRemainingUsr] = useState<usr_and_key_in_array[]>();
   const [currentUser, setCurrentUsr] = useState<currentUser_On_Chat>();
-
+  const [innerWH, setInnerWh] = useState({
+    innerHeight: window.innerHeight,
+    innerWidth: window.innerWidth,
+  });
   function setRemainingUsers() {
     if (session && oldChats) {
       const remain_Usr = admin.connections?.connected?.filter((usr) => {
@@ -60,14 +62,28 @@ const Chat = () => {
         admin,
         message: message,
       });
-     if(!oldChats?.length){
-      get_Old_ChatMessages({session,oldChats,admin,dispatch});
-     }
+      if (!oldChats?.length) {
+        get_Old_ChatMessages({ session, oldChats, admin, dispatch });
+      }
     }
   }
 
   useEffect(() => {
     withUseEffect();
+    const handleResize = () => {
+      setInnerWh({
+        innerHeight: window.innerHeight,
+        innerWidth: window.innerWidth,
+      });
+    };
+
+    // Add the event listener to window resize
+    window.addEventListener("resize", handleResize);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, [session]);
 
   if (!session) {
@@ -75,12 +91,12 @@ const Chat = () => {
   }
 
   const toggleAsside = {
-    ...(window.innerWidth <= 475 && {
+    ...(innerWH.innerWidth <= 700 && {
       display: currentUser ? "none" : "",
     }),
   };
   const toggleMain = {
-    ...(window.innerWidth <= 475 && {
+    ...(innerWH.innerWidth <= 700 && {
       display: currentUser ? "" : "none",
     }),
   };
