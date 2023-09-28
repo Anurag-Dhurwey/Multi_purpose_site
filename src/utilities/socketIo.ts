@@ -9,6 +9,7 @@ import {
 import {
   onlineUsers,
   set_Admins_Connections,
+  set_loadedChatMessages,
   set_onLineUsers,
 } from "@/redux_toolkit/features/indexSlice";
 import { Socket } from "socket.io-client";
@@ -45,24 +46,21 @@ export const getSocket = async ({
 };
 // these below variables are to prevent socket_io events to running multiple times
 let stop_to_run_OCRTU: string | undefined;
-let stop_to_run_chat_message: Date | undefined;
+let stop_to_run_chat_message: Date |string| undefined;
 
 export async function socketIoConnection({
   session,
   dispatch,
   admin,
-  // set_Admin,
-  // set_onLineUsers,
   message,
 }: socketIoConnectionType) {
   if (session) {
     const { socket, admin_with_id } = await getSocket({
       session,
       dispatch,
-      // set_Admin,
       admin,
     });
-    if (socket?.connected) {
+    if (socket) {
       socket.on("allOnlineUsers", (onLineUsers: onlineUsers[]) => {
         dispatch(set_onLineUsers(onLineUsers));
         console.log({ str: "allOnlineUsertest", onLineUsers });
@@ -104,6 +102,7 @@ export async function socketIoConnection({
       socket.on("chat_message", (msg: importedChat_msg) => {
         if (msg.date_time != stop_to_run_chat_message) {
           message.info(`${msg.message}`);
+          dispatch(set_loadedChatMessages({join_chat:{chat_id:msg.chat_id,msg}}))
           stop_to_run_chat_message = msg.date_time;
         } else {
           console.log("same");
@@ -132,11 +131,11 @@ type CRTU = {
 
 export interface importedChat_msg extends chat_messages {
   receiver_socketId: string;
+  chat_id:string
 }
 
 interface getSocketArgType {
   session: session;
   admin: admin;
-  // set_Admin: (action: admin) => void;
   dispatch: Function;
 }

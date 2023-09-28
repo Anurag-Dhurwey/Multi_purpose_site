@@ -14,6 +14,9 @@ interface propType {
 
 const UserGui = ({ children, user, disableProfineNav }: propType) => {
   const { _id, _key, image, name, email } = user;
+  if(!_id&&!name&&!email){
+    return null
+  }
   const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
   const slug = encodeURIComponent(JSON.stringify({ ...user }));
   const isOnline =

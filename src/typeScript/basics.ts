@@ -5,7 +5,6 @@ export type session = {
   user?: sessionUser;
 } | null;
 
-
 export type sessionUser = {
   image?: string | null;
   name?: string | null;
@@ -26,7 +25,7 @@ export interface min_id_of_usr {
   name: string;
 }
 
-export interface profileSlugObjType{
+export interface profileSlugObjType {
   _id?: string;
   email?: string;
   image?: string;
@@ -87,14 +86,14 @@ export interface like {
   };
 }
 
-export interface _ref{
+export interface _ref {
   _type: string;
   _ref: string;
-};
+}
 
 export interface like_ref {
   _key: string;
-  postedBy: _ref
+  postedBy: _ref;
 }
 
 interface comment extends like {
@@ -104,22 +103,20 @@ interface comment extends like {
 export interface comment_ref {
   _key: string;
   comment: string;
-  postedBy: _ref
+  postedBy: _ref;
 }
 
 export interface meadiaFile {
   _type: string;
-  asset: _ref
+  asset: _ref;
 }
 
-export type postedBy =min_id_of_usr
+export type postedBy = min_id_of_usr;
 
 export interface socketIoConnectionType {
   session: session;
   dispatch: Function;
   admin: admin;
-  // set_Admin: (action: admin) => void;
-  // set_onLineUsers: (action: Array<onlineUsers>) => void;
   message: MessageInstance;
 }
 
@@ -127,22 +124,26 @@ export interface suggestedData {
   users: min_id_of_usr[];
 }
 
-export interface oldChats {
+export interface users_with_old_chats {
   _id: string;
   userOne: min_id_of_usr;
   userTwo: min_id_of_usr;
- 
 }
+export interface loadedChatMessages {
+  _id: string;
+  friend: min_id_of_usr;
+  messages: chat_messages[];
+};
 
-export interface  chat_messages {
+export interface chat_messages {
   _key: string;
   sender: _ref;
   receiver: _ref;
   message: string;
-  date_time: Date;
-};
+  date_time: Date|string;
+}
 
-export interface currentUser_On_Chat{
-  chat_id?:string
-  user:min_id_of_usr;
+export interface currentUser_On_Chat {
+  chat_id?: string;
+  user: min_id_of_usr;
 }

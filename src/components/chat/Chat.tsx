@@ -13,14 +13,14 @@ import React, { useEffect, useState } from "react";
 import OnlineOffline from "./miniComps/OnlineOffline";
 import OldConnectedUsr from "./miniComps/OldConnectedUsr";
 import ChatBox from "./ChatBox";
-import { get_Old_ChatMessages } from "@/utilities/functions/getOldChatMessages";
+import { get_Users_with_Old_Chat } from "@/utilities/functions/getUsers_with_OldChats";
 
 const Chat = () => {
   const dispatch = useAppDispatch();
   const { data: session } = useSession();
   const admin = useAppSelector((state) => state.hooks.admin);
   const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
-  const oldChats = useAppSelector((state) => state.hooks.oldChats);
+  const users_with_old_chats = useAppSelector((state) => state.hooks.users_with_old_chats);
 
   const [remaining_Users, setRemainingUsr] = useState<usr_and_key_in_array[]>();
   const [currentUser, setCurrentUsr] = useState<currentUser_On_Chat>();
@@ -28,10 +28,12 @@ const Chat = () => {
     innerHeight: window.innerHeight,
     innerWidth: window.innerWidth,
   });
+
+  // this function is to filter friends who are not intracted yet with admin or no conversation yet 
   function setRemainingUsers() {
-    if (session && oldChats) {
+    if (session && users_with_old_chats?.length) {
       const remain_Usr = admin.connections?.connected?.filter((usr) => {
-        const isExist = oldChats.find((oldUsr) => {
+        const isExist = users_with_old_chats.find((oldUsr) => {
           const { userOne, userTwo } = oldUsr;
           return (
             userOne.email == usr.user.email || userTwo.email == usr.user.email
@@ -44,15 +46,15 @@ const Chat = () => {
   }
 
   function withUseEffec_two() {
-    if (session && oldChats) {
+    if (session && users_with_old_chats?.length) {
       setRemainingUsers();
-      console.log({ remaining_Users, onLineUsers });
+      console.log({ remaining_Users, onLineUsers,users_with_old_chats });
     }
   }
 
   useEffect(() => {
     withUseEffec_two();
-  }, [onLineUsers.length, session, oldChats]);
+  }, [onLineUsers, session, users_with_old_chats]);
 
   function withUseEffect() {
     if (session) {
@@ -62,14 +64,16 @@ const Chat = () => {
         admin,
         message: message,
       });
-      if (!oldChats?.length) {
-        get_Old_ChatMessages({ session, oldChats, admin, dispatch });
+      if (!users_with_old_chats?.length && admin._id) {
+        get_Users_with_Old_Chat({ session, admin, dispatch });
       }
     }
   }
 
   useEffect(() => {
+
     withUseEffect();
+
     const handleResize = () => {
       setInnerWh({
         innerHeight: window.innerHeight,
@@ -84,7 +88,7 @@ const Chat = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [session]);
+  }, [session,admin]);
 
   if (!session) {
     return null;
@@ -112,10 +116,10 @@ const Chat = () => {
         </span>
       )}
       <div className={style.chatMain}>
-        {oldChats && (
+        {users_with_old_chats && (
           <aside className={style.chatAside} style={toggleAsside}>
             <OldConnectedUsr
-              users_with_old_chats={oldChats}
+              users_with_old_chats={users_with_old_chats}
               setCurrentUsr={setCurrentUsr}
             />
           </aside>

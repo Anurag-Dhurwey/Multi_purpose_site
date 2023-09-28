@@ -7,7 +7,9 @@ import {
   connections,
   usr_and_key_in_array,
   min_id_of_usr,
-  oldChats,
+  users_with_old_chats,
+  loadedChatMessages,
+  chat_messages,
 } from "@/typeScript/basics";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -18,7 +20,8 @@ export interface CounterState {
   my_uploads: Array<media_Item>;
   onLineUsers: Array<onlineUsers>;
   suggestedData: suggestedData;
-  oldChats: oldChats[] | undefined;
+  users_with_old_chats: users_with_old_chats[] | undefined;
+  loadedChatMessages: loadedChatMessages[];
 }
 const initialState: CounterState = {
   darkmode: false,
@@ -42,7 +45,8 @@ const initialState: CounterState = {
   my_uploads: [],
   onLineUsers: [],
   suggestedData: { users: [] },
-  oldChats: [],
+  users_with_old_chats: [],
+  loadedChatMessages: [],
 };
 
 export const counterSlice = createSlice({
@@ -122,9 +126,33 @@ export const counterSlice = createSlice({
         state.suggestedData = { users: [...data] };
       }
     },
-    set_OldChats: (state, action: PayloadAction<oldChats[]>) => {
-      state.oldChats = action.payload;
-      console.log({slice:action.payload,s:state.oldChats})
+    set_users_with_old_chats: (
+      state,
+      action: PayloadAction<users_with_old_chats[]>
+    ) => {
+      state.users_with_old_chats = action.payload;
+    },
+    set_loadedChatMessages: (
+      state,
+      action: PayloadAction<loadedChatMessagesArgType>
+    ) => {
+      const { join_chat, delete_chat, userWithChat } = action.payload;
+      if (join_chat) {
+        const { chat_id, msg } = join_chat;
+        const new_loadedChatMessages = state.loadedChatMessages.map((load) => {
+          if (load._id == chat_id) {
+            return {
+              ...load,
+              messages: [...load.messages, msg],
+            };
+          }
+          return load;
+        });
+        state.loadedChatMessages = new_loadedChatMessages;
+      }
+      if (userWithChat) {
+        state.loadedChatMessages = [...state.loadedChatMessages, userWithChat];
+      }
     },
   },
 });
@@ -140,10 +168,17 @@ export const {
   set_AssetId,
   set_onLineUsers,
   set_suggestedData,
-  set_OldChats,
+  set_users_with_old_chats,
+  set_loadedChatMessages,
 } = counterSlice.actions;
 
 export default counterSlice.reducer;
+
+interface loadedChatMessagesArgType {
+  delete_chat?: null | { chat_id: string; msg: chat_messages };
+  join_chat?: null | { chat_id: string; msg: chat_messages };
+  userWithChat?: null | loadedChatMessages;
+}
 
 export interface suggestedDataPayloadType {
   _type: string;
