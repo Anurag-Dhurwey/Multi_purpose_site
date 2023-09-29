@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { isUserOnline } from "../chat/miniComps/OnlineOffline";
 import { useAppSelector } from "@/redux_toolkit/hooks";
-import style from './userGui.module.css'
+import style from "./userGui.module.css";
 
 interface propType {
   user: profileSlugObjType;
@@ -14,15 +14,19 @@ interface propType {
 
 const UserGui = ({ children, user, disableProfineNav }: propType) => {
   const { _id, _key, image, name, email } = user;
-  if(!_id&&!name&&!email){
-    return null
-  }
+
   const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
   const slug = encodeURIComponent(JSON.stringify({ ...user }));
   const isOnline =
     _id && name && email
       ? isUserOnline({ _id, name, email, image }, onLineUsers)
       : false;
+
+  if (!_id && !name && !email) {
+    console.error('_id ,name ,email does not found')
+    return null;
+  }
+
   return (
     <span className={style.userguiSpan}>
       {disableProfineNav ? (
@@ -34,7 +38,7 @@ const UserGui = ({ children, user, disableProfineNav }: propType) => {
       )}
 
       <p style={{ color: isOnline ? "green" : "black" }} className="text-xs">
-        {name?.length && name.length <=10?name:name?.slice(0,9)+'...'}
+        {name?.length && name.length <= 10 ? name : name?.slice(0, 9) + "..."}
       </p>
       <>{children}</>
     </span>
