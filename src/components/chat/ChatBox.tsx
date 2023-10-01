@@ -148,9 +148,14 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
     }
   }
 
-  function withUseEffect() {
+  async function withUseEffect() {
     if (session && !currentChatData) {
-      getChatMessages();
+      await getChatMessages();
+
+      const lastElement = document.getElementById('endMsg');
+      if (lastElement) {
+        lastElement.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   }
   useEffect(() => {
@@ -171,7 +176,7 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
           const uploadDate = new Date(date_time);
           const date = getDateFormate(uploadDate);
           return (
-            <span key={i} className={style.chatboxChildDivChildSpan}>
+            <span key={i} id={`${i==(currentChatData.messages.length-1)?'endMsg':''}`} className={style.chatboxChildDivChildSpan}>
               {date && <p className={style.chatboxChat}>{date}</p>}
               <p
                 style={{

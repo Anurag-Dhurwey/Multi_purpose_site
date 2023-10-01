@@ -34,9 +34,8 @@ const Page = () => {
   const [isPosting, setIsPosting] = useState<{ asset: boolean; post: boolean }>(
     { asset: false, post: false }
   );
-  const [isFileValid, setIsFileValid] = useState<
-  { name: string; message: string }[]
-  >();
+  const [isFileValid, setIsFileValid] =
+    useState<{ name: string; message: string }[]>();
   const [form, setForm] = useState<uploadForm>({
     caption: "",
     desc: "",
@@ -50,11 +49,11 @@ const Page = () => {
     const file = e.target.files;
 
     if (file) {
-      setIsFileValid(undefined)
+      setIsFileValid(undefined);
       setFile(file[0]);
       setForm({ ...form, filePath: e.target.value });
-      checkFileSize({file:file[0], setIsFileValid});
-      checkFileType({file:file[0], setIsFileValid})
+      checkFileSize({ file: file[0], setIsFileValid });
+      checkFileType({ file: file[0], setIsFileValid });
     }
   };
 
@@ -73,11 +72,42 @@ const Page = () => {
       setStage({ stageOne: "start", stageTwo: null });
       setModal(true);
       try {
+
         const uploadedAssetRes = await client.assets.upload("file", file, {
           contentType: file.type,
           filename: file.name,
         });
+
+        // const formData = new FormData();
+        // formData.append('file', file);
+      
+        // const uploadedAssetRes:{result:boolean, res:{_id:string}} = await axios.post("/api/upload/asset", formData, {
+        //   onUploadProgress: (progressEvent) => {
+        //     if(progressEvent.total){
+        //       const percentCompleted = Math.round(
+        //         (progressEvent.loaded * 100) / progressEvent.total
+        //       );
+        //       console.log(progressEvent)
+        //       // onUploadProgress(percentCompleted);
+        //     }
+      
+        //   },
+        //   headers: {
+        //     'Content-Type': 'multipart/form-data',
+        //   }
+        // });
+    
+        // const {result,res}=uploadedAssetRes
+
+
         if (uploadedAssetRes) {
+          const doc= {
+            _key: v4(),
+            asset: {
+              _type: "reference",
+              _ref: uploadedAssetRes._id,
+            },
+          }
           const assetId = admin.assetId
             ? admin.assetId
             : await getAssetId({
@@ -90,13 +120,7 @@ const Page = () => {
               .patch(assetId)
               .setIfMissing({ assets: [] })
               .insert("after", "assets[-1]", [
-                {
-                  _key: v4(),
-                  asset: {
-                    _type: "reference",
-                    _ref: uploadedAssetRes._id,
-                  },
-                },
+               doc
               ])
               .commit();
             const check = res.assets.find(
@@ -110,13 +134,7 @@ const Page = () => {
             const asset = {
               _type: "asset",
               assets: [
-                {
-                  _key: v4(),
-                  asset: {
-                    _type: "reference",
-                    _ref: uploadedAssetRes._id,
-                  },
-                },
+                doc
               ],
               email: admin.email,
               userId: admin._id,
@@ -126,8 +144,11 @@ const Page = () => {
           setUploadedAsset(uploadedAssetRes);
           setOnSuccess({ asset: true, post: null });
           setStage({ stageOne: "completed", stageTwo: null });
-          //  publish(uploadedAssetRes)
+
         }
+
+
+
       } catch (error) {
         setOnSuccess({ asset: false, post: null });
         setStage({ stageOne: "failed", stageTwo: null });
@@ -144,19 +165,16 @@ const Page = () => {
     }
   };
 
- 
   function withUseEffect() {
     if (session) {
       socketIoConnection({
         session,
-        // set_onLineUsers,
-        // set_Admin,
         dispatch,
         admin,
         message,
       });
       if (!meadia_items.length) {
-        getMediaItems({ dispatch,  messageApi });
+        getMediaItems({ dispatch, messageApi });
       }
     }
   }
@@ -200,7 +218,7 @@ const Page = () => {
           <div>
             <label htmlFor="desc">Description</label>
             <input
-              minLength={10}
+              minLength={6}
               id="desc"
               name="desc"
               type="text"
@@ -221,7 +239,8 @@ const Page = () => {
               accept="video/* ,image/png, image/jpeg, image/svg, image/gif"
             />
 
-            {isFileValid && isFileValid.length > 0 &&
+            {isFileValid &&
+              isFileValid.length > 0 &&
               isFileValid?.map((error, i) => {
                 return (
                   <p className={style.validationError} key={i}>
@@ -242,43 +261,55 @@ const Page = () => {
 
 export default Page;
 
-function checkFileSize({file,setIsFileValid}:checkFile) {
+function checkFileSize({ file, setIsFileValid }: checkFile) {
   const size: boolean = file.size <= 1000 * 1024 * 10;
- if (!size) {
-  const errorDoc=
-    { name: "size", message: "File size should be less than 10 MB" }
-    setIsFileValid((pre)=>{
-      return pre?[...pre,errorDoc]:[errorDoc]
+  if (!size) {
+    const errorDoc = {
+      name: "size",
+      message: "File size should be less than 10 MB",
+    };
+    setIsFileValid((pre) => {
+      return pre ? [...pre, errorDoc] : [errorDoc];
     });
   }
 }
 
-function checkFileType({file,setIsFileValid}:checkFile) {
-  const fileType=file.type.split('/').pop()
- if(fileType){
-  const check= videoFormates.includes(fileType) || imgFormates.includes(fileType)
- if(!check){
-  const errorDoc=
-  { name: "type", message: `sorry ${file.type} file not supported yet` }
-  setIsFileValid((pre)=>{
-    return pre?[...pre,errorDoc]:[errorDoc]
-  })
- }
- }else{
-  const errorDoc=
-  { name: "type", message: `sorry file extension not found` }
-  setIsFileValid((pre)=>{
-    return pre?[...pre,errorDoc]:[errorDoc]
-  })
- }
+function checkFileType({ file, setIsFileValid }: checkFile) {
+  const fileType = file.type.split("/").pop();
+  if (fileType) {
+    const check =
+      videoFormates.includes(fileType) || imgFormates.includes(fileType);
+    if (!check) {
+      const errorDoc = {
+        name: "type",
+        message: `sorry ${file.type} file not supported yet`,
+      };
+      setIsFileValid((pre) => {
+        return pre ? [...pre, errorDoc] : [errorDoc];
+      });
+    }
+  } else {
+    const errorDoc = {
+      name: "type",
+      message: `sorry file extension not found`,
+    };
+    setIsFileValid((pre) => {
+      return pre ? [...pre, errorDoc] : [errorDoc];
+    });
+  }
 }
 
-
-interface checkFile{
-  file: File, setIsFileValid: React.Dispatch<React.SetStateAction<{
-    name: string;
-    message: string;
-  }[]|undefined >>
+interface checkFile {
+  file: File;
+  setIsFileValid: React.Dispatch<
+    React.SetStateAction<
+      | {
+          name: string;
+          message: string;
+        }[]
+      | undefined
+    >
+  >;
 }
 
 interface createdAssetResType {
@@ -289,3 +320,4 @@ export interface stageType {
   stageOne: "start" | "failed" | "completed" | null;
   stageTwo: "start" | "failed" | "completed" | null;
 }
+

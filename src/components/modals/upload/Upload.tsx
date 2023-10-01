@@ -32,7 +32,7 @@ const Upload = ({
       setIsPosting({ asset: false, post: true });
       setStage({ stageOne: "completed", stageTwo: "start" });
       try {
-        const postedData = await fetch("/api/upload", {
+        const postedData = await fetch("/api/upload/post", {
           method: "POST",
           body: JSON.stringify({ uploadedFileRes, user: admin, form }),
         });
@@ -172,7 +172,9 @@ const Upload = ({
             {stage.stageTwo == "failed" && (
               <button
                 onClick={() => {
-                  console.log("try Again");
+                  uploadedFileRes
+                    ? publish(uploadedFileRes)
+                    : alert("something went wrong");
                 }}
               >
                 Try again
