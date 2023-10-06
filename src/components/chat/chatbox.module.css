@@ -51,7 +51,7 @@
 }
 @media (max-width:475px) {
   .chatboxParentDiv{
-    width: 96vw;
+    width: 100vw;
   }
   .chatboxFormInput{
     width: 90vw;

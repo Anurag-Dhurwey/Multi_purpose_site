@@ -11,12 +11,12 @@ interface propType {
 const OldConnectedUsr = ({ users_with_old_chats, setCurrentUsr }: propType) => {
   const admin = useAppSelector((state) => state.hooks.admin);
   return (
-      <ul>
+      <ul style={{width:"100%",height:'fit-content'}}>
         {users_with_old_chats?.map((usr, i) => {
           const { userOne, userTwo } = usr;
           const friend = admin.email != userOne.email ? userOne : userTwo;
           return (
-            <li key={i}>
+            <li key={i} style={{width:"100%",height:'fit-content',margin:'2px 0px'}}>
               <button
                 onClick={() =>
                   setCurrentUsr({ user: friend, chat_id: usr._id })

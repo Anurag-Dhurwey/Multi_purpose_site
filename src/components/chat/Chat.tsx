@@ -20,7 +20,9 @@ const Chat = () => {
   const { data: session } = useSession();
   const admin = useAppSelector((state) => state.hooks.admin);
   const onLineUsers = useAppSelector((state) => state.hooks.onLineUsers);
-  const users_with_old_chats = useAppSelector((state) => state.hooks.users_with_old_chats);
+  const users_with_old_chats = useAppSelector(
+    (state) => state.hooks.users_with_old_chats
+  );
 
   const [remaining_Users, setRemainingUsr] = useState<usr_and_key_in_array[]>();
   const [currentUser, setCurrentUsr] = useState<currentUser_On_Chat>();
@@ -29,7 +31,7 @@ const Chat = () => {
     innerWidth: window.innerWidth,
   });
 
-  // this function is to filter friends who are not intracted yet with admin or no conversation yet 
+  // this function is to filter friends who are not intracted yet with admin or no conversation yet
   function setRemainingUsers() {
     if (session && users_with_old_chats?.length) {
       const remain_Usr = admin.connections?.connected?.filter((usr) => {
@@ -48,7 +50,7 @@ const Chat = () => {
   function withUseEffec_two() {
     if (session && users_with_old_chats?.length) {
       setRemainingUsers();
-      console.log({ remaining_Users, onLineUsers,users_with_old_chats });
+      console.log({ remaining_Users, onLineUsers, users_with_old_chats });
     }
   }
 
@@ -71,7 +73,6 @@ const Chat = () => {
   }
 
   useEffect(() => {
-
     withUseEffect();
 
     const handleResize = () => {
@@ -88,7 +89,7 @@ const Chat = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [session,admin]);
+  }, [session, admin]);
 
   if (!session) {
     return null;
@@ -106,16 +107,16 @@ const Chat = () => {
   };
 
   return (
-    <div style={{ paddingBottom: "4px" }}>
-      {remaining_Users && (
-        <span>
+    <div className={style.mainParent}>
+      <div className={style.first_childDiv}>
+        {remaining_Users && (
           <OnlineOffline
             remain_usr={remaining_Users}
             setCurrentUsr={setCurrentUsr}
           />
-        </span>
-      )}
-      <div className={style.chatMain}>
+        )}
+      </div>
+      <div className={style.second_childDiv}>
         {users_with_old_chats && (
           <aside className={style.chatAside} style={toggleAsside}>
             <OldConnectedUsr

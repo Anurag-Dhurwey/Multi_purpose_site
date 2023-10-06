@@ -11,11 +11,12 @@
 }
 
 .userGuiImage{
+    max-width: 100px;
     border-radius: 100%;
     overflow: hidden;
 }
 
-@media (min-width: 600px) {
+@media (max-width: 600px) {
     .userGuiImage{
         max-width: 64px;
         max-height: 64px;
