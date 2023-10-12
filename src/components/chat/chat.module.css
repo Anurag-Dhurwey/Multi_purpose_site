@@ -14,6 +14,12 @@
     align-items: center;
 }
 
+.onlineOffline{
+    border: 2px solid rgba(26, 82, 26, 0.808);
+    height: fit-content;
+    width: 100%;
+}
+
 .chatAside{
     width: 20vw;
     min-width: 280px;
@@ -24,6 +30,9 @@
 
 .chatMainChatbox{
     width: 70vw;
+    height: 90vh;
+    
+    border: 2px solid rgba(5, 81, 196, 0.918);
 
 }
 

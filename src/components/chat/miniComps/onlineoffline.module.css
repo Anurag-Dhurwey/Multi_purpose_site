@@ -4,6 +4,6 @@
     justify-content: center;
     align-items: center;
     border: 2px solid rgba(26, 82, 26, 0.808);
-    height: 99vh;
-    width: 99vw;
+    height: fit-content;
+    width: 100%;
 }

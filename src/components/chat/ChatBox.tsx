@@ -163,7 +163,7 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
   }, [user._id]);
 
   return (
-    <main className={style.chatboxParentDiv}>
+    <div className={style.chatboxParentDiv}>
       <div style={{ alignSelf: "start" }}>
         <button onClick={() => setCurrentUsr(undefined)}>
           <IoArrowBackOutline />
@@ -206,7 +206,7 @@ const ChatBox = ({ currentUser, setCurrentUsr }: propType) => {
           send
         </button>
       </form>
-    </main>
+    </div>
   );
 };
 

@@ -48,9 +48,15 @@ const Chat = () => {
   }
 
   function withUseEffec_two() {
-    if (session && users_with_old_chats?.length) {
-      setRemainingUsers();
-      console.log({ remaining_Users, onLineUsers, users_with_old_chats });
+    
+    if (session) {
+      if (users_with_old_chats?.length) {
+        setRemainingUsers();
+      } else {
+        setRemainingUsr(
+          admin.connections?.connected ? [...admin.connections.connected] : []
+        );
+      }
     }
   }
 
@@ -109,22 +115,34 @@ const Chat = () => {
   return (
     <div className={style.mainParent}>
       <div className={style.first_childDiv}>
-        {remaining_Users && (
+        {remaining_Users ? (
           <OnlineOffline
             remain_usr={remaining_Users}
             setCurrentUsr={setCurrentUsr}
           />
+        ) : (
+          <ul className={style.onlineOffline}>
+            <li style={{ textAlign: "center" }}>
+              <p>No updates</p>
+            </li>
+          </ul>
         )}
       </div>
       <div className={style.second_childDiv}>
-        {users_with_old_chats && (
-          <aside className={style.chatAside} style={toggleAsside}>
+        <aside className={style.chatAside} style={toggleAsside}>
+          {users_with_old_chats?.length ? (
             <OldConnectedUsr
               users_with_old_chats={users_with_old_chats}
               setCurrentUsr={setCurrentUsr}
             />
-          </aside>
-        )}
+          ) : (
+            <ul>
+              <li style={{ textAlign: "center" }}>
+                <p>No connected user</p>
+              </li>
+            </ul>
+          )}
+        </aside>
         <main className={style.chatMainChatbox} style={toggleMain}>
           {currentUser && (
             <ChatBox currentUser={currentUser} setCurrentUsr={setCurrentUsr} />

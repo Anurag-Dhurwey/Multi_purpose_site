@@ -8,7 +8,7 @@ import {
   usr_and_key_in_array,
 } from "@/typeScript/basics";
 import UserGui from "@/components/userMinData/UserGui";
-
+import style from './onlineoffline.module.css'
 interface propType {
   remain_usr: usr_and_key_in_array[];
   setCurrentUsr: React.Dispatch<
@@ -17,7 +17,7 @@ interface propType {
 }
 const OnlineOffline = ({ remain_usr, setCurrentUsr }: propType) => {
   return (
-    <ul className="onlineoffline_Ul">
+    <ul className={style.onlineoffline_Ul}>
       {/* this component will map all ony Online Connected users  */}
       <MapUsr
         remain_usr={remain_usr}
